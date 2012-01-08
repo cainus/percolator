@@ -1,0 +1,13 @@
+{
+      "name": "percolator",
+      "version": "0.0.1",
+      "dependencies": {
+          "express" : "2.2.0",
+          "mongodb" : "0.9.6-19",
+          "express-mongoose"  : ">= 0.0.1",
+          "mongoose" : "1.6.0",
+          "express-resource" : "0.2.3",
+          "mocha" : "0.3.6",
+          "should" : "0.3.2"
+      }
+}
