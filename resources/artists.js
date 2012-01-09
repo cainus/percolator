@@ -1,4 +1,3 @@
-const _ = require('../underscore-min');
 const mongoose = require('mongoose');
 const SchemaResource = require('../SchemaResource').SchemaResource;
 

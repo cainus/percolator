@@ -33,11 +33,6 @@ function setRoutes(){
     getResources(function(resources){
       _.each(resources, function(resource){
         routes[resource] = require('./resources/' + resource).handler
-        console.log(resource);
-        console.log(routes[resource]);
-        _.each(routes[resource], function(v,k){
-          console.log(k); console.log(v);
-        });
         app.get('/' + resource, function(req, res){
           routes[resource].collectionGET(req, res);
         });

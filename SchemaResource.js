@@ -54,7 +54,6 @@ SchemaResource.prototype.collectionGET = function(req, res){
   var obj = this;
   this.schemaClass.find({}).execFind(function(err, docs){
     if (!!err){console.log(err); throw err;}
-    console.log(docs);
     var items = _.map(docs, function(v, k){
       return(obj.toRepresentation(v.doc));
     });
