@@ -1,37 +1,14 @@
 const _ = require('../underscore-min');
-
-var collection = {
-  "1" : { name: "Jimi Hendrix",
-                created_at: new Date(),
-                links: {
-                  self: { href: "/artists/1" },
-                  parent: { href: "/artists" }
-              }},
-
-  "2" : { name: "Bob Dylan",
-                created_at: new Date(),
-                links: {
-                  self: { href: "/artists/2" },
-                  parent: { href: "/artists" }
-              }}
+const mongoose = require('mongoose');
+const SchemaResource = require('../SchemaResource').SchemaResource;
 
 
-}
+var Artists = new mongoose.Schema({
+    'name' : { type: String, match: /[a-zA-z0-9\.]/ },
+    'created' :  { type: Date, default: Date.now }
+});
+var ArtistClass = mongoose.model('Artists', Artists);
 
 
-exports.GET = function(req, res){
-  res.send(collection[req.param("id")]);
-}
-
-exports.collectionGET = function(req, res){
-
-  var items = _.map(collection, function(v, k){
-    return(v);
-  });
-  var artistCollection = { items: items,
-                         links: {
-                           self: { href: "/artists" },
-                           parent: { href: "/" }
-                        }};
-  res.send(artistCollection);
-}
+var handler = new SchemaResource(ArtistClass, 'http://localhost:3000', 'artists');
+exports.handler = handler;
