@@ -20,7 +20,7 @@ function Router(app){
     var obj = this;
     Router_getResources(function(resources){
       _.each(resources, function(resource){
-        obj.routes[resource] = require('./resources/' + resource).handler
+        obj.routes[resource] = require(app.set('resource_dir') + '/' + resource).handler
         app.get('/' + resource, function(req, res){
           obj.routes[resource].collectionGET(req, res);
         });
@@ -42,9 +42,9 @@ function Router(app){
         });
       });
       app.get('/', function(req, res){
-        var serviceDocument = { links: { self: { href: "http://localhost:3000/" }}};
+        var serviceDocument = { links: { self: { href: app.set('base_url') }}};
         _.each(obj.routes, function(module, resource){
-          serviceDocument.links[resource] = {href : "http://localhost:3000/" + resource}
+          serviceDocument.links[resource] = {href : app.set('base_url') + resource}
         });
         res.send(serviceDocument);
       });

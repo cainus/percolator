@@ -5,9 +5,11 @@ const Router = require('./Router').Router;
 
 
 var app = express.createServer();
-
+var port = 3000
 app.configure(function(){
   app.use(fullBodyParser());
+  app.set('resource_dir', __dirname + '/resources');
+  app.set('base_url', 'http://localhost:' + port + '/');
 });
 
 var router = new Router(app);
@@ -17,4 +19,4 @@ console.log('------------------------------------');
 console.log('mongo_url: ' + mongo_url);
 var db = mongoose.connect(mongo_url)
 
-app.listen(3000);
+app.listen(port);
