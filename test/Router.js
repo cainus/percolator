@@ -19,39 +19,66 @@ describe('Router', function(){
 
     it ("throws an exception if a resource file doesn't export a handler");
 
-    it ("creates 405 responses for all methods that aren't implemented by the handler", function(done){
-        this.timeout(10000);
-        setTimeout(done, 3000);
-    });
-    
     it ("responds with a 200 and body for simple GET", function(done){
       this.timeout(10000);
       var app = express.createServer();
       var router = new Router(app, 'http://localhost:1337/', __dirname + '/../test_fixtures/resources')
       app.listen(1337, function(){
         HotTap("http://localhost:1337/happy").request("GET", function(err, result){
+          app.close();
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           should.exist(router.routes)
           result.status.should.equal(200)
           result.body.should.equal("this worked")
-          app.close();
           done();
         });
       });
     });
 
-    it ("responds with 405 when collection GET not implemented by the handler", function(done){
-      // TODO: other methods + singular resource
-      // TODO: make it return the "Allowed" methods
+    it ("responds with the Allow header for a simple OPTIONS", function(done){
       this.timeout(10000);
       var app = express.createServer();
       var router = new Router(app, 'http://localhost:1337/', __dirname + '/../test_fixtures/resources')
       app.listen(1337, function(){
-        HotTap("http://localhost:1337/empty").request("GET", function(err, result){
+        HotTap("http://localhost:1337/happy").request("OPTIONS", function(err, result){
+          app.close();
+          if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
+          should.exist(router.routes)
+          result.status.should.equal(200)
+          should.exist(result.headers['allow'])
+          result.headers['allow'].should.equal("GET")
+          done();
+        });
+      });
+    });
+
+    it ("responds with the Allow header for OPTIONS on a multi-method resource", function(done){
+      this.timeout(10000);
+      var app = express.createServer();
+      var router = new Router(app, 'http://localhost:1337/', __dirname + '/../test_fixtures/resources')
+      app.listen(1337, function(){
+        HotTap("http://localhost:1337/artists").request("OPTIONS", function(err, result){
+          app.close();
+          if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
+          should.exist(router.routes)
+          result.status.should.equal(200)
+          should.exist(result.headers['allow'])
+          result.headers['allow'].should.equal("GET,POST")
+          done();
+        });
+      });
+    });
+    it ("responds with 405 when method not implemented by the handler", function(done){
+      this.timeout(10000);
+      var app = express.createServer();
+      var router = new Router(app, 'http://localhost:1337/', __dirname + '/../test_fixtures/resources')
+      app.listen(1337, function(){
+        HotTap("http://localhost:1337/happy").request("POST", {}, '', function(err, result){
+          app.close();
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           should.exist(router.routes)
           result.status.should.equal(405)
-          app.close();
+          result.headers.allow.should.equal("GET")
           done();
         });
       });

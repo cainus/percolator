@@ -1,7 +1,7 @@
 const _ = require('./underscore-min');
 const mongoose = require('mongoose');
 
-SchemaResource = function(schemaClass, rootURL, resourceName){
+var SchemaResource = function(schemaClass, rootURL, resourceName){
   this.schemaClass = schemaClass;
   this.rootURL = rootURL;
   this.resourceName = resourceName;
