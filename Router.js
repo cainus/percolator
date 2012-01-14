@@ -1,4 +1,4 @@
-const _ = require('./underscore-min');
+const _ = require('underscore');
 const fs = require('fs');
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;

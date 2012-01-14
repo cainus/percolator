@@ -1,13 +1,13 @@
-const _ = require('./underscore-min');
+const _ = require('underscore');
 const mongoose = require('mongoose');
 
-var SchemaResource = function(schemaClass, rootURL, resourceName){
+var MongoResource = function(schemaClass, rootURL, resourceName){
   this.schemaClass = schemaClass;
   this.rootURL = rootURL;
   this.resourceName = resourceName;
 }
 
-SchemaResource.prototype.GET = function(req, res){
+MongoResource.prototype.GET = function(req, res){
   var obj = this;
   this.schemaClass.find({_id: req.param('id')}).execFind(function(err, docs){
     if (!!err){console.log(err); throw err;}
@@ -16,7 +16,7 @@ SchemaResource.prototype.GET = function(req, res){
   });
 }
 
-SchemaResource.prototype.PUT = function(req, res){
+MongoResource.prototype.PUT = function(req, res){
   var obj = this;
   this.schemaClass.find({_id: req.param('id')}).execFind(function(err, docs){
     if (!!err){console.log(err); throw err;}
@@ -30,7 +30,7 @@ SchemaResource.prototype.PUT = function(req, res){
   });
 }
 
-SchemaResource.prototype.DELETE = function(req, res){
+MongoResource.prototype.DELETE = function(req, res){
   this.schemaClass.find({_id: req.param('id')}).execFind(function(err, docs){
     if (!!err){console.log(err); throw err;}
     docs[0].remove(function(err){
@@ -39,7 +39,7 @@ SchemaResource.prototype.DELETE = function(req, res){
     });
   });
 }
-SchemaResource.prototype.collectionPOST = function(req, res){
+MongoResource.prototype.collectionPOST = function(req, res){
   var obj = this;
   var item = new this.schemaClass();
   var body = JSON.parse(req.fullBody);
@@ -50,14 +50,14 @@ SchemaResource.prototype.collectionPOST = function(req, res){
   });
 }
 
-SchemaResource.prototype.collectionGET = function(req, res){
+MongoResource.prototype.collectionGET = function(req, res){
   var obj = this;
   this.schemaClass.find({}).execFind(function(err, docs){
     if (!!err){console.log(err); throw err;}
     var items = _.map(docs, function(v, k){
       return(obj.toRepresentation(v.doc));
     });
-    
+
     var itemCollection = { items: items,
                            links: {
                              self: { href: obj.rootURL + '/' + obj.resourceName },
@@ -67,7 +67,7 @@ SchemaResource.prototype.collectionGET = function(req, res){
   });
 }
 
-SchemaResource.prototype.toRepresentation = function(item){
+MongoResource.prototype.toRepresentation = function(item){
   var url = this.rootURL + '/' + this.resourceName
   item.links = { self: { href: url + "/" + item._id },
                  parent: { href: url }
@@ -75,4 +75,4 @@ SchemaResource.prototype.toRepresentation = function(item){
   return(item)
 };
 
-exports.SchemaResource = SchemaResource;
+exports.MongoResource = MongoResource;
