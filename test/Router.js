@@ -1,7 +1,7 @@
 const express = require('express');
 const should = require('should');
 const Router = require('../Router').Router;
-const HotTap = require('../hottap').HotTap;
+const hottap = require('hottap').hottap;
 
 
 describe('Router', function(){
@@ -24,7 +24,7 @@ describe('Router', function(){
       var app = express.createServer();
       var router = new Router(app, 'http://localhost:1337/', __dirname + '/../test_fixtures/resources')
       app.listen(1337, function(){
-        HotTap("http://localhost:1337/happy").request("GET", function(err, result){
+        hottap("http://localhost:1337/happy").request("GET", function(err, result){
           app.close();
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           should.exist(router.routes)
@@ -40,7 +40,7 @@ describe('Router', function(){
       var app = express.createServer();
       var router = new Router(app, 'http://localhost:1337/', __dirname + '/../test_fixtures/resources')
       app.listen(1337, function(){
-        HotTap("http://localhost:1337/happy").request("OPTIONS", function(err, result){
+        hottap("http://localhost:1337/happy").request("OPTIONS", function(err, result){
           app.close();
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           should.exist(router.routes)
@@ -57,7 +57,7 @@ describe('Router', function(){
       var app = express.createServer();
       var router = new Router(app, 'http://localhost:1337/', __dirname + '/../test_fixtures/resources')
       app.listen(1337, function(){
-        HotTap("http://localhost:1337/artists").request("OPTIONS", function(err, result){
+        hottap("http://localhost:1337/artists").request("OPTIONS", function(err, result){
           app.close();
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           should.exist(router.routes)
@@ -73,7 +73,7 @@ describe('Router', function(){
       var app = express.createServer();
       var router = new Router(app, 'http://localhost:1337/', __dirname + '/../test_fixtures/resources')
       app.listen(1337, function(){
-        HotTap("http://localhost:1337/happy").request("POST", {}, '', function(err, result){
+        hottap("http://localhost:1337/happy").request("POST", {}, '', function(err, result){
           app.close();
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           should.exist(router.routes)
