@@ -46,59 +46,82 @@ var getQueryString = function(url_object){
   return result;
 }
 
-var url_request = function(){
-  var method = arguments[0] || null;
+var get_params = function(argz){
+
+  var method = argz[0] || null;
   var cb;
 
   // the last param is always the callback.
-  if ((arguments.length > 1) && (typeof(arguments[arguments.length - 1]) == 'function') ){
-    cb = arguments[arguments.length - 1];
+  if ((argz.length > 1) && (typeof(argz[argz.length - 1]) == 'function') ){
+    cb = argz[argz.length - 1];
   } else {
     throw "request() expects a callback for the last parameter." 
   }
 
   // the second param should be 'headers' if it's not the callback.
-  if (arguments.length > 2){
-      var headers = arguments[1];
+  if (argz.length > 2){
+      var headers = argz[1];
       if (typeof(headers) != 'object'){
         throw 'Argument Error: Expected an (headers) object for the second argument.';
       }
   }
 
   // the third param should be the body if it's not the callback.
-  if (arguments.length > 3){
-    var body = arguments[2];
+  if (argz.length > 3){
+    var body = argz[2];
   }
 
+  return { "method" : method,
+           "body" : body || '',
+           "headers" : headers || {},
+           "cb" : cb}
 
-    var options = {
-      host: this.hostname,
-      port: this.port,
-      path: optionPath(this),
-      headers: headers,
-      method: method
-    };
+}
 
-    var protocol_lib = (this.protocol == 'https') ? https : http;
-    var req = protocol_lib.request(options, function(res) {
-      res.setEncoding('utf8');
-      var body = '';
-      res.on('data', function (chunk) {
-        body += chunk;
-      });
-      res.on('end', function(){
-        var response = {"status" : res.statusCode, "headers" : res.headers, "body" : body };
-        //console.log(response);
-        cb(null, response);
 
-      });
+var url_request = function(){
+  var params = get_params(arguments);
+  var method = params.method;
+  var cb = params.cb;
+  var headers = params.headers;
+  var body = params.body;
+
+  if (!!body && body != ''){
+    headers['Content-Length'] = body.length;
+  }
+
+  var options = {
+    host: this.hostname,
+    port: this.port,
+    path: optionPath(this),
+    headers: headers,
+    method: method
+  };
+
+  var protocol_lib = (this.protocol == 'https') ? https : http;
+  var req = protocol_lib.request(options, function(res) {
+    res.setEncoding('utf8');
+    var body = '';
+    res.on('data', function (chunk) {
+      body += chunk;
     });
+    res.on('end', function(){
+      var response = {"status" : res.statusCode, "headers" : res.headers, "body" : body };
+      //console.log(response);
+      cb(null, response);
 
-    req.on('error', function(e) {
-      cb(e);
     });
+  });
 
-    req.end();
+  req.on('error', function(e) {
+    cb(e);
+  });
+
+  if (!!body && body != ''){
+    req.write(body);
+  }
+
+  req.end();
 
 }
 
@@ -125,8 +148,27 @@ var url_toString = function(){
   return this.protocol + '://' + authstr + this.hostname + portstr + optionPath(this);
 }
 
+var json_request = function(){
+  var params = get_params(arguments);
+  var method = params.method;
+  var cb = params.cb;
+  var headers = params.headers;
+  var body = params.body;
+  headers['content-type'] = 'application/json';
+  headers['accept'] = 'application/json';
+  body = JSON.stringify(body);
+  var json_cb = function(error, response){
+    if (!!response.body){
+      response.body = JSON.parse(response.body);
+    }
+    cb(error, response);
+  }
+  this.request(method, headers, body, json_cb);
+}
+
 var Url = function(url){
   this.request = url_request;
+  this.json = json_request;
   this.toString = url_toString;
   this.url_object = node_url.parse(url);
   var o = this.url_object;

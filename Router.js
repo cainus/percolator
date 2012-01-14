@@ -97,6 +97,16 @@ function setDefaultOptionsHandler(app, route){
     });
 }
 
+function createServiceDocument(app, base_url, routes){
+      app.get('/', function(req, res){
+        var serviceDocument = { links: { self: { href: base_url }}};
+        _.each(routes, function(route, resource){
+          serviceDocument.links[resource] = {href : base_url + resource}
+        });
+        res.send(serviceDocument);
+      });
+}
+
 function Router(app, base_url, resource_dir){
   this.resource_dir = resource_dir
   check_directory(this.resource_dir);
@@ -118,14 +128,7 @@ function Router(app, base_url, resource_dir){
           setDefaultOptionsHandler(app, route);
         }
       });
-      app.get('/', function(req, res){
-        var serviceDocument = { links: { self: { href: obj.base_url }}};
-        _.each(obj.routes, function(route, resource){
-          serviceDocument.links[resource] = {href : obj.base_url + resource}
-        });
-        res.send(serviceDocument);
-      });
-
+      createServiceDocument(app, obj.base_url, obj.routes);
   });
 }
 exports.Router = Router;
