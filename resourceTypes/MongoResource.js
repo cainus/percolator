@@ -1,8 +1,10 @@
 const _ = require('underscore');
 const mongoose = require('mongoose');
 
-var MongoResource = function(schemaClass, rootURL, resourceName){
-  this.schemaClass = schemaClass;
+
+var MongoResource = function(app, resourceName, schema){
+  this.schemaClass = mongoose.model(resourceName, new mongoose.Schema(schema));
+  var rootURL = "http://localhost:3000"
   this.rootURL = rootURL;
   this.resourceName = resourceName;
 }
@@ -41,12 +43,41 @@ MongoResource.prototype.DELETE = function(req, res){
 }
 MongoResource.prototype.collectionPOST = function(req, res){
   var obj = this;
-  var item = new this.schemaClass();
-  var body = JSON.parse(req.fullBody);
-  item.name = body.name;
+  var json_type = 'application/json';
+  var contentType = req.header('Content-Type');
+  var error = false;
+  if (!contentType || contentType.substring(0, json_type.length) != json_type){
+    res.send('IncorrectContentType', 415);
+    return
+  }
+  try {
+    var body = JSON.parse(req.fullBody);
+  } catch(err){
+    res.send('MalformedJSON [' + req.fullBody + ']', 400);
+    return;
+  }
+  console.log('in coll post');
+  var doc_data = {
+    "name" : body.name
+  }
+  var item = new this.schemaClass(doc_data);
+  console.log('schema', this.schemaClass)
+  console.log("item", item);
   item.save(function (err) {
-    if (!!err){console.log(err); throw err;}
-    res.send(obj.toRepresentation(item.doc));
+    if (!!err){
+      switch(err.name){
+        case 'ValidationError':
+          res.send(JSON.stringify(err), 422);
+          break;
+        default : 
+          console.log(err);
+          throw err;
+      }
+      return
+    } else {
+      res.header('Location',  obj.rootURL + '/' + obj.resourceName + '/' + item._id);
+      res.send(201);
+    }
   });
 }
 
@@ -65,6 +96,7 @@ MongoResource.prototype.collectionGET = function(req, res){
                           }};
     res.send(itemCollection);
   });
+  console.log("after");
 }
 
 MongoResource.prototype.toRepresentation = function(item){
