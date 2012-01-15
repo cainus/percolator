@@ -1,13 +1,10 @@
+const MongoResource = require('../resourceTypes/MongoResource').MongoResource;
 const mongoose = require('mongoose');
-const SchemaResource = require('../SchemaResource').SchemaResource;
+Schema = mongoose.Schema;
+var app = {}
+exports.handler = new MongoResource(app, 'songs', {
+    	'name' : { type: String, match: /[a-zA-z0-9\.]/ },
+    	'created' :  { type: Date, default: Date.now },
+    	'_artist' : { type: Schema.ObjectId, ref: 'Artists' }
+})
 
-
-var Songs = new mongoose.Schema({
-    'name' : { type: String, match: /[a-zA-z0-9\.]/ },
-    'created' :  { type: Date, default: Date.now }
-});
-var SongClass = mongoose.model('Songs', Songs);
-
-
-var handler = new SchemaResource(SongClass, 'http://localhost:3000', 'songs');
-exports.handler = handler;

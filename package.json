@@ -9,6 +9,7 @@
           "mongoose" : "1.6.0",
           "express-resource" : "0.2.3",
           "mocha" : "0.3.6",
-          "should" : "0.3.2"
+          "should" : "0.3.2",
+          "underscore" : ""
       }
 }
