@@ -25,6 +25,9 @@ MongoResource.prototype.PUT = function(req, res){
     var item = docs[0]
     var body = JSON.parse(req.fullBody);
     item.name = body.name
+    if (!!body._artist){
+      item._artist = body._artist
+    };
     item.save(function(err){
       if (!!err){console.log(err); throw err;}
       res.send(obj.toRepresentation(item.doc));
@@ -100,10 +103,19 @@ MongoResource.prototype.collectionGET = function(req, res){
 }
 
 MongoResource.prototype.toRepresentation = function(item){
+  var rootURL = this.rootURL
   var url = this.rootURL + '/' + this.resourceName
-  item.links = { self: { href: url + "/" + item._id },
+  var links = { self: { href: url + "/" + item._id },
                  parent: { href: url }
                };
+  _.each(item, function(v, k){
+    if (k[0] === '_' && k !== '_id'){
+      new_key = k.slice(1);
+      links[new_key] = { href: rootURL + '/' + new_key + 's' + '/' + v };
+      delete item[k]
+    };
+  });
+  item.links = links;
   return(item)
 };
 
