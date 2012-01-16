@@ -35,7 +35,7 @@ describe('MongoResource', function(){
       this.timeout(10000);
       var app = express.createServer();
       var port = getPort();
-      var router = new Router(app, 'http://localhost:' + port + '/', __dirname + '/../test_fixtures/resources')
+      var router = new Router(app, 'http://localhost:' + port + '/', __dirname + '/../test_fixtures/resources', '')
 
       app.listen(port, function(){
         hottap("http://localhost:" + port + "/artists").json("GET", function(err, result){
@@ -53,7 +53,7 @@ describe('MongoResource', function(){
       this.timeout(10000);
       var app = express.createServer();
       var port = getPort();
-      var router = new Router(app, 'http://localhost:' + port + '/', __dirname + '/../test_fixtures/resources')
+      var router = new Router(app, 'http://localhost:' + port + '/', __dirname + '/../test_fixtures/resources', '')
       app.listen(port, function(){
         hottap("http://localhost:" + port + "/artists").request("POST", {'Content-Type' : 'application/json'}, 'asdf', function(err, result){
           app.close();
@@ -68,7 +68,7 @@ describe('MongoResource', function(){
       this.timeout(10000);
       var app = express.createServer();
       var port = getPort();
-      var router = new Router(app, 'http://localhost:'+ port + '/', __dirname + '/../test_fixtures/resources')
+      var router = new Router(app, 'http://localhost:'+ port + '/', __dirname + '/../test_fixtures/resources', '')
 
       app.listen(port, function(){
         hottap("http://localhost:" + port + "/artists").request("POST", {}, 'asdf', function(err, result){

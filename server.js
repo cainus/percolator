@@ -10,7 +10,9 @@ app.configure(function(){
   app.use(fullBodyParser());
 });
 
-var router = new Router(app, 'http://localhost:' + port + '/', __dirname + '/resources');
+var root_url = 'http://localhost:' + port + '/'
+var root_path = ''
+var router = new Router(app, root_url, __dirname + '/resources', root_path);
 
 var mongo_url = 'mongodb://127.0.0.1:27017/percolator';
 console.log('------------------------------------');

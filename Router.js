@@ -23,7 +23,7 @@ function setAllowHeader(res, route, is_sub_resource){
   res.header('Allow', route.get_allowed_methods(is_sub_resource).join(","));
 }
 
-function attachMethod(app, http_method, is_sub_resource, route){
+function attachMethod(app, http_method, is_sub_resource, route, root_path){
     var app_method = {"GET" : "get", 
                       "POST" : "post", 
                       "DELETE" : "del", 
@@ -31,10 +31,10 @@ function attachMethod(app, http_method, is_sub_resource, route){
                       "OPTIONS" : "options"}[http_method];
     if (is_sub_resource){
       var handler_method = http_method 
-      var path = '/' + route.resource_name + '/:id';
+      var path = root_path + route.resource_name + '/:id';
     } else {
       var handler_method = 'collection' + http_method;
-      var path = '/' + route.resource_name
+      var path = root_path + route.resource_name
     }
     var handler = route.module;
     if (!!handler[handler_method]){
@@ -85,20 +85,20 @@ function Route(resource_name, module){
   }
 }
 
-function setDefaultOptionsHandler(app, route){
+function setDefaultOptionsHandler(app, route, root_path){
   var resource = route.resource_name
-    app.options('/' + resource, function(req, res){
+    app.options(root_path + resource, function(req, res){
       setAllowHeader(res, route, false) 
       res.send('')
     });
-    app.options('/' + resource + '/:id', function(req, res){
+    app.options(root_path + resource + '/:id', function(req, res){
       setAllowHeader(res, route, true) 
       res.send('')
     });
 }
 
-function createServiceDocument(app, base_url, routes){
-      app.get('/', function(req, res){
+function createServiceDocument(app, base_url, routes, root_path){
+      app.get(root_path, function(req, res){
         var serviceDocument = { links: { self: { href: base_url }}};
         _.each(routes, function(route, resource){
           serviceDocument.links[resource] = {href : base_url + resource}
@@ -107,10 +107,11 @@ function createServiceDocument(app, base_url, routes){
       });
 }
 
-function Router(app, base_url, resource_dir){
+function Router(app, base_url, resource_dir, root_path){
   this.resource_dir = resource_dir
   check_directory(this.resource_dir);
-  this.base_url = base_url
+  this.base_url = base_url + root_path
+  this.root_path = (root_path == '') ? '/' :  ('/' + root_path + '/')
   var obj = this;
   this.routes = {}
 
@@ -121,14 +122,14 @@ function Router(app, base_url, resource_dir){
         var route = new Route(resource, module);
         obj.routes[resource] = route; 
         _.each(["GET", "POST", "PUT", "DELETE"], function(http_method){
-          attachMethod(app, http_method, false, route);
-          attachMethod(app, http_method, true, route);
+          attachMethod(app, http_method, false, route, obj.root_path);
+          attachMethod(app, http_method, true, route, obj.root_path);
         });
         if (route.get_allowed_methods().indexOf("OPTIONS") == -1){
-          setDefaultOptionsHandler(app, route);
+          setDefaultOptionsHandler(app, route, obj.root_path);
         }
       });
-      createServiceDocument(app, obj.base_url, obj.routes);
+      createServiceDocument(app, obj.base_url, obj.routes, obj.root_path);
   });
 }
 exports.Router = Router;
