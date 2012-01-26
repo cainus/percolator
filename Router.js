@@ -1,7 +1,25 @@
 const _ = require('underscore');
 const fs = require('fs');
+const path = require('path');
+
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
+function urlJoin(){
+  // joins with /, but not redundantly.  does not normalize pieces.
+  var retval = '';
+  for(var i = 0; i < arguments.length; i++){
+    if ((retval != '') && (!endsWith(retval, '/'))){
+      retval += '/'
+    }
+    if (arguments[i][0] == '/'){
+      retval += arguments[i].substring(1, arguments.length);
+    } else {
+      retval += arguments[i];
+    }
+  }
+  return retval;
 }
 
 function check_directory(dir){
@@ -31,19 +49,19 @@ function attachMethod(app, http_method, is_sub_resource, route, root_path){
                       "OPTIONS" : "options"}[http_method];
     if (is_sub_resource){
       var handler_method = http_method 
-      var path = root_path + route.resource_name + '/:id';
+      var route_path = root_path + route.resource_name + '/:id';
     } else {
       var handler_method = 'collection' + http_method;
-      var path = root_path + route.resource_name
+      var route_path = root_path + route.resource_name
     }
     var handler = route.module;
     if (!!handler[handler_method]){
       route.add_allowed_method(http_method, is_sub_resource)
-      app[app_method](path, function(req, res){
+      app[app_method](route_path, function(req, res){
         handler[handler_method](req, res);
       });
     } else {
-      app[app_method](path, function(req, res){
+      app[app_method](route_path, function(req, res){
         setAllowHeader(res, route, is_sub_resource);
         res.send('', 405);
       });
@@ -99,9 +117,10 @@ function setDefaultOptionsHandler(app, route, root_path){
 
 function createServiceDocument(app, base_url, routes, root_path){
       app.get(root_path, function(req, res){
-        var serviceDocument = { links: { self: { href: base_url }}};
+        var new_base_url = urlJoin(app.settings.base_path, base_url)
+        var serviceDocument = { links: { self: { href: new_base_url }}};
         _.each(routes, function(route, resource){
-          serviceDocument.links[resource] = {href : base_url + resource}
+          serviceDocument.links[resource] = {href : urlJoin(new_base_url, resource)}
         });
         res.send(serviceDocument);
       });

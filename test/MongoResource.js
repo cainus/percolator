@@ -35,6 +35,7 @@ describe('MongoResource', function(){
       this.timeout(10000);
       var app = express.createServer();
       var port = getPort();
+      app.settings.base_path = 'http://localhost:' + port;
       var router = new Router(app, 'http://localhost:' + port + '/', __dirname + '/../test_fixtures/resources', '')
 
       app.listen(port, function(){
@@ -42,7 +43,7 @@ describe('MongoResource', function(){
           app.close();
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           result.body.items.length.should.equal(0);
-          result.body.links.self.href.should.equal("http://localhost:3000/artists")
+          result.body.links.self.href.should.equal("http://localhost:" + port + "/artists")
           done();
         });
       });
