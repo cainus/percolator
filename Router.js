@@ -9,16 +9,18 @@ function endsWith(str, suffix) {
 function urlJoin(){
   // joins with /, but not redundantly.  does not normalize pieces.
   var retval = '';
+  console.log(arguments);
   for(var i = 0; i < arguments.length; i++){
     if ((retval != '') && (!endsWith(retval, '/'))){
       retval += '/'
     }
-    if (arguments[i][0] == '/'){
-      retval += arguments[i].substring(1, arguments.length);
-    } else {
-      retval += arguments[i];
+    var additive = arguments[i]
+    if ((additive != '') && (additive[0] == '/')){
+      additive = additive.substring(1, additive.length);
     }
+    retval += additive;
   }
+  console.log("out: " + retval);
   return retval;
 }
 
