@@ -6,6 +6,7 @@ const hottap = require('hottap').hottap;
 const mongoose = require('mongoose');
 const _ = require('underscore');
 const fullBodyParser = require('../fullBodyParser');
+const jsonBodyParser = require('../jsonBodyParser');
 
 var lastPort = 1300;
 function getPort(){
@@ -53,6 +54,8 @@ describe('MongoResource', function(){
   it ("#collectionPOST returns a 400 when it can't parse the JSON", function(done){
       this.timeout(10000);
       var app = express.createServer();
+      app.use(fullBodyParser());
+      app.use(jsonBodyParser());
       var port = getPort();
       var router = new Router(app, 'http://localhost:' + port + '/', __dirname + '/../test_fixtures/resources', '')
       app.listen(port, function(){

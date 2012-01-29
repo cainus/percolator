@@ -87,12 +87,7 @@ MongoResource.prototype.collectionPOST = function(req, res){
     res.send('IncorrectContentType', 415);
     return
   }
-  try {
-    var body = JSON.parse(req.fullBody);
-  } catch(err){
-    res.send('MalformedJSON [' + req.fullBody + ']', 400);
-    return;
-  }
+  var body = req.jsonBody;
   console.log('in coll post');
   var mongoRes = this;
   this.preCreate(req, res, function(err, doc){
@@ -106,9 +101,21 @@ MongoResource.prototype.collectionPOST = function(req, res){
       }
       item.save(function (err) {
         if (!!err){
-          if (err.toString().indexOf("duplciate key error index")){
+          if (err.toString().indexOf("duplicate key error index")){
            // example: [Error: E11000 duplicate key error index: slackertax.users.$login_1  dup key: { : null }]
-           var errDoc = mongoRes.error('DuplicateKeyError', 'Inserting that resource would violate a uniqueness constraint.', err.toString());
+           var re = new RegExp('\.\$([a-zA-Z]+)_[0-9]');
+           re = new RegExp('\\.\\$([a-zA-Z]+)_[0-9]');
+           var match = err.toString().match(re);
+           console.log(err.toString());
+           console.log(match);
+           if (match){
+             var detail = match[1];
+           } else {
+             var detail = err.toString();
+           }
+           var errDoc = mongoRes.error('DuplicateKeyError', 
+                                       'Inserting that resource would violate a uniqueness constraint.', 
+                                       detail);
            console.log("ERRDOC");
            console.log(errDoc);
            res.send(errDoc, 409);
@@ -126,7 +133,7 @@ MongoResource.prototype.collectionPOST = function(req, res){
           return
         } else {
           res.header('Location',  mongoRes.href(item._id));
-          res.send(201);
+          res.send('', 201);
         }
       });
     }
@@ -165,7 +172,7 @@ MongoResource.prototype.href = function(id, base_path){
 
 MongoResource.prototype.error = function(type, message, detail){
   var retval = { 'error' : { 'type' : type, 'message' : message} }
-  if (!!detail){
+  if (detail == "" || !!detail){
      retval["error"]["detail"] = detail
   }
   return retval 

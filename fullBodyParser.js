@@ -27,7 +27,6 @@ exports = module.exports = function fullBodyParser(){
     req.on('end', function(){
         try {
           req.fullBody = data
-          console.log("got fullbody: " + req.fullBody);
           return next();
         } catch (err) {
           return next(err);
