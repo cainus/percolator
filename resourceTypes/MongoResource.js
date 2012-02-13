@@ -77,6 +77,9 @@ MongoResource.prototype.DELETE = function(req, res){
 MongoResource.prototype.preCreate = function(req, res, cb){
   cb(false);
 }
+MongoResource.prototype.postCreate = function(req, res, cb){
+  cb(false);
+}
 
 MongoResource.prototype.collectionPOST = function(req, res){
   var obj = this;
@@ -101,7 +104,7 @@ MongoResource.prototype.collectionPOST = function(req, res){
       }
       item.save(function (err) {
         if (!!err){
-          if (err.toString().indexOf("duplicate key error index")){
+          if (err.toString().indexOf("duplicate key error index") != -1){
            // example: [Error: E11000 duplicate key error index: slackertax.users.$login_1  dup key: { : null }]
            var re = new RegExp('\.\$([a-zA-Z]+)_[0-9]');
            re = new RegExp('\\.\\$([a-zA-Z]+)_[0-9]');
@@ -118,7 +121,9 @@ MongoResource.prototype.collectionPOST = function(req, res){
                                        detail);
            console.log("ERRDOC");
            console.log(errDoc);
+           console.log("pre 409")
            res.send(errDoc, 409);
+           console.log("post 409")
            return;
           }
 
@@ -132,17 +137,25 @@ MongoResource.prototype.collectionPOST = function(req, res){
           }
           return
         } else {
-          res.header('Location',  mongoRes.href(item._id));
-          res.send('', 201);
+
+          mongoRes.postCreate(req, res, function(err){
+            res.header('Location',  mongoRes.href(item._id));
+            res.send('', 201);
+          });
         }
       });
     }
   });
 }
 
+
+MongoResource.prototype.finder = function(req){
+  return this.schemaClass.find({});
+}
+
 MongoResource.prototype.collectionGET = function(req, res){
   var obj = this;
-  this.schemaClass.find({}).execFind(function(err, docs){
+  this.finder(req).execFind(function(err, docs){
     if (!!err){console.log(err); throw err;}
     var items = _.map(docs, function(v, k){
       return(obj.toRepresentation(v.doc, obj.getParentURI(req)));
@@ -157,7 +170,6 @@ MongoResource.prototype.collectionGET = function(req, res){
                           }};
     res.send(itemCollection);
   });
-  console.log("after");
 }
 
 MongoResource.prototype.href = function(id, base_path){
