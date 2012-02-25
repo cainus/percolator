@@ -1,7 +1,7 @@
 const _ = require('underscore');
 
 
-var JsonResource = function(app, resourceName){
+var Resource = function(app, resourceName){
   var rootURL = "/"
   this.rootURL = rootURL;
   this.resourceName = resourceName;
@@ -9,7 +9,7 @@ var JsonResource = function(app, resourceName){
   this.field_validators = {}
 }
 
-JsonResource.prototype.setDocumentValidator = function(requiredFields,
+Resource.prototype.setDocumentValidator = function(requiredFields,
                                                        optionalFields,
                                                        doc_validation_function){
   this.validation = {'required' : requiredFields,
@@ -17,14 +17,14 @@ JsonResource.prototype.setDocumentValidator = function(requiredFields,
                      'docValidator' : doc_validation_function}
 }
 
-JsonResource.prototype.getParentURI = function(req){
+Resource.prototype.getParentURI = function(req){
   var path = req.originalUrl.split(this.resourceName)[0];
   var parentURI = req.app.settings.base_path + path
   console.log("parentUri: " + parentURI);
   return parentURI;
 }
 
-JsonResource.prototype.href = function(id, base_path){
+Resource.prototype.href = function(id, base_path){
   var url = '';
   if (base_path){ url = base_path; }
   if (url[url.length - 1] != '/'){
@@ -34,7 +34,7 @@ JsonResource.prototype.href = function(id, base_path){
   return url
 }
 
-JsonResource.prototype.send_error = function(res, status_code, type, message, detail){
+Resource.prototype.send_error = function(res, status_code, type, message, detail){
   var retval = { 'error' : { 'type' : type, 'message' : message} }
   if (detail == "" || !!detail){
      retval["error"]["detail"] = detail
@@ -42,7 +42,7 @@ JsonResource.prototype.send_error = function(res, status_code, type, message, de
   res.send( retval, status_code )
 }
 
-JsonResource.prototype.toRepresentation = function(item, base_path){
+Resource.prototype.toRepresentation = function(item, base_path){
   var url = base_path || ''
   if (url[url.length - 1] != '/'){
     url += '/';
@@ -61,11 +61,11 @@ JsonResource.prototype.toRepresentation = function(item, base_path){
   return(item)
 };
 
-JsonResource.prototype.add_field_validator = function(field_name, validator, message){
+Resource.prototype.add_field_validator = function(field_name, validator, message){
   this.field_validators[field_name] = {"validator" : validator, "message" : message}
 }
 
-JsonResource.prototype.validate = function(response, doc){
+Resource.prototype.validate = function(response, doc){
   var resource = this;
   if (!this.validation){return true;}
   var properties = _.keys(doc);
@@ -118,15 +118,15 @@ JsonResource.prototype.validate = function(response, doc){
   return this.validation.docValidator(response, doc);
 };
 
-JsonResource.prototype.preCreate = function(req, res, cb){
+Resource.prototype.preCreate = function(req, res, cb){
   var doc = req.jsonBody;
   if (this.validate(res, doc)){
     return cb(false);
   }
   return cb(true);
 }
-JsonResource.prototype.postCreate = function(req, res, cb){
+Resource.prototype.postCreate = function(req, res, cb){
   return cb(false);
 }
 
-exports.JsonResource = JsonResource;
+exports.Resource = Resource;
