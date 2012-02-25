@@ -1,6 +1,6 @@
 const _ = require('underscore');
 const mongoose = require('mongoose');
-
+const JsonResource = require('./JsonResource').JsonResource;
 
 var MongoResource = function(app, resourceName, schema){
   this.schemaClass = mongoose.model(resourceName, new mongoose.Schema(schema));
@@ -9,12 +9,7 @@ var MongoResource = function(app, resourceName, schema){
   this.resourceName = resourceName;
 }
 
-MongoResource.prototype.getParentURI = function(req){
-  var path = req.originalUrl.split(this.resourceName)[0];
-  var parentURI = req.app.settings.base_path + path
-  console.log("parentUri: " + parentURI);
-  return parentURI;
-}
+MongoResource.prototype = new JsonResource({}, 'resourceName');
 
 MongoResource.prototype.GET = function(req, res){
   var obj = this;
@@ -74,13 +69,6 @@ MongoResource.prototype.DELETE = function(req, res){
   });
 }
 
-MongoResource.prototype.preCreate = function(req, res, cb){
-  cb(false);
-}
-MongoResource.prototype.postCreate = function(req, res, cb){
-  cb(false);
-}
-
 MongoResource.prototype.collectionPOST = function(req, res){
   var obj = this;
   var json_type = 'application/json';
@@ -91,7 +79,6 @@ MongoResource.prototype.collectionPOST = function(req, res){
     return
   }
   var body = req.jsonBody;
-  console.log('in coll post');
   var mongoRes = this;
   this.preCreate(req, res, function(err, doc){
     if (!err){
@@ -171,42 +158,5 @@ MongoResource.prototype.collectionGET = function(req, res){
     res.send(itemCollection);
   });
 }
-
-MongoResource.prototype.href = function(id, base_path){
-  var url = '';
-  if (base_path){ url = base_path; }
-  if (url[url.length - 1] != '/'){
-    url += '/';
-  }
-  url += (this.resourceName + "/" + id)
-  return url
-}
-
-MongoResource.prototype.error = function(type, message, detail){
-  var retval = { 'error' : { 'type' : type, 'message' : message} }
-  if (detail == "" || !!detail){
-     retval["error"]["detail"] = detail
-  }
-  return retval 
-}
-
-MongoResource.prototype.toRepresentation = function(item, base_path){
-  var url = base_path || ''
-  if (url[url.length - 1] != '/'){
-    url += '/';
-  }
-  var links = { self: { href: this.href(item._id, url) },
-                 parent: { href: url + this.resourceName }
-               };
-  _.each(item, function(v, k){
-    if (k[0] === '_' && k !== '_id'){
-      new_key = k.slice(1);
-      links[new_key] = { href: url + new_key + 's' + '/' + v };
-      delete item[k]
-    };
-  });
-  item.links = links;
-  return(item)
-};
 
 exports.MongoResource = MongoResource;
