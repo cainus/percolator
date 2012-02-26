@@ -9,9 +9,7 @@ var Resource = function(app, resourceName){
   this.field_validators = {}
 }
 
-Resource.prototype.setDocumentValidator = function(requiredFields,
-                                                       optionalFields,
-                                                       doc_validation_function){
+Resource.prototype.setDocumentValidator = function(requiredFields, optionalFields,doc_validation_function){
   this.validation = {'required' : requiredFields,
                      'optional' : optionalFields,
                      'docValidator' : doc_validation_function}
@@ -83,7 +81,7 @@ Resource.prototype.validate = function(response, doc){
 
   console.log("missing? no.");
   var allowed = _.union(this.validation.optional, this.validation.required);
-  var extra = _.difference(allowed, properties);
+  var extra = _.difference(properties, allowed);
   console.log("extra?");
   if (extra.length > 0){
    console.log('extra? yes');
@@ -115,7 +113,11 @@ Resource.prototype.validate = function(response, doc){
     return false;
   }
   console.log('bad field? no.');
-  return this.validation.docValidator(response, doc);
+  if (this.validation.docValidator) {
+    return this.validation.docValidator(response, doc);
+  } else {
+    return true;
+  }
 };
 
 Resource.prototype.preCreate = function(req, res, cb){
