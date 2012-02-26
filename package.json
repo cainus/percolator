@@ -5,7 +5,7 @@
        "url": "https://github.com/cainus/percolator/issues"
       },
       "dependencies": {
-          "express" : "2.2.0",
+          "express" : "2.5.8",
           "hottap" : "1.0.0",
           "mongodb" : "0.9.6-19",
           "express-mongoose"  : ">= 0.0.1",

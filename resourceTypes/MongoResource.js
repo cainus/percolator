@@ -1,6 +1,6 @@
 const _ = require('underscore');
 const mongoose = require('mongoose');
-const JsonResource = require('./JsonResource').JsonResource;
+const Resource = require('./Resource').Resource;
 
 var MongoResource = function(app, resourceName, schema){
   this.schemaClass = mongoose.model(resourceName, new mongoose.Schema(schema));
@@ -9,7 +9,7 @@ var MongoResource = function(app, resourceName, schema){
   this.resourceName = resourceName;
 }
 
-MongoResource.prototype = new JsonResource({}, 'resourceName');
+MongoResource.prototype = new Resource({}, 'resourceName');
 
 MongoResource.prototype.GET = function(req, res){
   var obj = this;

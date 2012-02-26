@@ -1,7 +1,7 @@
 const _ = require('underscore');
 
 
-var JsonResource = function(app, resourceName){
+var Resource = function(app, resourceName){
   var rootURL = "/"
   this.rootURL = rootURL;
   this.resourceName = resourceName;
@@ -9,22 +9,20 @@ var JsonResource = function(app, resourceName){
   this.field_validators = {}
 }
 
-JsonResource.prototype.setDocumentValidator = function(requiredFields,
-                                                       optionalFields,
-                                                       doc_validation_function){
+Resource.prototype.setDocumentValidator = function(requiredFields, optionalFields,doc_validation_function){
   this.validation = {'required' : requiredFields,
                      'optional' : optionalFields,
                      'docValidator' : doc_validation_function}
 }
 
-JsonResource.prototype.getParentURI = function(req){
+Resource.prototype.getParentURI = function(req){
   var path = req.originalUrl.split(this.resourceName)[0];
   var parentURI = req.app.settings.base_path + path
   console.log("parentUri: " + parentURI);
   return parentURI;
 }
 
-JsonResource.prototype.href = function(id, base_path){
+Resource.prototype.href = function(id, base_path){
   var url = '';
   if (base_path){ url = base_path; }
   if (url[url.length - 1] != '/'){
@@ -34,7 +32,7 @@ JsonResource.prototype.href = function(id, base_path){
   return url
 }
 
-JsonResource.prototype.send_error = function(res, status_code, type, message, detail){
+Resource.prototype.send_error = function(res, status_code, type, message, detail){
   var retval = { 'error' : { 'type' : type, 'message' : message} }
   if (detail == "" || !!detail){
      retval["error"]["detail"] = detail
@@ -42,7 +40,7 @@ JsonResource.prototype.send_error = function(res, status_code, type, message, de
   res.send( retval, status_code )
 }
 
-JsonResource.prototype.toRepresentation = function(item, base_path){
+Resource.prototype.toRepresentation = function(item, base_path){
   var url = base_path || ''
   if (url[url.length - 1] != '/'){
     url += '/';
@@ -61,47 +59,62 @@ JsonResource.prototype.toRepresentation = function(item, base_path){
   return(item)
 };
 
-JsonResource.prototype.add_field_validator = function(field_name, validator, message){
+Resource.prototype.add_field_validator = function(field_name, validator, message){
   this.field_validators[field_name] = {"validator" : validator, "message" : message}
 }
 
-JsonResource.prototype.validate = function(response, doc){
+Resource.prototype.validate = function(response, doc){
   var resource = this;
   if (!this.validation){return true;}
   var properties = _.keys(doc);
-  var missing = _.difference(this.validation.required, properties);
-  console.log("missing?");
-  if (missing.length > 0){
-   console.log('missing required');
-   console.log(missing);
-   this.send_error(response, 422,
-                        "MissingAttribute",
-                        "The " + resource.resourceName + " resource requires a property named '" + missing[0] + "'", missing[0]);
-   console.log("missing? yes.");
-   return false;
+
+  if (!this.checkRequiredAttributes(this.validation.required, properties, response, resource)){
+    return false;
   }
 
-  console.log("missing? no.");
-  var allowed = _.union(this.validation.optional, this.validation.required);
-  var extra = _.difference(allowed, properties);
-  console.log("extra?");
+  if (!this.checkExtraAttributes(this.validation.optional, this.validation.required, properties, response, resource)){
+    return false;
+  }
+  if (!this.checkAttributeValidity(doc, response, resource)){
+    return false;
+  }
+  if (this.validation.docValidator) {
+    return this.validation.docValidator(response, doc);
+  } else {
+    return true;
+  }
+};
+
+Resource.prototype.checkRequiredAttributes = function(requiredProperties, incomingProperties, response, resource){
+  var missing = _.difference(requiredProperties, incomingProperties);
+  if (missing.length > 0){
+   resource.send_error(response, 422,
+                        "MissingAttribute",
+                        "The " + resource.resourceName + " resource requires a property named '" + missing[0] + "'", missing[0]);
+   return false;
+  }
+  return true;
+}
+
+Resource.prototype.checkExtraAttributes = function(optionalProperties, requiredProperties, incomingProperties, response, resource){
+  var allowedProperties = _.union(optionalProperties, requiredProperties);
+  var extra = _.difference(incomingProperties, allowedProperties);
   if (extra.length > 0){
-   console.log('extra? yes');
-   this.send_error(response, 422,
+   resource.send_error(response, 422,
                         "UnexpectedAttribute",
                         "The " + resource.resourceName + " resource should not contain a property named '" + extra[0]+ "'", extra[0]);
    return false;
   }
-  console.log('extra? no');
-  console.log('bad field?');
+  return true;
+}
+
+Resource.prototype.checkAttributeValidity = function(doc, response, resource){
   var bad_field = _.any(doc, function(value, key){
     var validator_obj = resource.field_validators[key]
     if (!validator_obj) return false;
     if (validator_obj["validator"](value)){
       return false;
     } else {
-      console.log('bad property: ', value);
-      console.log("doc: ", doc);
       resource.send_error(response, 422,
                         "InvalidAttribute",
                         "The " + resource.resourceName + 
@@ -111,22 +124,20 @@ JsonResource.prototype.validate = function(response, doc){
     }
   });
   if (bad_field) {
-    console.log('bad field? yes.');
     return false;
   }
-  console.log('bad field? no.');
-  return this.validation.docValidator(response, doc);
-};
+  return true;
+}
 
-JsonResource.prototype.preCreate = function(req, res, cb){
+Resource.prototype.preCreate = function(req, res, cb){
   var doc = req.jsonBody;
   if (this.validate(res, doc)){
     return cb(false);
   }
   return cb(true);
 }
-JsonResource.prototype.postCreate = function(req, res, cb){
+Resource.prototype.postCreate = function(req, res, cb){
   return cb(false);
 }
 
-exports.JsonResource = JsonResource;
+exports.Resource = Resource;

@@ -21,6 +21,7 @@ var clearDB = function(name){
   schemaClass.collection.drop();
 }
 
+// Mongo needs to be running for these tests to pass.
 var mongo_url = 'mongodb://127.0.0.1:27017/percolator_test';
 
 describe('MongoResource', function(){ 
