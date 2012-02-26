@@ -67,39 +67,54 @@ Resource.prototype.validate = function(response, doc){
   var resource = this;
   if (!this.validation){return true;}
   var properties = _.keys(doc);
-  var missing = _.difference(this.validation.required, properties);
-  console.log("missing?");
-  if (missing.length > 0){
-   console.log('missing required');
-   console.log(missing);
-   this.send_error(response, 422,
-                        "MissingAttribute",
-                        "The " + resource.resourceName + " resource requires a property named '" + missing[0] + "'", missing[0]);
-   console.log("missing? yes.");
-   return false;
+
+  if (!this.checkRequiredAttributes(this.validation.required, properties, response, resource)){
+    return false;
   }
 
-  console.log("missing? no.");
-  var allowed = _.union(this.validation.optional, this.validation.required);
-  var extra = _.difference(properties, allowed);
-  console.log("extra?");
+  if (!this.checkExtraAttributes(this.validation.optional, this.validation.required, properties, response, resource)){
+    return false;
+  }
+  if (!this.checkAttributeValidity(doc, response, resource)){
+    return false;
+  }
+  if (this.validation.docValidator) {
+    return this.validation.docValidator(response, doc);
+  } else {
+    return true;
+  }
+};
+
+Resource.prototype.checkRequiredAttributes = function(requiredProperties, incomingProperties, response, resource){
+  var missing = _.difference(requiredProperties, incomingProperties);
+  if (missing.length > 0){
+   resource.send_error(response, 422,
+                        "MissingAttribute",
+                        "The " + resource.resourceName + " resource requires a property named '" + missing[0] + "'", missing[0]);
+   return false;
+  }
+  return true;
+}
+
+Resource.prototype.checkExtraAttributes = function(optionalProperties, requiredProperties, incomingProperties, response, resource){
+  var allowedProperties = _.union(optionalProperties, requiredProperties);
+  var extra = _.difference(incomingProperties, allowedProperties);
   if (extra.length > 0){
-   console.log('extra? yes');
-   this.send_error(response, 422,
+   resource.send_error(response, 422,
                         "UnexpectedAttribute",
                         "The " + resource.resourceName + " resource should not contain a property named '" + extra[0]+ "'", extra[0]);
    return false;
   }
-  console.log('extra? no');
-  console.log('bad field?');
+  return true;
+}
+
+Resource.prototype.checkAttributeValidity = function(doc, response, resource){
   var bad_field = _.any(doc, function(value, key){
     var validator_obj = resource.field_validators[key]
     if (!validator_obj) return false;
     if (validator_obj["validator"](value)){
       return false;
     } else {
-      console.log('bad property: ', value);
-      console.log("doc: ", doc);
       resource.send_error(response, 422,
                         "InvalidAttribute",
                         "The " + resource.resourceName + 
@@ -109,16 +124,10 @@ Resource.prototype.validate = function(response, doc){
     }
   });
   if (bad_field) {
-    console.log('bad field? yes.');
     return false;
   }
-  console.log('bad field? no.');
-  if (this.validation.docValidator) {
-    return this.validation.docValidator(response, doc);
-  } else {
-    return true;
-  }
-};
+  return true;
+}
 
 Resource.prototype.preCreate = function(req, res, cb){
   var doc = req.jsonBody;
