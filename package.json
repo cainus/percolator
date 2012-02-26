@@ -1,6 +1,9 @@
 {
       "name": "percolator",
       "version": "0.0.1",
+      "bugs": {
+       "url": "https://github.com/cainus/percolator/issues"
+      },
       "dependencies": {
           "express" : "2.2.0",
           "hottap" : "1.0.0",
