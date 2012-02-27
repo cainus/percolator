@@ -1,17 +1,16 @@
 const _ = require('underscore');
 
-var Builder = function(){};
+var Representer = function(){};
 
-Builder.prototype.error = function(type, message, detail, callback){
+Representer.prototype.error = function(type, message, detail){
 	if (!type || !message) {
-		callback("MissingRequiredFields")
-		return
+		throw new Error("MissingRequiredFields");
 	}
   var jsonError = { 'error' : { 'type' : type, 'message' : message} }
   if (detail == "" || !!detail){
      jsonError["error"]["detail"] = detail
   }
-  callback(null, jsonError)
+  return jsonError;
 };
 
-exports.Builder = Builder;
+exports.Representer = Representer;
