@@ -124,7 +124,8 @@ describe('Router', function(){
           hottap("http://localhost:1337/").request("GET", function(err, result){
             app.close();
             result.status.should.equal(200)
-            // TODO check links here
+            var body = JSON.parse(result.body)
+            body.links.happy.should.equal('/happy')
             done();
           });
         });

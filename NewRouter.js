@@ -37,7 +37,7 @@ Router.prototype.generateRoutes = function(root_uri){
     var resourceHandler = require(filePath).handler
     router.setRouteHandlers('/' + resourceName, resourceHandler);
   });
-  this.setRouteHandlers('/', this.getServiceDocumentHandler('/'))
+  this.setRouteHandlers('/', this.getServiceDocumentHandler('/', root_resources))
   router.app.use(function(req, res, next){ return router.errorNotFound(req, res)})
 }
 
@@ -89,8 +89,12 @@ Router.prototype.loadResourceTree = function(cb){
   });
 };
 
-Router.prototype.getServiceDocumentHandler = function(path){
-  var serviceDoc = this.representer.individual({}, {'self' : path})
+Router.prototype.getServiceDocumentHandler = function(path, root_resources){
+  var links = {'self' : path}
+  _.each(root_resources, function(resource){
+    links[resource] = urlJoin(path, resource);
+  });
+  var serviceDoc = this.representer.individual({}, links)
   return {
     'GET' : function(req, res){ res.send(serviceDoc); }
   }
@@ -143,4 +147,11 @@ exports.Router = Router;
 
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
+function urlJoin(){
+  return _.toArray(arguments)
+            .join('/')     // add a path divisor
+            .split('//')   // remove duplicate slashes
+            .join('/');    // re-join with single slashes
 }
