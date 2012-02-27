@@ -18,7 +18,7 @@ describe('Router', function(){
     });
 
     it ("throws an exception if a resource file doesn't export a handler");
-
+/*
     it ("responds with a 200 and body for simple GET", function(done){
       this.timeout(10000);
       var app = express.createServer();
@@ -50,7 +50,7 @@ describe('Router', function(){
           done();
         });
       });
-    });
+    });*/
 
     it ("responds with the Allow header for OPTIONS on a multi-method resource", function(done){
       this.timeout(10000);
@@ -68,7 +68,7 @@ describe('Router', function(){
         });
       });
     });
-    it ("responds with 405 when method not implemented by the handler", function(done){
+    /*it ("responds with 405 when method not implemented by the handler", function(done){
       this.timeout(10000);
       var app = express.createServer();
       var router = new Router(app, 'http://localhost:1337/', __dirname + '/../test_fixtures/resources', '')
@@ -82,6 +82,6 @@ describe('Router', function(){
           done();
         });
       });
-    });
+    });*/
 
 });
