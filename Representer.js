@@ -10,14 +10,18 @@ Representer.prototype.error = function(type, message, detail){
   if (detail == "" || !!detail){
      jsonError["error"]["detail"] = detail
   }
-  return jsonError;
+  return JSON.stringify(jsonError);
+};
+
+Representer.prototype.options = function(methods){
+	return JSON.stringify({"Allowed" : methods})
 };
 
 Representer.prototype.individual = function(object, links){
 	if (!_.include(_.keys(links), "self")){ throw "MissingSelfLink"}
 
 	object.links = links
-	return object
+	return JSON.stringify(object)
 };
 
 Representer.prototype.collection = function(collectionName, objects, collectionLinks, maxPageSize, pageLinks){
@@ -31,6 +35,6 @@ Representer.prototype.collection = function(collectionName, objects, collectionL
 		if (!_.include(_.keys(pageLinks), "first")){ throw "MissingFirstPageLink"}
 		collection.pagination = { "maxPageSize": maxPageSize, "links": pageLinks }
 	}
-	return collection
+	return JSON.stringify(collection)
 }
 exports.Representer = Representer;

@@ -22,12 +22,13 @@ Router.prototype.initialize = function(cb){
     if (!!err) return cb(err);
     router.available = true;
     router.app.use(function(req, res, next){ return router.handleRequest(req, res, next)})
-    router.generateRoutes();
+    var root_uri = '/';
+    router.generateRoutes(root_uri);
     cb();
   });
 }
 
-Router.prototype.generateRoutes = function(){
+Router.prototype.generateRoutes = function(root_uri){
   var router = this;
   var root_resources = [];
   _.each(this.resourceTree['/'], function(resourceName){
@@ -36,7 +37,7 @@ Router.prototype.generateRoutes = function(){
     var resourceHandler = require(filePath).handler
     router.setRouteHandlers('/' + resourceName, resourceHandler);
   });
-  this.setRouteHandlers('/', this.getServiceDocumentHandler())
+  this.setRouteHandlers('/', this.getServiceDocumentHandler('/'))
   router.app.use(function(req, res, next){ return router.errorNotFound(req, res)})
 }
 
@@ -59,7 +60,7 @@ Router.prototype.setRouteHandlers = function(resourcePath, resourceHandler){
   })
   router.setRouteHandler("OPTIONS", resourcePath, function(req, res){
     res.header('Allow', allowed_methods.join(","));
-    res.send({"Allowed" : allowed_methods});
+    res.send(router.representer.options(allowed_methods));
   })
 
 }
@@ -88,8 +89,8 @@ Router.prototype.loadResourceTree = function(cb){
   });
 };
 
-Router.prototype.getServiceDocumentHandler = function(){
-  var serviceDoc = JSON.stringify({})
+Router.prototype.getServiceDocumentHandler = function(path){
+  var serviceDoc = this.representer.individual({}, {'self' : path})
   return {
     'GET' : function(req, res){ res.send(serviceDoc); }
   }

@@ -6,6 +6,13 @@ describe("Representer", function(){
 	beforeEach(function(){
 		this.representer = new Representer();
 	})
+
+  describe("options representation builder", function(){
+		it("takes an array of allowed methods and returns a simple json object", function(){
+      var json = this.representer.options(["GET", "POST"])
+      JSON.parse(json).should.eql({"Allowed" : ["GET", "POST"]})
+		})
+  })
 	
 	describe("error representation builder", function(){
 
@@ -20,11 +27,13 @@ describe("Representer", function(){
 		})
 
 		it("returns a properly formatted json error block when given valid input", function(){
-			this.representer.error("SomeError", "Error message.").should.eql({"error":{"type":"SomeError", "message":"Error message."}})
+			JSON.parse(this.representer.error("SomeError", "Error message."))
+        .should.eql({"error":{"type":"SomeError", "message":"Error message."}})
 		})
 
 		it("returns a json error block with a detail", function(){
-			this.representer.error("SomeError", "Error message.", "detail").should.eql({"error":{"type":"SomeError", "message":"Error message.", "detail":"detail"}})
+			JSON.parse(this.representer.error("SomeError", "Error message.", "detail"))
+        .should.eql({"error":{"type":"SomeError", "message":"Error message.", "detail":"detail"}})
 		})
 	})
 
@@ -43,7 +52,7 @@ describe("Representer", function(){
 		it("returns a links hash in the representation", function(){
 			var object = { "hello": "world"}
 			var links = { "self": { "href": "selflink"} }
-			var res = this.representer.individual(object, links)
+			var res = JSON.parse(this.representer.individual(object, links))
 			res.should.eql({
 				"hello": "world", 
 				"links": {
@@ -68,7 +77,7 @@ describe("Representer", function(){
 		})
 
 		it("returns the objects in a named array and the collection links", function(){
-			var res = this.representer.collection("messages", [this.object], {"self": {"href": "collectionselflink"}})
+			var res = JSON.parse(this.representer.collection("messages", [this.object], {"self": {"href": "collectionselflink"}}))
 			res.should.eql({ "messages": [ 
 				{ "hello": "world", 
 					"links": {
@@ -93,6 +102,7 @@ describe("Representer", function(){
 		it("returns the collection with pagination when page size and page links are provided", function(){
 			var res = this.representer.collection("messages", [this.object], {"self": {"href": "collectionselflink"}}, 
 				20, { "first": { "href": "firstPage"}, "next": {"href": "nextPage"} })
+      res = JSON.parse(res);
 			res.should.eql({ 
 				"messages": [ 
 					{ "hello": "world", 
