@@ -132,7 +132,7 @@ Resource.prototype.checkAttributeValidity = function(doc, response, resource){
 Resource.prototype.preCreate = function(req, res, cb){
   var doc = req.jsonBody;
   if (this.validate(res, doc)){
-    return cb(false);
+    return cb(false, doc);
   }
   return cb(true);
 }

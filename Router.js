@@ -1,30 +1,162 @@
-const _ = require('underscore');
+const Representer = require('./Representer').Representer;
 const fs = require('fs');
-const path = require('path');
+const _ = require('underscore');
+const fullBodyParser = require('./middleware/fullBodyParser');
+const jsonBodyParser = require('./middleware/jsonBodyParser');
 
-function endsWith(str, suffix) {
-    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+function Router(app, resourceDirectory, base_uri){
+  this.representer = new Representer();
+  this.resourceDirectory = resourceDirectory;
+  this.app = app;
+  if (base_uri == '') base_uri = null;
+  this.base_uri = base_uri || '/';
+  this.resourceTree = {}
+  this.available = false;
+  this.app_methods = {"GET" : "get", 
+                      "POST" : "post", 
+                      "DELETE" : "del", 
+                      "PUT" : "put",
+                      };
 }
 
-function urlJoin(){
-  // joins with /, but not redundantly.  does not normalize pieces.
-  var retval = '';
-  console.log(arguments);
-  for(var i = 0; i < arguments.length; i++){
-    if ((retval != '') && (!endsWith(retval, '/'))){
-      retval += '/'
-    }
-    var additive = arguments[i]
-    if ((additive != '') && (additive[0] == '/')){
-      additive = additive.substring(1, additive.length);
-    }
-    retval += additive;
+Router.prototype.initialize = function(cb){
+  var router = this;
+  this.loadResourceTree(function(err){
+    if (!!err) return cb(err);
+    router.available = true;
+    router.app.use(fullBodyParser());
+    router.app.use(jsonBodyParser());
+    router.app.use(function(req, res, next){ return router.handleRequest(req, res, next)})
+    router.generateRoutes();
+    cb();
+  });
+}
+
+Router.prototype.generateRoutes = function(){
+  var router = this;
+  var root_resources = [];
+  _.each(this.resourceTree['/'], function(resourceName){
+    root_resources.push(resourceName);
+    var filePath = urlJoin(router.resourceDirectory, resourceName);
+    var resourceHandler = require(filePath).handler
+    var routeString = urlJoin(router.base_uri, resourceName)
+    router.setRouteHandlers(routeString, resourceHandler);
+  });
+
+  var serviceDocHandler = this.getServiceDocumentHandler(this.base_uri, root_resources)
+  this.setRouteHandlers(this.base_uri, serviceDocHandler)
+  var base_uri_without_slash = this.base_uri.substring(0, this.base_uri.length - 1);
+  if (base_uri_without_slash != ""){
+    this.setRouteHandlers(base_uri_without_slash, serviceDocHandler)
   }
-  console.log("out: " + retval);
-  return retval;
+  router.app.use(function(req, res, next){ return router.errorNotFound(req, res)})
 }
 
-function check_directory(dir){
+Router.prototype.setRouteHandlers = function(resourcePath, resourceHandler){
+  var router = this;
+  var isCollection = router.handlerIsCollection(resourceHandler);
+
+  // set GET, POST, PUT, DELETE for this resource file
+  if (isCollection){
+    _.each(router.app_methods, function(functionName, http_method){
+      router._routeToMethodHandler(resourcePath, resourceHandler, http_method, 'collection');
+      router._routeToMethodHandler(urlJoin(resourcePath, ':id') , resourceHandler, http_method);
+    })
+  } else {
+    _.each(router.app_methods, function(functionName, http_method){
+      router._routeToMethodHandler(resourcePath, resourceHandler, http_method);
+    })
+  }
+
+  // set OPTIONS for this resource
+  if (isCollection){
+    this._setOptionsHandler(resourceHandler, resourcePath, true);
+    this._setOptionsHandler(resourceHandler, urlJoin(resourcePath, ':id'), false);
+  } else {
+    this._setOptionsHandler(resourceHandler, resourcePath, false);
+  }
+}
+
+Router.prototype._routeToMethodHandler = function(resourcePath, resourceHandler, httpMethod, methodPrefix){
+    var router = this;
+    var methodPrefix = methodPrefix || ''
+    var handlerDefault = function(q, s){
+                        // default to method not allowed
+                        router.errorMethodNotAllowed(q, s)
+                      }
+    var resourceMethod = methodPrefix + httpMethod;
+    if (!!resourceHandler[resourceMethod]){
+      var handler = function(q, s){resourceHandler[resourceMethod](q, s)}
+    } else {
+      var handler = handlerDefault;
+    }
+    this.setRouteHandler(httpMethod, resourcePath, handler);
+}
+
+Router.prototype._setOptionsHandler = function(resourceHandler, resourcePath, isCollection){
+  var allowed_methods = [];
+  var router = this;
+  _.each(router.app_methods, function(functionName, httpMethod){
+    var handlerMethod = (isCollection) ? ("collection" + httpMethod) : httpMethod;
+    if (!!resourceHandler[handlerMethod]){
+      allowed_methods.push(httpMethod)
+    }
+  });
+  this.setRouteHandler("OPTIONS", resourcePath, function(req, res){
+    res.header('Allow', allowed_methods.join(","));
+    res.send(router.representer.options(allowed_methods));
+  })
+}
+
+
+
+Router.prototype.handlerIsCollection = function(handler){
+  // if any collection method is set, it's a collection
+  return _.any(_.keys(this.app_methods), function(method){
+    return !!handler["collection" + method]
+  });
+}
+
+Router.prototype.setRouteHandler = function(http_method, path, handler){
+  var methods = _.clone(this.app_methods)
+  methods["OPTIONS"] = 'options'
+  var app_method = methods[http_method]
+  this.app[app_method](path, handler)
+}
+
+Router.prototype.loadResourceTree = function(cb){
+  try {
+    this.validateResourceDirectory();
+  } catch (ex) {
+    return cb(ex);
+  }
+  var router = this;
+  fs.readdir(this.resourceDirectory, function(err, files){
+    var resources = [];
+    _.each(files, function(file){
+      if (endsWith(file, ".js")) {
+        resources.push(file.substring(0, file.length - 3));
+      };
+    });
+    router.resourceTree['/'] = resources;
+    cb(null);
+  });
+};
+
+Router.prototype.getServiceDocumentHandler = function(path, root_resources){
+  var links = {'self' : path}
+  _.each(root_resources, function(resource){
+    links[resource] = urlJoin(path, resource);
+  });
+  var serviceDoc = this.representer.individual({}, links)
+  return {
+    'GET' : function(req, res){ res.send(serviceDoc); }
+  }
+}
+
+
+Router.prototype.validateResourceDirectory =function(){
+  var dir = this.resourceDirectory
   try {
     var stats = fs.lstatSync(dir);
   } catch (err){
@@ -39,118 +171,41 @@ function check_directory(dir){
   }
 }
 
-function setAllowHeader(res, route, is_sub_resource){
-  res.header('Allow', route.get_allowed_methods(is_sub_resource).join(","));
-}
 
-function attachMethod(app, http_method, is_sub_resource, route, root_path){
-    var app_method = {"GET" : "get", 
-                      "POST" : "post", 
-                      "DELETE" : "del", 
-                      "PUT" : "put", 
-                      "OPTIONS" : "options"}[http_method];
-    if (is_sub_resource){
-      var handler_method = http_method 
-      var route_path = root_path + route.resource_name + '/:id';
-    } else {
-      var handler_method = 'collection' + http_method;
-      var route_path = root_path + route.resource_name
-    }
-    var handler = route.module;
-    if (!!handler[handler_method]){
-      route.add_allowed_method(http_method, is_sub_resource)
-      app[app_method](route_path, function(req, res){
-        handler[handler_method](req, res);
-      });
-    } else {
-      app[app_method](route_path, function(req, res){
-        setAllowHeader(res, route, is_sub_resource);
-        res.send('', 405);
-      });
-    }
-}
-
-
-
-function Router_getResources(dir, cb){
-  // TODO : there can't be resources named parent, self, etc.
-  fs.readdir(dir, function(err, files){
-    var resources = [];
-    _.each(files, function(file){
-      if (endsWith(file, ".js")) {
-        resources.push(file.substring(0, file.length - 3));
-      };
-    });
-    cb(resources);
-  });
-};
-
-
-function Route(resource_name, module){
-  this.resource_name = resource_name;  // the string name of the resource
-  this.module = module;           // the handler object loaded from the file
-  this.allowed_methods = [];      // all the methods allowed on the main resource
-  this.allowed_methods_sub = [];  // all the methods allowed on the sub resource
-  this.get_allowed_methods = function(is_sub_resource){
-    return (is_sub_resource) ? this.allowed_methods_sub : this.allowed_methods;
+Router.prototype.handleRequest = function(req, res, next){
+  if (!this.available){
+    return this.errorServerUnavailable(req, res)
   }
-  this.add_allowed_method = function(method, is_sub_resource){
-    this.get_allowed_methods(is_sub_resource).push(method)
-    //console.log(this.toString());
-  }
-  this.toString = function(){
-    return '[Route ' + resource_name + 
-           ' Methods: ' + this.allowed_methods.join(",") +
-           ' SubResource Methods: ' + this.allowed_methods_sub.join(",") + ']';
-  }
+  //return this.errorNotFound(req, res);
+  return next();
 }
 
-function setDefaultOptionsHandler(app, route, root_path){
-  var resource = route.resource_name
-    app.options(root_path + resource, function(req, res){
-      setAllowHeader(res, route, false) 
-      res.send('')
-    });
-    app.options(root_path + resource + '/:id', function(req, res){
-      setAllowHeader(res, route, true) 
-      res.send('')
-    });
+Router.prototype.errorServerUnavailable = function(req, res){
+  var error_representation = this.representer.error("ServerUnavailable", "The server is currently offline.")
+  res.send(error_representation, 503);
 }
 
-function createServiceDocument(app, base_url, routes, root_path){
-      app.get(root_path, function(req, res){
-        var new_base_url = urlJoin(app.settings.base_path, base_url)
-        var serviceDocument = { links: { self: { href: new_base_url }}};
-        _.each(routes, function(route, resource){
-          serviceDocument.links[resource] = {href : urlJoin(new_base_url, resource)}
-        });
-        res.send(serviceDocument);
-      });
+Router.prototype.errorNotFound = function(req, res){
+  var error_representation = this.representer.error("NotFound", "There is no resource with the provided URI.", req.originalUrl)
+  res.send(error_representation, 404);
 }
 
-function Router(app, base_url, resource_dir, root_path){
-  this.resource_dir = resource_dir
-  check_directory(this.resource_dir);
-  this.base_url = base_url + root_path
-  this.root_path = (root_path == '') ? '/' :  ('/' + root_path + '/')
-  var obj = this;
-  this.routes = {}
-
-  Router_getResources(obj.resource_dir, function(resources){
-      //console.log(resources);
-      _.each(resources, function(resource){
-        var module = require(obj.resource_dir + '/' + resource).handler
-        var route = new Route(resource, module);
-        obj.routes[resource] = route; 
-        _.each(["GET", "POST", "PUT", "DELETE"], function(http_method){
-          attachMethod(app, http_method, false, route, obj.root_path);
-          attachMethod(app, http_method, true, route, obj.root_path);
-        });
-        if (route.get_allowed_methods().indexOf("OPTIONS") == -1){
-          setDefaultOptionsHandler(app, route, obj.root_path);
-        }
-      });
-      createServiceDocument(app, obj.base_url, obj.routes, obj.root_path);
-  });
+Router.prototype.errorMethodNotAllowed = function(req, res){
+  var error_representation = this.representer.error("MethodNotAllowed", "That method is not allowed for this resource.", req.method)
+  res.send(error_representation, 405);
 }
+
 exports.Router = Router;
+
+// -- util
+
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
+function urlJoin(){
+  return _.toArray(arguments)
+            .join('/')     // add a path divisor
+            .split('//')   // remove duplicate slashes
+            .join('/');    // re-join with single slashes
+}

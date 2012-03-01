@@ -49,7 +49,6 @@ MongoResource.prototype.PUT = function(req, res){
 
 MongoResource.prototype.DELETE = function(req, res){
   var obj = this;
-  console.log("HERE!!")
   this.schemaClass.find({_id: req.param('id')}).execFind(function(err, docs){
     if (!!err){
       console.log("unknown error:");
@@ -79,8 +78,11 @@ MongoResource.prototype.collectionPOST = function(req, res){
     return
   }
   var body = req.jsonBody;
+  console.log("=================BODY============================");
+  console.log(body);
   var mongoRes = this;
   this.preCreate(req, res, function(err, doc){
+    console.log("doc is: " + doc);
     if (!err){
       var item = new mongoRes.schemaClass(doc);
       console.log('schema', mongoRes.schemaClass)
@@ -91,6 +93,7 @@ MongoResource.prototype.collectionPOST = function(req, res){
       }
       item.save(function (err) {
         if (!!err){
+          console.log("save error: " + err);
           if (err.toString().indexOf("duplicate key error index") != -1){
            // example: [Error: E11000 duplicate key error index: slackertax.users.$login_1  dup key: { : null }]
            var re = new RegExp('\.\$([a-zA-Z]+)_[0-9]');
@@ -114,6 +117,8 @@ MongoResource.prototype.collectionPOST = function(req, res){
            return;
           }
 
+          console.log("============================================");
+          console.log(err);
           switch(err.name){
             case 'ValidationError':
               res.send(JSON.stringify(err), 422);
