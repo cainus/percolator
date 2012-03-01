@@ -1,7 +1,7 @@
-const Resource = require('../resourceTypes/Resource').Resource;
+const Resource = require('../lib/resourceTypes/Resource').Resource;
 const express = require('express');
 const should = require('should');
-const Router = require('../Router').Router;
+const Router = require('../lib/Router').Router;
 const hottap = require('hottap').hottap;
 const _ = require('underscore');
 

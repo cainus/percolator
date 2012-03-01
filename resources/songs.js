@@ -1,4 +1,4 @@
-const MongoResource = require('../resourceTypes/MongoResource').MongoResource;
+const MongoResource = require('../lib/resourceTypes/MongoResource').MongoResource;
 const mongoose = require('mongoose');
 Schema = mongoose.Schema;
 

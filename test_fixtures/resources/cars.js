@@ -1,4 +1,4 @@
-const Resource = require('../../resourceTypes/Resource').Resource;
+const Resource = require('../../lib/resourceTypes/Resource').Resource;
 const _ = require('underscore');
 
 

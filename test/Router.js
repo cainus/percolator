@@ -1,12 +1,18 @@
 const express = require('express');
 const should = require('should');
-const Router = require('../Router').Router;
+const Router = require('../lib/Router').Router;
 const hottap = require('hottap').hottap;
 const _ = require('underscore');
 const mongoose = require('mongoose');
 
 
 describe('Router', function(){
+	beforeEach(function(){
+    this.app = express.createServer();
+    this.db = mongoose.connect('mongodb://127.0.0.1:27017/percolator')
+    this.simpleRouter = new Router(this.app, __dirname + '/../test_fixtures/resources')
+	})
+
     it ("returns an exception when the resource directory doesn't exist", function(done){
       this.timeout(10000);
       var app = express.createServer();
@@ -22,7 +28,6 @@ describe('Router', function(){
       this.timeout(10000);
       var app = express.createServer();
       var router = new Router(app, __dirname + '/../test_fixtures/resources')
-      //var router = new Router(app, 'http://localhost:1337/api', __dirname + '/../test_fixtures/resources', 'api')
       router.initialize(function(){
         router.available = false;
         app.listen(1337, function(){
@@ -40,9 +45,8 @@ describe('Router', function(){
 
 
     it ("responds with a 404 if the resource is entirely unknown", function(done){
-      var app = express.createServer();
-      var router = new Router(app, __dirname + '/../test_fixtures/resources')
-      router.initialize(function(){
+      var app = this.app;
+      this.simpleRouter.initialize(function(){
         app.listen(1338, function(){
           hottap("http://localhost:1338/doesnotexist").request("GET", function(err, result){
             app.close();
@@ -58,9 +62,9 @@ describe('Router', function(){
 
     it ("creates a route tree", function(done){
       // TODO make this dive into deeper dirs for nested resources!
-      var app = express.createServer();
-      var router = new Router(app, __dirname + '/../test_fixtures/resources')
-      router.initialize(function(err){
+      var app = this.app;
+      var router = this.simpleRouter;
+      router.initialize(function(){
         var diff = _.difference( router.resourceTree['/'], ['cars', 'happy', 'artists', 'empty', 'many'])
         diff.length.should.equal(0)
         done();
@@ -68,9 +72,8 @@ describe('Router', function(){
     })
 
     it ("responds with a 200 if the resource exists and method is implemented", function(done){
-      var app = express.createServer();
-      var router = new Router(app, __dirname + '/../test_fixtures/resources')
-      router.initialize(function(){
+      var app = this.app;
+      this.simpleRouter.initialize(function(){
         app.listen(1337, function(){
           hottap("http://localhost:1337/happy").request("GET", function(err, result){
             app.close();
@@ -100,9 +103,8 @@ describe('Router', function(){
     });
 
     it ("responds with a 405 if the resource exists but the method is disallowed", function(done){
-      var app = express.createServer();
-      var router = new Router(app, __dirname + '/../test_fixtures/resources')
-      router.initialize(function(err){
+      var app = this.app;
+      this.simpleRouter.initialize(function(err){
         if (!!err){ throw err;}
         app.listen(1338, function(){
           hottap("http://localhost:1338/happy").request("POST", function(err, result){
@@ -118,9 +120,8 @@ describe('Router', function(){
     });
 
     it ("responds with the Allow header for a simple OPTIONS", function(done){
-      var app = express.createServer();
-      var router = new Router(app, __dirname + '/../test_fixtures/resources')
-      router.initialize(function(){
+      var app = this.app;
+      this.simpleRouter.initialize(function(){
         app.listen(1337, function(){
           hottap("http://localhost:1337/happy").request("OPTIONS", function(err, result){
             app.close();
@@ -137,9 +138,8 @@ describe('Router', function(){
     });
 
     it ("responds with the Allow header for a OPTIONS on sub-resources of collections", function(done){
-      var app = express.createServer();
-      var router = new Router(app, __dirname + '/../test_fixtures/resources')
-      router.initialize(function(){
+      var app = this.app;
+      this.simpleRouter.initialize(function(){
         app.listen(1337, function(){
           hottap("http://localhost:1337/many/1234").request("OPTIONS", function(err, result){
             app.close();
@@ -156,9 +156,8 @@ describe('Router', function(){
     });
 
     it ("responds with the Allow header for a OPTIONS on collections", function(done){
-      var app = express.createServer();
-      var router = new Router(app, __dirname + '/../test_fixtures/resources')
-      router.initialize(function(){
+      var app = this.app;
+      this.simpleRouter.initialize(function(){
         app.listen(1337, function(){
           hottap("http://localhost:1337/many/").request("OPTIONS", function(err, result){
             app.close();
@@ -175,9 +174,8 @@ describe('Router', function(){
     });
 
     it ("responds with a service document when the root is requested", function(done){
-      var app = express.createServer();
-      var router = new Router(app, __dirname + '/../test_fixtures/resources')
-      router.initialize(function(){
+      var app = this.app;
+      this.simpleRouter.initialize(function(){
         app.listen(1337, function(){
           hottap("http://localhost:1337/").request("GET", function(err, result){
             app.close();
@@ -207,9 +205,8 @@ describe('Router', function(){
     })
 
     it ("sets up collection routes when possible", function(done){
-      var app = express.createServer();
-      var router = new Router(app, __dirname + '/../test_fixtures/resources')
-      router.initialize(function(){
+      var app = this.app;
+      this.simpleRouter.initialize(function(){
         app.listen(1337, function(){
           hottap("http://localhost:1337/many").request("GET", function(err, result){
             app.close();
@@ -223,11 +220,8 @@ describe('Router', function(){
     });
 
     it ("sets up collection sub resource routes when possible", function(done){
-      var app = express.createServer();
-      var mongo_url = 'mongodb://127.0.0.1:27017/percolator';
-      var db = mongoose.connect(mongo_url)
-      var router = new Router(app, __dirname + '/../test_fixtures/resources')
-      router.initialize(function(){
+      var app = this.app;
+      this.simpleRouter.initialize(function(){
         app.listen(1337, function(){
           hottap("http://localhost:1337/many/1234").request("GET", function(err, result){
                             result.status.should.equal(200)
@@ -240,22 +234,32 @@ describe('Router', function(){
     });
 
   // TODO make full urls on all links an option
-  // TODO make MongoResource use *not* spit full url 
+  // TODO make MongoResource *not* spit full url 
   // TODO is it possible to make the router deny all requests if it hasn't been initialized?
 
   describe("#handlerIsCollection", function(){
     it ("returns false when the handler is not a collection", function(done){
-      var app = express.createServer();
-      var router = new Router(app, __dirname + '/../test_fixtures/resources')
-      router.handlerIsCollection({"GET" : function(){}}).should.equal(false);
+      this.simpleRouter.handlerIsCollection({"GET" : function(){}}).should.equal(false);
       done();
     });
     it ("returns true when the handler is a collection", function(done){
-      var app = express.createServer();
-      var router = new Router(app, __dirname + '/../test_fixtures/resources')
-      router.handlerIsCollection({"collectionGET" : function(){}}).should.equal(true);
+      this.simpleRouter.handlerIsCollection({"collectionGET" : function(){}}).should.equal(true);
       done();
     });
   });
-
+  /*
+    it('should not allow uris that are too long', function(done){
+        req.method = 'GET';
+        req.url = '';
+        for(var i = 0; i < 500; i++){
+            req.url += '1234567890';
+        }
+        res.send = function(msg, status){
+          status.should.equal(414);
+          msg.should.equal('Request URI Too Long.');
+          done();
+        }
+        subject(req, res, next);
+    });
+  */
 });

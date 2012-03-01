@@ -1,4 +1,4 @@
-const MongoResource = require('../resourceTypes/MongoResource').MongoResource;
+const MongoResource = require('../lib/resourceTypes/MongoResource').MongoResource;
 
 var app = {}
 exports.handler = new MongoResource(app, 'artists', {

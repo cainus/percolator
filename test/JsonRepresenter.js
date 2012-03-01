@@ -1,10 +1,10 @@
-const Representer = require('../Representer').Representer;
+const JsonRepresenter = require('../lib/representers/JsonRepresenter').JsonRepresenter;
 const should = require('should');
 
 describe("Representer", function(){
 		
 	beforeEach(function(){
-		this.representer = new Representer();
+		this.representer = new JsonRepresenter();
 	})
 
   describe("options representation builder", function(){
