@@ -25,7 +25,7 @@ var mongo_url = 'mongodb://127.0.0.1:27017/percolator_test';
 describe('MongoResource', function(){ 
 
    beforeEach(function(done){
-     clearDB('artists');
+     clearDB('artist');
      this.db = mongoose.connect(mongo_url)
      done();
   });
@@ -39,11 +39,11 @@ describe('MongoResource', function(){
       var router = new Router(app, __dirname + '/../test_fixtures/resources')
       router.initialize(function(){
         app.listen(port, function(){
-          hottap("http://localhost:" + port + "/artists").json("GET", function(err, result){
+          hottap("http://localhost:" + port + "/artist").json("GET", function(err, result){
             app.close();
             if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
             result.body.items.length.should.equal(0);
-            result.body.links.self.href.should.equal("http://localhost:" + port + "/artists")
+            result.body.links.self.href.should.equal("http://localhost:" + port + "/artist")
             done();
           });
         });
@@ -58,7 +58,7 @@ describe('MongoResource', function(){
       var router = new Router(app, __dirname + '/../test_fixtures/resources')
       router.initialize(function(){
         app.listen(port, function(){
-          hottap("http://localhost:" + port + "/artists").request("POST", {'Content-Type' : 'application/json'}, 'asdf', function(err, result){
+          hottap("http://localhost:" + port + "/artist").request("POST", {'Content-Type' : 'application/json'}, 'asdf', function(err, result){
             app.close();
             if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
             result.status.should.equal(400);
@@ -75,7 +75,7 @@ describe('MongoResource', function(){
       var router = new Router(app, __dirname + '/../test_fixtures/resources')
       router.initialize(function(){
         app.listen(port, function(){
-          hottap("http://localhost:" + port + "/artists").request("POST", {}, 'asdf', function(err, result){
+          hottap("http://localhost:" + port + "/artist").request("POST", {}, 'asdf', function(err, result){
             app.close();
             if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
             result.status.should.equal(415);
@@ -96,7 +96,7 @@ describe('MongoResource', function(){
       var router = new Router(app, 'http://localhost:' + port + '/', __dirname + '/../test_fixtures/resources')
 
       app.listen(port, function(){
-        hottap("http://localhost:" + port + "/artists").request("POST", {'Content-Type':'application/json'}, '{}', function(err, result){
+        hottap("http://localhost:" + port + "/artist").request("POST", {'Content-Type':'application/json'}, '{}', function(err, result){
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           console.log('rizzle', result);
           hottap(result.headers.location).request("GET", {'Content-Type':'application/json'}, function(err, response){
@@ -105,7 +105,7 @@ describe('MongoResource', function(){
           });
           app.close();
           result.status.should.equal(422);
-          var schemaClass = mongoose.model('artists', new mongoose.Schema());
+          var schemaClass = mongoose.model('artist', new mongoose.Schema());
           schemaClass.find({}).execFind(function(err, docs){
             console.log(docs);
             docs.count.should.equal(0);
@@ -130,12 +130,12 @@ describe('MongoResource', function(){
 
       app.listen(port, function(){
         var artist = '{"name" : "artist"' + port + '}';
-        hottap("http://localhost:' + port '/artists").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
+        hottap("http://localhost:' + port '/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
           app.close();
           console.log(result);
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           result.status.should.equal(201);
-          result.headers['Location'].should.equal("http://localhost:3000/artists")
+          result.headers['Location'].should.equal("http://localhost:3000/artist")
           done();
         });
       });

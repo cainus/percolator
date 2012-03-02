@@ -60,16 +60,6 @@ describe('Router', function(){
       });
     });
 
-    it ("creates a route tree", function(done){
-      // TODO make this dive into deeper dirs for nested resources!
-      var app = this.app;
-      var router = this.simpleRouter;
-      router.initialize(function(){
-        var diff = _.difference( router.resourceTree['/'], ['cars', 'happy', 'artists', 'empty', 'many'])
-        diff.length.should.equal(0)
-        done();
-      });
-    })
 
     it ("responds with a 200 if the resource exists and method is implemented", function(done){
       var app = this.app;
@@ -219,6 +209,39 @@ describe('Router', function(){
       });
     });
 
+    it('should not allow uris that are too long', function(done){
+      var url = 'http://localhost:1337/';
+      for(var i = 0; i < 500; i++){
+        url += '1234567890';
+      }
+      var app = this.app;
+      this.simpleRouter.initialize(function(){
+        app.listen(1337, function(){
+          hottap(url).request("GET", function(err, result){
+            result.status.should.equal(414);
+            JSON.parse(result.body).error.type.should.equal('RequestUriTooLong');
+            app.close();
+            done();
+          });
+        });
+      });
+    });
+
+   /* 
+    it ("sets up collection sub-sub resources when a folder exists with resources", function(done){
+      var app = this.app;
+      this.simpleRouter.initialize(function(){
+        app.listen(1337, function(){
+          hottap("http://localhost:1337/artist/1234/album").request("GET", function(err, result){
+                            result.status.should.equal(200)
+                            result.body.should.eql('1234')
+                            app.close();
+                            done();
+                          });
+        });
+      });
+    });
+*/
     it ("sets up collection sub resource routes when possible", function(done){
       var app = this.app;
       this.simpleRouter.initialize(function(){
@@ -232,6 +255,17 @@ describe('Router', function(){
         });
       });
     });
+
+    it ("creates a route tree", function(done){
+      // TODO make this dive into deeper dirs for nested resources!
+      var app = this.app;
+      var router = this.simpleRouter;
+      router.initialize(function(){
+        var diff = _.difference( router.resourceTree['/'], ['cars', 'happy', 'artist', 'empty', 'many'])
+        diff.length.should.equal(0)
+        done();
+      });
+    })
 
   // TODO make full urls on all links an option
   // TODO make MongoResource *not* spit full url 
@@ -247,19 +281,5 @@ describe('Router', function(){
       done();
     });
   });
-  /*
-    it('should not allow uris that are too long', function(done){
-        req.method = 'GET';
-        req.url = '';
-        for(var i = 0; i < 500; i++){
-            req.url += '1234567890';
-        }
-        res.send = function(msg, status){
-          status.should.equal(414);
-          msg.should.equal('Request URI Too Long.');
-          done();
-        }
-        subject(req, res, next);
-    });
-  */
+  
 });
