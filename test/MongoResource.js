@@ -85,36 +85,23 @@ describe('MongoResource', function(){
       });
   });
 
-  it ("#collectionPOST returns a 422 when the input doesn't fulfill the schema requirements"); /*, function(done){
-     // NO IDEA HOW TO MAKE THIS WORK!!! WTF!!!
-````` this.timeout(10000);
+  it ("#collectionPOST returns a 422 when the input doesn't fulfill the schema requirements", function(done){
       var app = express.createServer();
-      app.configure(function(){
-        app.use(fullBodyParser());
-      });
-      var port = getPort();
-      var router = new Router(app, 'http://localhost:' + port + '/', __dirname + '/../test_fixtures/resources')
-
-      app.listen(port, function(){
-        hottap("http://localhost:" + port + "/artist").request("POST", {'Content-Type':'application/json'}, '{}', function(err, result){
-          if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
-          console.log('rizzle', result);
-          hottap(result.headers.location).request("GET", {'Content-Type':'application/json'}, function(err, response){
-            console.log('err', err);
-            console.log('response', response);
-          });
-          app.close();
-          result.status.should.equal(422);
-          var schemaClass = mongoose.model('artist', new mongoose.Schema());
-          schemaClass.find({}).execFind(function(err, docs){
-            console.log(docs);
-            docs.count.should.equal(0);
+      var port = 1337;
+      var router = new Router(app, __dirname + '/../test_fixtures/resources')
+      router.initialize(function(){
+        app.listen(port, function(){
+          hottap("http://localhost:" + port + "/artist")
+            .request("POST", {'Content-Type':'application/json'}, '{}', function(err, result){
+            if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
+            result.status.should.equal(422);
+            JSON.parse(result.body).name.should.equal("ValidationError");
+            app.close();
             done();
           });
         });
-      });
+     });
   });
-*/
 
 
   it ("#collectionPOST returns a 201 with a Location header", function(done){
