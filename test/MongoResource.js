@@ -117,29 +117,24 @@ describe('MongoResource', function(){
 */
 
 
-  it ("#collectionPOST returns a 201 with a Location header");
-/*
   it ("#collectionPOST returns a 201 with a Location header", function(done){
       this.timeout(10000);
       var app = express.createServer();
-      app.configure(function(){
-        app.use(fullBodyParser());
-      });
-      var port = getPort();
-      var router = new Router(app, 'http://localhost:' + port + '/', __dirname + '/../test_fixtures/resources')
-
-      app.listen(port, function(){
-        var artist = '{"name" : "artist"' + port + '}';
-        hottap("http://localhost:' + port '/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
-          app.close();
-          console.log(result);
-          if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
-          result.status.should.equal(201);
-          result.headers['Location'].should.equal("http://localhost:3000/artist")
-          done();
+      var port = 1337;
+      var router = new Router(app, __dirname + '/../test_fixtures/resources')
+      router.initialize(function(){
+        app.listen(port, function(){
+          var artist = '{"name" : "artist"}';
+          hottap("http://localhost:1337/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
+            app.close();
+            if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
+            result.status.should.equal(201);
+            result.headers.location.should.match(/artist\/[a-z0-9]/)
+            done();
+          });
         });
       });
   });
-  */
+  
 });
 
