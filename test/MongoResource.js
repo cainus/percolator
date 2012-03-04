@@ -6,13 +6,6 @@ const hottap = require('hottap').hottap;
 const mongoose = require('mongoose');
 const _ = require('underscore');
 
-var lastPort = 1300;
-function getPort(){
-  lastPort++
-  return lastPort;
-}
-
-
 var clearDB = function(name){
   // remove stuff
   var schemaClass = mongoose.model(name, new mongoose.Schema());
@@ -26,6 +19,16 @@ describe('MongoResource', function(){
 
    beforeEach(function(done){
      clearDB('artist');
+     this.app = express.createServer();
+     this.db = mongoose.connect(mongo_url)
+     done();
+  });
+   afterEach(function(done){
+     try {
+       this.app.close()
+     } catch(ex){
+        // do nothing... already closed
+     }
      this.db = mongoose.connect(mongo_url)
      done();
   });
@@ -33,7 +36,7 @@ describe('MongoResource', function(){
 
   it ("should return a proper collection for GET representing an empty mongo collection", function(done){
       this.timeout(10000);
-      var app = express.createServer();
+      var app = this.app;
       var port = 1337; 
       app.settings.base_path = 'http://localhost:' + port;
       var router = new Router(app, __dirname + '/../test_fixtures/resources')
@@ -53,7 +56,7 @@ describe('MongoResource', function(){
 
   it ("#collectionPOST returns a 400 when it can't parse the JSON", function(done){
       this.timeout(10000);
-      var app = express.createServer();
+      var app = this.app;
       var port = 1337; 
       var router = new Router(app, __dirname + '/../test_fixtures/resources')
       router.initialize(function(){
@@ -70,7 +73,7 @@ describe('MongoResource', function(){
 
   it ("#collectionPOST returns a 415 when it's not JSON", function(done){
       this.timeout(10000);
-      var app = express.createServer();
+      var app = this.app;
       var port = 1337; 
       var router = new Router(app, __dirname + '/../test_fixtures/resources')
       router.initialize(function(){
@@ -86,7 +89,7 @@ describe('MongoResource', function(){
   });
 
   it ("#collectionPOST returns a 422 when the input doesn't fulfill the schema requirements", function(done){
-      var app = express.createServer();
+      var app = this.app;
       var port = 1337;
       var router = new Router(app, __dirname + '/../test_fixtures/resources')
       router.initialize(function(){
@@ -105,8 +108,7 @@ describe('MongoResource', function(){
 
 
   it ("#collectionPOST returns a 201 with a Location header", function(done){
-      this.timeout(10000);
-      var app = express.createServer();
+      var app = this.app;
       var port = 1337;
       var router = new Router(app, __dirname + '/../test_fixtures/resources')
       router.initialize(function(){
