@@ -12,6 +12,14 @@ describe('Router', function(){
     this.db = mongoose.connect('mongodb://127.0.0.1:27017/percolator')
     this.simpleRouter = new Router(this.app, __dirname + '/../test_fixtures/resources')
 	})
+	afterEach(function(){
+    try {
+      this.app.close();
+    } catch (ex){
+      // do nothing
+    }
+	})
+  
 
     it ("returns an exception when the resource directory doesn't exist", function(done){
       this.timeout(10000);
@@ -227,21 +235,6 @@ describe('Router', function(){
       });
     });
 
-   /* 
-    it ("sets up collection sub-sub resources when a folder exists with resources", function(done){
-      var app = this.app;
-      this.simpleRouter.initialize(function(){
-        app.listen(1337, function(){
-          hottap("http://localhost:1337/artist/1234/album").request("GET", function(err, result){
-                            result.status.should.equal(200)
-                            result.body.should.eql('1234')
-                            app.close();
-                            done();
-                          });
-        });
-      });
-    });
-*/
     it ("sets up collection sub resource routes when possible", function(done){
       var app = this.app;
       this.simpleRouter.initialize(function(){
@@ -266,7 +259,21 @@ describe('Router', function(){
         done();
       });
     })
-
+  /* 
+    it ("sets up collection sub-sub resources when a folder exists with resources", function(done){
+      var app = this.app;
+      this.simpleRouter.initialize(function(){
+        app.listen(1337, function(){
+          hottap("http://localhost:1337/artist/1234/album").request("GET", function(err, result){
+                            result.status.should.equal(200)
+                            result.body.should.eql('1234')
+                            app.close();
+                            done();
+                          });
+        });
+      });
+    });
+*/
   // TODO make full urls on all links an option
   // TODO make MongoResource *not* spit full url 
   // TODO is it possible to make the router deny all requests if it hasn't been initialized?
