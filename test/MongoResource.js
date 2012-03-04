@@ -8,7 +8,10 @@ const _ = require('underscore');
 
 var clearDB = function(name){
   // remove stuff
-  var schemaClass = mongoose.model(name, new mongoose.Schema());
+  var schemaClass = mongoose.model(name, new mongoose.Schema({
+        'name' : { type: String, match: /[a-zA-z0-9\.]/, required : true },
+        'created' :  { type: Date, default: Date.now, required : true }
+}));
   schemaClass.collection.drop();
 }
 
