@@ -31,7 +31,10 @@ describe('ResourceTree', function(){
       var kid = tree.addChild('someresource', {})
       kid.addChild("deepkid", {})
       tree.addChild('someotherresource', {})
-      tree.toString().should.equal("[Resource /]\nL-[Resource someresource]\nL--[Resource deepkid]\nL-[Resource someotherresource]");
+      tree.toString().should.match(/L-\[Resource someresource\]/)
+      tree.toString().should.match(/L--\[Resource deepkid\]/)
+      tree.toString().should.match(/L-\[Resource someotherresource\]/)
+      tree.toString().should.match(/^\[Resource \/\]/);
       done();
     });
   });
@@ -52,7 +55,7 @@ describe('ResourceTree', function(){
       var tree = new ResourceTree();
       tree.fromFileSystem(__dirname + '/../test_fixtures/resources');
       console.log("\n" + tree.toString());
-      tree.toString().should.equal("[Resource /]\nL-[Resource cars]\nL-[Resource happy]\nL-[Resource many]\nL-[Resource empty]\nL-[Resource artist]\nL--[Resource album]");
+      tree.toString().should.match(/L--\[Resource album\]/);
       done();
     })
   });
