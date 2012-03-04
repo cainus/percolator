@@ -18,8 +18,6 @@ app.set('base_path', 'http://localhost' + portStr + '/api');
 
 
 var router = new Router(app, __dirname + '/resources', '/api/');
-router.initialize(function(){
-  app.listen(port, function(){
-    console.log("Application started!");
-  });
+app.listen(port, function(){
+  console.log("Application started!");
 });
