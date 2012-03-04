@@ -26,7 +26,7 @@ describe('Router', function(){
       var app = express.createServer();
       var router = new Router(app, __dirname + '/../test_fixtures/no_dir_by_this_name')
       router.initialize(function(err){
-        err.should.equal('resource_dir parameter was not a valid directory: /home/cainus/percolator/test/../test_fixtures/no_dir_by_this_name');
+        err.should.match(/resource_dir parameter was not a valid directory:/);
         done();
       })
     });

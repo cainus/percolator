@@ -54,8 +54,8 @@ describe('ResourceTree', function(){
     it ("should load in a hierarchy from the filesytem", function(done){
       var tree = new ResourceTree();
       tree.fromFileSystem(__dirname + '/../test_fixtures/resources');
-      console.log("\n" + tree.toString());
       tree.toString().should.match(/L--\[Resource album\]/);
+      tree.toString().should.match(/L-\[Resource artist\]/);
       done();
     })
   });
