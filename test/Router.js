@@ -205,17 +205,25 @@ describe('Router', function(){
       diff.length.should.equal(0)
       done();
     })
-/*
+
     it ("sets up collection sub-sub resources when a folder exists with resources", function(done){
       this.app.listen(1337, function(){
         hottap("http://localhost:1337/artist/1234/album").request("GET", function(err, result){
                           result.status.should.equal(200)
-                          result.body.should.eql('1234')
                           done();
                         });
       });
     });
-*/
+
+    it ("should 405 on missing methods of a sub-collection", function(done){
+      this.app.listen(1337, function(){
+        hottap("http://localhost:1337/artist/1234/album/").request("PUT", function(err, result){
+                          result.status.should.equal(405)
+                          done();
+                        });
+      });
+    });
+
   // TODO make full urls on all links an option
   // TODO make MongoResource *not* spit full url 
   // TODO is it possible to make the router deny all requests if it hasn't been initialized?
