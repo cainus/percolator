@@ -24,9 +24,7 @@ describe('Router', function(){
     it ("returns an exception when the resource directory doesn't exist", function(done){
       this.app = express.createServer();
       try {
-        console.log("trying");
         var router = new Router(this.app, __dirname + '/../test_fixtures/no_dir_by_this_name')
-        console.log("failed");
         should.fail("expected exception was noth thrown")
       } catch (err){
         err.should.match(/resource_dir parameter was not a valid directory:/);
@@ -40,8 +38,6 @@ describe('Router', function(){
       this.app.listen(1337, function(){
         hottap("http://localhost:1337/").request("GET", function(err, result){
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
-          console.log("**********************");
-          console.log(result.body);
           result.status.should.equal(503)
           JSON.parse(result.body).error.type.should.equal("ServerUnavailable")
           JSON.parse(result.body).error.message.should.equal("The server is currently offline.")
