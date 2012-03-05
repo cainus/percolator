@@ -85,7 +85,7 @@ describe('MongoResource', function(){
           .request("POST", {'Content-Type':'application/json'}, '{}', function(err, result){
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           result.status.should.equal(422);
-          JSON.parse(result.body).name.should.equal("ValidationError");
+          JSON.parse(result.body).error.type.should.equal("ValidationError");
           done();
         });
       });
