@@ -190,11 +190,13 @@ describe('MongoResource', function(){
         this.app.listen(port, function(){
           var artist = '{"name" : "artist"}';
           hottap("http://localhost:1337/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
-            hottap("http://localhost:" + port + "/artist").json("GET", function(err, result){
+            var self_location = result.headers.location;
+            hottap("http://localhost:" + port + "/artist").request("GET", {'Content-Type' : 'application/json'}, function(err, result){
               if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
-              result.body.items.length.should.equal(1);
-              result.body.links.self.href.should.equal("/artist")
-              result.body.items[0].links.parent.href.should.equal("http://localhost:1337/artist")
+              var body = JSON.parse(result.body);
+              body.items.length.should.equal(1);
+              body.items[0].links.self.href.should.equal(self_location)
+              body.items[0].links.parent.href.should.equal("/artist")
               done();
             });
           });
