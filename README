@@ -1,5 +1,0 @@
-installing mocha:
-npm install -g mocha
-
-running tests:
-mocha
