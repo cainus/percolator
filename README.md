@@ -1,5 +1,8 @@
 # Percolator
-Percolator is a framework for quickly and easily building quality web APIs.  
+[![Build
+Status](https://secure.travis-ci.org/cainus/percolator.png?branch=master)](http://travis-ci.org/cainus/percolator)
+Percolator is a framework for quickly and easily building quality web APIs with node.js.  
+
 It is intended for developers who want to build great APIs, but don't want to
 have to write tedious boiler plate code over-and-over to achieve it.
 
