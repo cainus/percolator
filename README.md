@@ -15,11 +15,13 @@ To create a simple read-only /helloworld resource that responds with "Hello
 World!", create a file in the root resources directory called "helloworld.js"
 and put this in it:
 
-exports.handler = {
-  GET : function(req, res){
-    res.send('Hello World!');
+```javascript
+  exports.handler = {
+    GET : function(req, res){
+      res.send('Hello World!');
+    }
   }
-}
+```
 
 "req" and "res" are simply express's request and response objects.
 
@@ -27,11 +29,13 @@ exports.handler = {
 To create a "/rockband" collection resource based on a "rockband" Mongo collection, 
 create a file called "rockband.js" and put this in it:
 
+```javascript
   const MongoResource = require('../lib/resourceTypes/MongoResource').MongoResource;
   exports.handler = new MongoResource('rockbands', {
-        'name' : { type: String, match: /[a-zA-z0-9\.]/, required : true },
-        'created' :  { type: Date, default: Date.now, required : true }
+    'name' : { type: String, match: /[a-zA-z0-9\.]/, required : true },
+    'created' : { type: Date, default: Date.now, required : true }
   })
+```
 
 You'll automatically get a "rockband" collection that you can GET and POST to
 (with validations), that stores in Mongo.  Every rockband that you add via POST
@@ -39,6 +43,7 @@ will be available at its own URL afterward, for GETting, updating via PUT and
 deleting via DELETE.  Here's how a GET on /rockband looks when it has one rock
 band:
 
+```javascript
   {
     items: [
       {
@@ -64,9 +69,11 @@ band:
       }
     }
   }
-
+```
 
 Here's how a GET on /rockband/1234 looks:
+
+```javascript
   {
       created: "2012-03-17T19:39:28.200Z",
       name: "The Clash",
@@ -80,10 +87,12 @@ Here's how a GET on /rockband/1234 looks:
         }
       }
     }
+```
 
 Here's how a GET on /rockband/4567 (which doesn't exist!) looks (with a 404
 status):
 
+```javascript
   {
     error: {
       type: "RecordNotFoundError",
@@ -91,6 +100,7 @@ status):
       detail: "4567"
     }
   }
+```
 
 ## Values
 ### Make the hard stuff simple
