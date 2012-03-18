@@ -38,8 +38,8 @@ describe('Router', function(){
 
     it ("responds with a 503 if the server is marked as unavailable", function(done){
       this.simpleRouter.available = false;
-      this.app.listen(1337, function(){
-        hottap("http://localhost:1337/").request("GET", function(err, result){
+      this.app.listen(9999, function(){
+        hottap("http://localhost:9999/").request("GET", function(err, result){
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           result.status.should.equal(503)
           JSON.parse(result.body).error.type.should.equal("ServerUnavailable")
@@ -64,8 +64,8 @@ describe('Router', function(){
 
 
     it ("responds with a 200 if the resource exists and method is implemented", function(done){
-      this.app.listen(1337, function(){
-        hottap("http://localhost:1337/happy").request("GET", function(err, result){
+      this.app.listen(9999, function(){
+        hottap("http://localhost:9999/happy").request("GET", function(err, result){
           result.status.should.equal(200)
           result.body.should.equal("this worked")
           done();
@@ -76,8 +76,8 @@ describe('Router', function(){
     // make it so we can mount the router to a different path
     it ("responds with a 200 for an existing resource on a *mounted* path", function(done){
       this.simpleRouter = new Router(this.app, this.resourceDir, '/api/')
-      this.app.listen(1337, function(){
-        hottap("http://localhost:1337/api/happy").request("GET", function(err, result){
+      this.app.listen(9999, function(){
+        hottap("http://localhost:9999/api/happy").request("GET", function(err, result){
           result.status.should.equal(200)
           result.body.should.equal("this worked")
           done();
@@ -98,8 +98,8 @@ describe('Router', function(){
     });
 
     it ("responds with the Allow header for a simple OPTIONS", function(done){
-      this.app.listen(1337, function(){
-        hottap("http://localhost:1337/happy").request("OPTIONS", function(err, result){
+      this.app.listen(9999, function(){
+        hottap("http://localhost:9999/happy").request("OPTIONS", function(err, result){
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           result.status.should.equal(200)
           should.exist(result.headers['allow'])
@@ -112,8 +112,8 @@ describe('Router', function(){
     });
 
     it ("responds with the Allow header for a OPTIONS on sub-resources of collections", function(done){
-      this.app.listen(1337, function(){
-        hottap("http://localhost:1337/many/1234").request("OPTIONS", function(err, result){
+      this.app.listen(9999, function(){
+        hottap("http://localhost:9999/many/1234").request("OPTIONS", function(err, result){
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           result.status.should.equal(200)
           should.exist(result.headers['allow'])
@@ -126,8 +126,8 @@ describe('Router', function(){
     });
 
     it ("responds with the Allow header for a OPTIONS on collections", function(done){
-      this.app.listen(1337, function(){
-        hottap("http://localhost:1337/many/").request("OPTIONS", function(err, result){
+      this.app.listen(9999, function(){
+        hottap("http://localhost:9999/many/").request("OPTIONS", function(err, result){
           if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
           result.status.should.equal(200)
           should.exist(result.headers['allow'])
@@ -140,8 +140,8 @@ describe('Router', function(){
     });
 
     it ("responds with a service document when the root is requested", function(done){
-      this.app.listen(1337, function(){
-        hottap("http://localhost:1337/").request("GET", function(err, result){
+      this.app.listen(9999, function(){
+        hottap("http://localhost:9999/").request("GET", function(err, result){
           result.status.should.equal(200)
           var body = JSON.parse(result.body)
           body.links.happy.should.equal('/happy')
@@ -153,8 +153,8 @@ describe('Router', function(){
     it ("responds with a service document for the root url, even without a trailing / ", function(done){
       var app = express.createServer();
       var router = new Router(app, this.resourceDir, '/api')
-      app.listen(1337, function(){
-        hottap("http://localhost:1337/api").request("GET", function(err, result){
+      app.listen(9999, function(){
+        hottap("http://localhost:9999/api").request("GET", function(err, result){
           app.close();
           result.status.should.equal(200)
           var body = JSON.parse(result.body)
@@ -165,8 +165,8 @@ describe('Router', function(){
     })
 
     it ("sets up collection routes when possible", function(done){
-      this.app.listen(1337, function(){
-        hottap("http://localhost:1337/many").request("GET", function(err, result){
+      this.app.listen(9999, function(){
+        hottap("http://localhost:9999/many").request("GET", function(err, result){
           result.status.should.equal(200)
           var body = JSON.parse(result.body)
           body.items[0].hello.should.equal("collectors")
@@ -176,11 +176,11 @@ describe('Router', function(){
     });
 
     it('should not allow uris that are too long', function(done){
-      var url = 'http://localhost:1337/';
+      var url = 'http://localhost:9999/';
       for(var i = 0; i < 500; i++){
         url += '1234567890';
       }
-      this.app.listen(1337, function(){
+      this.app.listen(9999, function(){
         hottap(url).request("GET", function(err, result){
           result.status.should.equal(414);
           JSON.parse(result.body).error.type.should.equal('RequestUriTooLong');
@@ -190,8 +190,8 @@ describe('Router', function(){
     });
 
     it ("sets up collection sub resource routes when possible", function(done){
-      this.app.listen(1337, function(){
-        hottap("http://localhost:1337/many/1234").request("GET", function(err, result){
+      this.app.listen(9999, function(){
+        hottap("http://localhost:9999/many/1234").request("GET", function(err, result){
                           result.status.should.equal(200)
                           result.body.should.eql('1234')
                           done();
@@ -208,8 +208,8 @@ describe('Router', function(){
     })
 
     it ("sets up collection sub-sub resources when a folder exists with resources", function(done){
-      this.app.listen(1337, function(){
-        hottap("http://localhost:1337/artist/1234/album").request("GET", function(err, result){
+      this.app.listen(9999, function(){
+        hottap("http://localhost:9999/artist/1234/album").request("GET", function(err, result){
                           result.status.should.equal(200)
                           done();
                         });
@@ -217,8 +217,8 @@ describe('Router', function(){
     });
 
     it ("should 405 on missing methods of a sub-collection", function(done){
-      this.app.listen(1337, function(){
-        hottap("http://localhost:1337/artist/1234/album/").request("PUT", function(err, result){
+      this.app.listen(9999, function(){
+        hottap("http://localhost:9999/artist/1234/album/").request("PUT", function(err, result){
                           result.status.should.equal(405)
                           done();
                         });

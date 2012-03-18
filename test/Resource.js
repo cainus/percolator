@@ -25,7 +25,7 @@ describe('Resource', function(){
   it ("should return 422 when parameters are missing", function(done){
     var app = this.app;
     var router = this.router;
-    var port = 1337;
+    var port = 9999;
     app.settings.base_path = 'http://localhost:' + port;
     app.listen(port, function(){
       hottap("http://localhost:" + port + "/cars").request("POST", {'Content-Type' : 'application/json'}, 
@@ -43,7 +43,7 @@ describe('Resource', function(){
   it ("should return 422 when the year is less than 1930", function(done){
     var app = this.app;
     var router = this.router;
-    var port = 1337;
+    var port = 9999;
     app.settings.base_path = 'http://localhost:' + port;
     app.listen(port, function(){
       hottap("http://localhost:" + port + "/cars").request("POST", {'Content-Type' : 'application/json'}, 
@@ -61,7 +61,7 @@ describe('Resource', function(){
   it ("should return 422 when an disallowed extra attribute is passed in", function(done){
     var app = this.app;
     var router = this.router;
-    var port = 1337; 
+    var port = 9999; 
     app.settings.base_path = 'http://localhost:' + port;
     app.listen(port, function(){
       hottap("http://localhost:" + port + "/cars").request("POST", {'Content-Type' : 'application/json'}, 
@@ -79,7 +79,7 @@ describe('Resource', function(){
   it ("should return 200 when an allowed extra attribute is passed in", function(done){
     var app = this.app;
     var router = this.router;
-    var port = 1337;
+    var port = 9999;
     app.settings.base_path = 'http://localhost:' + port;
     app.listen(port, function(){
       hottap("http://localhost:" + port + "/cars").request("POST", {'Content-Type' : 'application/json'}, 
@@ -95,7 +95,7 @@ describe('Resource', function(){
   it ("should return 200 when all the required attributes are passed in", function(done){
     var app = this.app;
     var router = this.router;
-    var port = 1337;
+    var port = 9999;
     app.settings.base_path = 'http://localhost:' + port;
     app.listen(port, function(){
       hottap("http://localhost:" + port + "/cars").request("POST", {'Content-Type' : 'application/json'}, 
