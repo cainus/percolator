@@ -1,9 +1,11 @@
-const ResourceTree = require('../lib/ResourceTree').ResourceTree;
-const should = require('should');
+var should = require('should');
+var percolator = require('../');
+var ResourceTree = percolator.ResourceTree;
 
 describe('ResourceTree', function(){ 
 
   beforeEach(function(done){
+     this.resourceDir = __dirname + '/test_fixtures/resources';
      done();
   });
 
@@ -53,7 +55,7 @@ describe('ResourceTree', function(){
     });
     it ("should load in a hierarchy from the filesytem", function(done){
       var tree = new ResourceTree();
-      tree.fromFileSystem(__dirname + '/../test_fixtures/resources');
+      tree.fromFileSystem(this.resourceDir);
       tree.toString().should.match(/L--\[Resource album\]/);
       tree.toString().should.match(/L-\[Resource artist\]/);
       done();

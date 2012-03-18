@@ -1,14 +1,19 @@
-const Resource = require('../lib/resourceTypes/Resource').Resource;
 const express = require('express');
 const should = require('should');
-const Router = require('../lib/Router').Router;
 const hottap = require('hottap').hottap;
 const _ = require('underscore');
+var percolator = require('../');
+var Router = percolator.Router;
+
+function setUp(){
+}
 
 describe('Resource', function(){ 
 
   beforeEach(function(done){
-    this.app = express.createServer();
+    var resourceDir = __dirname + '/test_fixtures/resources';
+    this.app = express.createServer()
+    this.router = new Router(this.app, resourceDir)
     done();
   });
   afterEach(function(done){
@@ -19,9 +24,9 @@ describe('Resource', function(){
 
   it ("should return 422 when parameters are missing", function(done){
     var app = this.app;
+    var router = this.router;
     var port = 1337;
     app.settings.base_path = 'http://localhost:' + port;
-    var router = new Router(app, __dirname + '/../test_fixtures/resources')
     app.listen(port, function(){
       hottap("http://localhost:" + port + "/cars").request("POST", {'Content-Type' : 'application/json'}, 
         '{"hello":"world"}', function(err, result){
@@ -37,9 +42,9 @@ describe('Resource', function(){
 
   it ("should return 422 when the year is less than 1930", function(done){
     var app = this.app;
+    var router = this.router;
     var port = 1337;
     app.settings.base_path = 'http://localhost:' + port;
-    var router = new Router(app, __dirname + '/../test_fixtures/resources')
     app.listen(port, function(){
       hottap("http://localhost:" + port + "/cars").request("POST", {'Content-Type' : 'application/json'}, 
         '{"make":"Ford", "model":"Model-T", "year":"1905"}', function(err, result){
@@ -55,9 +60,9 @@ describe('Resource', function(){
 
   it ("should return 422 when an disallowed extra attribute is passed in", function(done){
     var app = this.app;
+    var router = this.router;
     var port = 1337; 
     app.settings.base_path = 'http://localhost:' + port;
-    var router = new Router(app, __dirname + '/../test_fixtures/resources')
     app.listen(port, function(){
       hottap("http://localhost:" + port + "/cars").request("POST", {'Content-Type' : 'application/json'}, 
         '{"make":"Ford", "model":"Model-T", "year":"1905", "color":"red"}', function(err, result){
@@ -73,9 +78,9 @@ describe('Resource', function(){
 
   it ("should return 200 when an allowed extra attribute is passed in", function(done){
     var app = this.app;
+    var router = this.router;
     var port = 1337;
     app.settings.base_path = 'http://localhost:' + port;
-    var router = new Router(app, __dirname + '/../test_fixtures/resources')
     app.listen(port, function(){
       hottap("http://localhost:" + port + "/cars").request("POST", {'Content-Type' : 'application/json'}, 
         '{"make":"Subaru", "model":"Impreza", "year":"2005", "topSpeed":"155"}', function(err, result){
@@ -89,9 +94,9 @@ describe('Resource', function(){
 
   it ("should return 200 when all the required attributes are passed in", function(done){
     var app = this.app;
+    var router = this.router;
     var port = 1337;
     app.settings.base_path = 'http://localhost:' + port;
-    var router = new Router(app, __dirname + '/../test_fixtures/resources')
     app.listen(port, function(){
       hottap("http://localhost:" + port + "/cars").request("POST", {'Content-Type' : 'application/json'}, 
         '{"make":"Subaru", "model":"Impreza", "year":"2005"}', function(err, result){
@@ -102,5 +107,7 @@ describe('Resource', function(){
       });
     });
   });
+
+
 });
 

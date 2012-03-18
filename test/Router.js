@@ -1,16 +1,19 @@
-const express = require('express');
-const should = require('should');
-const Router = require('../lib/Router').Router;
-const hottap = require('hottap').hottap;
-const _ = require('underscore');
-const mongoose = require('mongoose');
+var express = require('express');
+var should = require('should');
+var hottap = require('hottap').hottap;
+var _ = require('underscore');
+// TODO kill this require?
+var mongoose = require('mongoose');
 
+var percolator = require('../');
+var Router = percolator.Router;
 
 describe('Router', function(){
 	beforeEach(function(){
+    this.resourceDir = __dirname + '/test_fixtures/resources';
     this.app = express.createServer();
     this.db = mongoose.connect('mongodb://127.0.0.1:27017/percolator')
-    this.simpleRouter = new Router(this.app, __dirname + '/../test_fixtures/resources')
+    this.simpleRouter = new Router(this.app, this.resourceDir)
 	})
 	afterEach(function(){
     try {
@@ -24,8 +27,8 @@ describe('Router', function(){
     it ("returns an exception when the resource directory doesn't exist", function(done){
       this.app = express.createServer();
       try {
-        var router = new Router(this.app, __dirname + '/../test_fixtures/no_dir_by_this_name')
-        should.fail("expected exception was noth thrown")
+        var router = new Router(this.app, __dirname + '/../test_fixtures/no_dir_by_this_name' )
+        should.fail("expected exception was not thrown")
       } catch (err){
         err.should.match(/resource_dir parameter was not a valid directory:/);
         done();
@@ -72,7 +75,7 @@ describe('Router', function(){
 
     // make it so we can mount the router to a different path
     it ("responds with a 200 for an existing resource on a *mounted* path", function(done){
-      this.simpleRouter = new Router(this.app, __dirname + '/../test_fixtures/resources', '/api/')
+      this.simpleRouter = new Router(this.app, this.resourceDir, '/api/')
       this.app.listen(1337, function(){
         hottap("http://localhost:1337/api/happy").request("GET", function(err, result){
           result.status.should.equal(200)
@@ -149,7 +152,7 @@ describe('Router', function(){
 
     it ("responds with a service document for the root url, even without a trailing / ", function(done){
       var app = express.createServer();
-      var router = new Router(app, __dirname + '/../test_fixtures/resources', '/api')
+      var router = new Router(app, this.resourceDir, '/api')
       app.listen(1337, function(){
         hottap("http://localhost:1337/api").request("GET", function(err, result){
           app.close();

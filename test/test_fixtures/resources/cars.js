@@ -1,4 +1,5 @@
-const Resource = require('../../lib/resourceTypes/Resource').Resource;
+const Percolator = require('../../../');
+const Resource = Percolator.Resource;
 const _ = require('underscore');
 
 
