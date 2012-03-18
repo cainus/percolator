@@ -4,6 +4,9 @@
       "bugs": {
        "url": "https://github.com/cainus/percolator/issues"
       },
+      "scripts" : {
+        "test" : "make test"
+      },
       "dependencies": {
           "express" : "2.5.8",
           "hottap" : "1.0.0",
