@@ -54,10 +54,10 @@ describe('MongoResource', function(){
 
   describe("#GET", function(){
     it ("returns a 404 if not resource exists with a corresponding id", function(done){
-        var port = 1337;
+        var port = 9999;
         var router = new Router(this.app, this.resourceDir)
         this.app.listen(port, function(){
-          hottap("http://localhost:1337/artist/000").request("GET", {'Content-Type' : 'application/json'}, function(err, result){
+          hottap("http://localhost:9999/artist/000").request("GET", {'Content-Type' : 'application/json'}, function(err, result){
             if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
             result.status.should.equal(404);
             done();
@@ -66,16 +66,16 @@ describe('MongoResource', function(){
     });
 
     it ("returns a single resource if one exists", function(done){
-        var port = 1337;
+        var port = 9999;
         var router = new Router(this.app, this.resourceDir)
         this.app.listen(port, function(){
           var artist = '{"name" : "artist"}';
-          hottap("http://localhost:1337/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
+          hottap("http://localhost:9999/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
             if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
             result.status.should.equal(201);
             result.headers.location.should.match(/artist\/[a-z0-9]/)
             var location = result.headers.location
-            var url = 'http://localhost:1337' + location
+            var url = 'http://localhost:9999' + location
             hottap(url).request("GET", {'Content-Type' : 'application/json'}, function(err, result){
                     var body = JSON.parse(result.body);
                     result.status.should.equal(200)
@@ -93,11 +93,11 @@ describe('MongoResource', function(){
   describe("#PUT", function(){
 
     it ("returns a 404 if resource doesn't exist", function(done){
-        var port = 1337;
+        var port = 9999;
         var router = new Router(this.app, this.resourceDir)
         var artist = '{"name" : "artist"}';
         this.app.listen(port, function(){
-          hottap("http://localhost:1337/artist/000").request("PUT", {'Content-Type' : 'application/json'}, artist, function(err, result){
+          hottap("http://localhost:9999/artist/000").request("PUT", {'Content-Type' : 'application/json'}, artist, function(err, result){
             if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
             result.status.should.equal(404);
             done();
@@ -108,16 +108,16 @@ describe('MongoResource', function(){
     // TODO what if the update doesn't pass validations?!?
 
     it ("updates a resource if one exists", function(done){
-        var port = 1337;
+        var port = 9999;
         var router = new Router(this.app, this.resourceDir)
         this.app.listen(port, function(){
           var artist = '{"name" : "artist"}';
-          hottap("http://localhost:1337/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
+          hottap("http://localhost:9999/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
             if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
             result.status.should.equal(201);
             result.headers.location.should.match(/artist\/[a-z0-9]/)
             var location = result.headers.location
-            var url = 'http://localhost:1337' + location
+            var url = 'http://localhost:9999' + location
             artist = '{"name" : "otherartist"}';
             hottap(url).request("PUT", {'Content-Type' : 'application/json'}, artist, function(err, result){
                     var body = JSON.parse(result.body);
@@ -137,10 +137,10 @@ describe('MongoResource', function(){
 
   describe("#DELETE", function(){
     it ("returns a 404 if resource doesn't exist", function(done){
-        var port = 1337;
+        var port = 9999;
         var router = new Router(this.app, this.resourceDir)
         this.app.listen(port, function(){
-          hottap("http://localhost:1337/artist/000").request("DELETE", {'Content-Type' : 'application/json'}, function(err, result){
+          hottap("http://localhost:9999/artist/000").request("DELETE", {'Content-Type' : 'application/json'}, function(err, result){
             if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
             result.status.should.equal(404);
             done();
@@ -149,16 +149,16 @@ describe('MongoResource', function(){
     });
  
     it ("deletes a resource if one exists", function(done){
-        var port = 1337;
+        var port = 9999;
         var router = new Router(this.app, this.resourceDir)
         this.app.listen(port, function(){
           var artist = '{"name" : "artist"}';
-          hottap("http://localhost:1337/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
+          hottap("http://localhost:9999/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
             if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
             result.status.should.equal(201);
             result.headers.location.should.match(/artist\/[a-z0-9]/)
             var location = result.headers.location
-            var url = 'http://localhost:1337' + location
+            var url = 'http://localhost:9999' + location
             hottap(url).request("GET", {'Content-Type' : 'application/json'}, function(err, result){
               result.status.should.equal(200);
               hottap(url).request("DELETE", {'Content-Type' : 'application/json'}, function(err, result){
@@ -178,7 +178,7 @@ describe('MongoResource', function(){
 
   describe("#collectionGET", function(){
     it ("should return a proper collection for GET representing an empty mongo collection", function(done){
-        var port = 1337; 
+        var port = 9999; 
         this.app.settings.base_path = 'http://localhost:' + port;
         var router = new Router(this.app, this.resourceDir)
         this.app.listen(port, function(){
@@ -191,12 +191,12 @@ describe('MongoResource', function(){
         });
     });
     it ("should return a proper collection for GET when resource has been added", function(done){
-        var port = 1337; 
+        var port = 9999; 
         this.app.settings.base_path = 'http://localhost:' + port;
         var router = new Router(this.app, this.resourceDir)
         this.app.listen(port, function(){
           var artist = '{"name" : "artist"}';
-          hottap("http://localhost:1337/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
+          hottap("http://localhost:9999/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
             var self_location = result.headers.location;
             hottap("http://localhost:" + port + "/artist").request("GET", {'Content-Type' : 'application/json'}, function(err, result){
               if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
@@ -213,7 +213,7 @@ describe('MongoResource', function(){
 
   describe("#collectionPOST", function(){
     it ("returns a 400 when it can't parse the JSON", function(done){
-        var port = 1337; 
+        var port = 9999; 
         var router = new Router(this.app, this.resourceDir)
         this.app.listen(port, function(){
           hottap("http://localhost:" + port + "/artist").request("POST", {'Content-Type' : 'application/json'}, 'asdf', function(err, result){
@@ -226,7 +226,7 @@ describe('MongoResource', function(){
 
     it ("returns a 415 when it's not JSON", function(done){
         this.timeout(10000);
-        var port = 1337; 
+        var port = 9999; 
         var router = new Router(this.app, this.resourceDir)
         this.app.listen(port, function(){
           hottap("http://localhost:" + port + "/artist").request("POST", {}, 'asdf', function(err, result){
@@ -238,7 +238,7 @@ describe('MongoResource', function(){
     });
 
     it ("returns a 422 when the input doesn't fulfill the schema requirements", function(done){
-        var port = 1337;
+        var port = 9999;
         var router = new Router(this.app, this.resourceDir)
         this.app.listen(port, function(){
           hottap("http://localhost:" + port + "/artist")
@@ -253,11 +253,11 @@ describe('MongoResource', function(){
 
 
     it ("returns a 201 with a Location header when doc is valid", function(done){
-        var port = 1337;
+        var port = 9999;
         var router = new Router(this.app, this.resourceDir)
         this.app.listen(port, function(){
           var artist = '{"name" : "artist"}';
-          hottap("http://localhost:1337/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
+          hottap("http://localhost:9999/artist").request("POST", {'Content-Type' : 'application/json'}, artist, function(err, result){
             if (!!err){ console.log(err); should.fail("error shouldn't exist. " + err);}
             result.status.should.equal(201);
             result.headers.location.should.match(/artist\/[a-z0-9]/)
