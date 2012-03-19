@@ -137,9 +137,4 @@ allow custom media-types (per resource, even) if the user wishes.
 * better support for other cross-cutting "aspects" like logging and throttling
 
 ## Automated Tests:
-
-### installing mocha:
-npm install -g mocha
-
-### running tests:
-mocha
+npm test
