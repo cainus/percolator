@@ -14,10 +14,12 @@ var app = express.createServer();
 var port = process.env.PORT || 3000;
 var portStr = ':' + port + '';
 if (port == 80){portstr = '';}
-app.set('base_path', 'http://localhost' + portStr + '/api');
+var apiUrl = 'http://localhost' + portStr + '/api'
+app.set('base_path', apiUrl);
 
 
-var router = new Router(app, __dirname + '/resources', '/api/');
+var router = new Router(app, __dirname + '/test/test_fixtures/resources', '/api/');
 app.listen(port, function(){
   console.log("Application started!");
+  console.log("API being served from: " + apiUrl);
 });

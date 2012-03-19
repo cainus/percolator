@@ -16,6 +16,8 @@
           "express-resource" : "0.2.3",
           "mocha" : "0.14.1",
           "underscore" : "",
+          "resourceful" : "0.1.10",
+          "revalidator" : "0.1.0",
           "should" : "0.3.2"
       }
 }
