@@ -1,5 +1,7 @@
 {
-      "name": "percolator",
+      "name": "Percolator",
+      "description" : "Percolator is a framework for quickly and easily building quality HTTP APIs in Node.js",
+      "keywords" : ["api", "rest", "http", "resource", "hypermedia"], 
       "version": "0.0.1",
       "bugs": {
        "url": "https://github.com/cainus/percolator/issues"
@@ -7,17 +9,26 @@
       "scripts" : {
         "test" : "make test"
       },
+      "maintainers": [
+        {
+          "name": "Gregg Caines",
+          "email": "gregg@caines.ca",
+          "web": "http://caines.ca"
+        } 
+      ],
       "dependencies": {
           "express" : "2.5.8",
-          "hottap" : "1.0.0",
           "mongodb" : "0.9.6-19",
           "express-mongoose"  : ">= 0.0.1",
           "mongoose" : "1.6.0",
           "express-resource" : "0.2.3",
-          "mocha" : "0.14.1",
           "underscore" : "",
           "resourceful" : "0.1.10",
-          "revalidator" : "0.1.0",
+          "revalidator" : "0.1.0"
+      },
+      "devDependencies" : {
+          "hottap" : "1.0.0",
+          "mocha" : "0.14.1",
           "should" : "0.3.2"
       }
 }
