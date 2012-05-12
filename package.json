@@ -24,7 +24,9 @@
           "express-resource" : "0.2.3",
           "underscore" : "",
           "resourceful" : "0.1.10",
-          "revalidator" : "0.1.0"
+          "revalidator" : "0.1.0",
+          "detour" : "0.7.0",
+          "walk" : "2.1.1"
       },
       "devDependencies" : {
           "hottap" : "1.0.0",
