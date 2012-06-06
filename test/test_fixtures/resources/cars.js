@@ -15,7 +15,7 @@ resource.validator.addFieldValidator('year', function(value){
   return value > 1930
 }, 'is later than 1930');
 
-resource.collectionPOST = function(req, res){ 
+resource.POST = function(req, res){ 
 	var doc = req.jsonBody;
   resource.preCreate(req, res, function(err, doc){
     if (!err) {
@@ -23,5 +23,4 @@ resource.collectionPOST = function(req, res){
     }
   })
 }
-
 exports.handler = resource;

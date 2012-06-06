@@ -18,15 +18,14 @@
       ],
       "dependencies": {
           "express" : "2.5.8",
-          "mongodb" : "0.9.6-19",
-          "express-mongoose"  : ">= 0.0.1",
           "mongoose" : "1.6.0",
-          "express-resource" : "0.2.3",
           "underscore" : "",
-          "resourceful" : "0.1.10",
-          "revalidator" : "0.1.0",
-          "detour" : "0.7.0",
-          "walk" : "2.1.1"
+          "resorcery" : "0.1.1",
+          "detour" : "0.8.5",
+          "reaper" : "0.1.1",
+          "walk" : "2.1.1",
+          "elementtree" : "0.1.1",
+          "persist" : "0.2.3"
       },
       "devDependencies" : {
           "hottap" : "1.0.0",

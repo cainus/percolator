@@ -1,7 +1,6 @@
 const MongoResource = require('../lib/resourceTypes/MongoResource');
 const express = require('express');
 const should = require('should');
-const Router = require('../lib/Router').Router;
 const hottap = require('hottap').hottap;
 const mongoose = require('mongoose');
 const _ = require('underscore');
@@ -9,8 +8,7 @@ const _ = require('underscore');
 function setUp(){
     var resourceDir = __dirname + '/test_fixtures/resources';
     var app = express.createServer()
-    return { app : app,
-             router : new Router(app, resourceDir) }
+    return { app : app }
 }
 
 function parentDir(path){
