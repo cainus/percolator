@@ -44,19 +44,13 @@ var errors = {
 
 _.each(errors, function(v, k){
   JsonResponder.prototype[k] = function(detail){
-    //todo debug here
-    console.log("TYPE");
-    console.log(v.type);
     var obj = {"error" : v};
     obj.error.detail = detail || {};
-    console.log(obj);
     this.res.setHeader('Content-Type', 'application/json');
     this.res.setHeader('Allow', 'POST');
     this.res.writeHead(v.type);
     var out = JSON.stringify(obj)
-    console.log(out);
     this.res.end(out);
-    console.log("wooo");
   }
 });
 
