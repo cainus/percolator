@@ -1,1 +1,1 @@
-module.exports = require('./lib/percolator');
+module.exports = require('./percolator');

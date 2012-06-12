@@ -2,16 +2,16 @@ _ = require('underscore');
 
 var StatusManager = function(){
   this.registry = {};
-}
+};
 
 StatusManager.prototype.register = function(contentType, responder){
   this.registry[contentType] = responder;
-}
+};
 
 StatusManager.prototype.createResponder = function(req, res){
   // TODO make this do conneg and pick a responder from the registry!
   return new JsonResponder(req, res);
-}
+};
 
 
 // TODO make default test/plain, text/html, application/xml responders
@@ -19,7 +19,7 @@ StatusManager.prototype.createResponder = function(req, res){
 var JsonResponder = function(req, res){
   this.req = req;
   this.res = res;
-}
+};
 
 var errors = {
   'internalServerError' : {type : 500, message : 'Internal Server Error'},
@@ -40,7 +40,7 @@ var errors = {
   'unsupportedMediaType' : {type : 415, message : 'Unsupported Media Type'},
   'unprocessableEntity' : {type : 422, message : 'Unprocessable Entity'},
   'tooManyRequests' :     {type : 429, message : 'Too Many Requests'}
-}
+};
 
 _.each(errors, function(v, k){
   JsonResponder.prototype[k] = function(detail){
@@ -49,16 +49,16 @@ _.each(errors, function(v, k){
     this.res.setHeader('Content-Type', 'application/json');
     this.res.setHeader('Allow', 'POST');
     this.res.writeHead(v.type);
-    var out = JSON.stringify(obj)
+    var out = JSON.stringify(obj);
     this.res.end(out);
-  }
+  };
 });
 
 JsonResponder.prototype.OPTIONS = function(methods){
     this.res.setHeader('Allow', methods.join(","));
     this.res.writeHead(200);
     return this.res.end(JSON.stringify({"allowed methods" : methods}));
-}
+};
 
 
 exports.StatusManager = StatusManager;

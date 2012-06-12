@@ -1,18 +1,13 @@
-var fs = require('fs');
 var express = require('express');
-var Router = require('detour').Router;
-var Reaper = require('reaper').Reaper;
-var StatusManager = require('./StatusManager').StatusManager;
 var JsonResponder = require('./StatusManager').JsonResponder;
-var resource = require('resorcery').resource;
 var _ = require('underscore');
 var Percolator = require('./percolator').Percolator;
 
-// TODO why is handle404 getting called on every request?
 // TODO collections proof-of-concept - POST, PUT, DELETE
 // TODO make status man do conneg
 // TODO producers of app/json should respond to requests for app/blah+json
 // TODO res and req on the resource object itself (and not passed in?)
+// TODO get a specific mediatype in there
 // == low priority ==
 // TODO better error output when there's an error in mediaTypes, resources, etc.
 // TODO how to put content-type in links
@@ -47,6 +42,7 @@ $P.getRoutes(function(err){
   server = express.createServer();
 
   server.configure(function(){
+      server.use(express.favicon());
       server.use(express.bodyParser());
       server.use(function(req, res, next){
         console.log(req.method, ' ', req.url);
