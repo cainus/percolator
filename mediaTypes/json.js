@@ -1,9 +1,9 @@
 
-exports.in = function (str){
+exports.fromString = function (str){
   return JSON.parse(str);
-}
+};
 
-exports.out = function(obj){
+exports.toString = function(obj){
   return JSON.stringify(obj);
-}
+};
 

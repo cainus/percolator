@@ -1,20 +1,26 @@
 //var fs = require('fs');
 var Router = require('detour').Router;
 var Reaper = require('reaper').Reaper;
+var express = require('express');
 var StatusManager = require('./StatusManager').StatusManager;
+var JsonResponder = require('./StatusManager').JsonResponder;
 var _ = require('underscore');
 
 Percolator = function(options){
   this.statusman = new StatusManager();
-  this.router = new Router();
   this.options = options;
   this.mediaTypes = new Reaper();
   this.port = options.port || 80;
   this.protocol = options.protocol || 'http';
   this.resourceDir = options.resourceDir || './resources';
-  this.options = {port : this.port, 
-                  protocol : this.protocol, 
-                  resourceDir : this.resoourceDir};
+  this.resourcePath = options.resourcePath || '/api';
+  this.staticDir = options.staticDir || './static';
+  this.options = {port : this.port,
+                  protocol : this.protocol,
+                  resourcePath : this.resourcePath,
+                  staticDir : this.staticDir,
+                  resourceDir : this.resourceDir};
+  this.router = new Router(this.resourcePath);
   this.assignErrorHandlers();
 };
 
@@ -130,6 +136,39 @@ Percolator.prototype.registerMediaType = function(type, instr, outobj){
 
 Percolator.prototype.registerStatusResponder = function(type, responder){
   this.statusman.register(type, responder);
+};
+
+
+Percolator.prototype.expressStart = function(cb){
+
+  var that = this;
+
+  var jsonType = require('./mediaTypes/json');
+  this.registerMediaType('application/json', jsonType.fromString, jsonType.toString);
+  //var xmlType = require('./mediaTypes/xml');
+  // this.registerMediaType('application/xml', xmlType.in, xmlType.out);
+
+  this.registerStatusResponder('application/json',  JsonResponder);
+
+  this.getRoutes(function(err){
+    if (err) {return cb(err);}
+
+    var server = express.createServer();
+
+    server.configure(function(){
+        server.use(express.favicon());
+        server.use(express['static'](that.options.staticDir));
+        server.use(express.bodyParser());
+        server.use(function(req, res, next){
+          console.log(req.method, ' ', req.url);
+          next();
+        });
+        server.use(that.router.connectMiddleware);
+    });
+
+    server.listen(that.port);
+    return cb();
+  });
 };
 
 exports.Percolator = Percolator;
