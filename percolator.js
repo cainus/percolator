@@ -15,7 +15,7 @@ Percolator = function(options){
   this.resourceDir = options.resourceDir || './resources';
   this.resourcePath = options.resourcePath || '/api';
   this.staticDir = options.staticDir || './static';
-  this.options = this.extend(options,
+  this.options = _.extend(options,
                              {port : this.port,
                               protocol : this.protocol,
                               resourcePath : this.resourcePath,
