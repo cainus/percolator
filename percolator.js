@@ -15,11 +15,12 @@ Percolator = function(options){
   this.resourceDir = options.resourceDir || './resources';
   this.resourcePath = options.resourcePath || '/api';
   this.staticDir = options.staticDir || './static';
-  this.options = {port : this.port,
-                  protocol : this.protocol,
-                  resourcePath : this.resourcePath,
-                  staticDir : this.staticDir,
-                  resourceDir : this.resourceDir};
+  this.options = this.extend(options,
+                             {port : this.port,
+                              protocol : this.protocol,
+                              resourcePath : this.resourcePath,
+                              staticDir : this.staticDir,
+                              resourceDir : this.resourceDir});
   this.router = new Router(this.resourcePath);
   this.assignErrorHandlers();
 };
