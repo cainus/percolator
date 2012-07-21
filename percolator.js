@@ -168,7 +168,7 @@ Percolator.prototype.expressStart = function(cb){
     });
 
     server.listen(that.port);
-    return cb();
+    return cb(null, server);
   });
 };
 
