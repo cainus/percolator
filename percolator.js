@@ -49,6 +49,13 @@ Percolator.prototype.setRepresenterMethod = function(resource){
   };
 };
 
+Percolator.prototype.setStatusMethod = function(resource){
+  // set status() object for all resources
+  var that = this;
+  resource.status = function(req, res){
+    return that.statusman.createResponder(req, res);
+  };
+};
 
 Percolator.prototype.setOptionsHandler = function(resource){
   // tell each resource how to respond to OPTIONS
@@ -94,6 +101,7 @@ Percolator.prototype.decorateResource = function(resource){
     return abs;
   };
   this.setRepresenterMethod(resource);
+  this.setStatusMethod(resource);
 
 };
 
@@ -125,6 +133,11 @@ Percolator.prototype.assignErrorHandlers = function(){
   };
 
   router.handle500 = function(req, res, ex){
+    console.log("===============================");
+    console.log("Uncaught Exception");
+    console.log(ex);
+    console.log(req.method, ' ', req.url);
+    console.log(ex.stack);
     statusman.createResponder(req, res).internalServerError();
   };
 
