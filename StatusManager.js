@@ -22,9 +22,11 @@ var JsonResponder = function(req, res){
 };
 
 var errors = {
-  'internalServerError' : {type : 500, message : 'Internal Server Error'},
+  'internalServer' : {type : 500, message : 'Internal Server Error'},
   'notImplemented' :      {type : 501, message : 'Not Implemented'},
+  'badGateway' :          {type : 502, message : 'Bad Gateway'},
   'serviceUnavailable' :  {type : 503, message : 'Service Unavailable'},
+  'gatewayTimeout' :  {type : 504, message : 'Gateway Timeout'},
   'badRequest' :          {type : 400, message : 'Bad Request'},
   'unauthenticated' :     {type : 401, message : 'Unauthenticated'},
   'forbidden' :           {type : 403, message : 'Forbidden'},
@@ -42,12 +44,13 @@ var errors = {
   'tooManyRequests' :     {type : 429, message : 'Too Many Requests'}
 };
 
+
+/* set methods on the JsonResponder for every kind of error that could occur.  */
 _.each(errors, function(v, k){
   JsonResponder.prototype[k] = function(detail){
     var obj = {"error" : v};
     obj.error.detail = detail || {};
     this.res.setHeader('Content-Type', 'application/json');
-    this.res.setHeader('Allow', 'POST');
     this.res.writeHead(v.type);
     var out = JSON.stringify(obj);
     this.res.end(out);
