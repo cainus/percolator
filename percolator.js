@@ -1,6 +1,7 @@
 //var fs = require('fs');
 var Router = require('detour').Router;
 var Reaper = require('reaper').Reaper;
+var UriUtil = require('./uriUtil').UriUtil;
 var express = require('express');
 var StatusManager = require('./StatusManager').StatusManager;
 var JsonResponder = require('./StatusManager').JsonResponder;
@@ -12,6 +13,7 @@ Percolator = function(options){
   this.mediaTypes = new Reaper();
   this.port = options.port || 80;
   this.protocol = options.protocol || 'http';
+  var protocol = this.protocol;
   this.resourceDir = options.resourceDir || './resources';
   this.resourcePath = options.resourcePath || '/api';
   this.staticDir = options.staticDir || './static';
@@ -22,6 +24,11 @@ Percolator = function(options){
                               staticDir : this.staticDir,
                               resourceDir : this.resourceDir});
   this.router = new Router(this.resourcePath);
+  var router = this.router;
+  this.router.onRequest = function(handler, req, res, cb){
+    handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
+    cb(null, handler);
+  };
   this.assignErrorHandlers();
 };
 
