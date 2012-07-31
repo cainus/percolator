@@ -89,7 +89,6 @@ take a url-encoded string and return a decoded version of it.
 
 ```javascript
 this.uri.query();
-};
 ```
 Get the querystring data off the current url as an object with the name/value pairs in the querystring.  An 
 alternative url can optionally be passed in.
