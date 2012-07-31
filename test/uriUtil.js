@@ -9,7 +9,6 @@ TODO?
 uri.append( path )  // auto adds path to current url 
                     // should just use get() with path vars instead?
 uri.renameRel(oldname, newname)  // rename a key in links
-uri.help() // explanation of all methods and current values
 uri.resolve()  (url.resolve)
 uri.format()  (url.format)
 uri.routes (all possible names/routes)  // router does not yet support this
@@ -81,8 +80,7 @@ describe('UriUtil', function(){
         }
       };
       var u = new UriUtil(router, '[path]');
-      u.links().should.eql({self : '[path]', parent : 'parent[path]', somechild : 'child[path]'});
-      
+      u.links().should.eql({self : 'http://localhost/[path]', parent : 'http://localhost/parent[path]', somechild : 'http://localhost/child[path]'});
       calledNamedChildUrls.should.equal(true);
       calledParentUrls.should.equal(true);
     });
@@ -100,7 +98,7 @@ describe('UriUtil', function(){
         }
       };
       var u = new UriUtil(router, '[path]');
-      u.links().should.eql({self : '[path]', somechild : 'child[path]'});
+      u.links().should.eql({self : 'http://localhost/[path]', somechild : 'http://localhost/child[path]'});
       
       calledNamedChildUrls.should.equal(true);
       calledParentUrls.should.equal(true);
@@ -133,20 +131,21 @@ describe('UriUtil', function(){
       var called = false;
       var router = { getNamedChildUrls : function(url){
         called = true;
-        return url;
+        return {somename : url};
       } };
-      var u = new UriUtil(router, '[path]');
-      u.namedKids().should.equal('[path]');
+      var u = new UriUtil(router, '[path]', 'https', 'somesite.com');
+      u.namedKids().somename.should.equal('https://somesite.com/[path]');
       called.should.equal(true);
     });
+
     it ("calls the router's getNamedChildUrls with the input url", function(){
       var called = false;
       var router = { getNamedChildUrls : function(url){
         called = true;
-        return url;
+        return {someurl :  url};
       } };
-      var u = new UriUtil(router, '[path]');
-      u.namedKids('input').should.equal('input');
+      var u = new UriUtil(router, '[path]', 'https', 'somesite.com');
+      u.namedKids('input').someurl.should.equal('https://somesite.com/input');
       called.should.equal(true);
     });
   });
@@ -254,7 +253,7 @@ describe('UriUtil', function(){
     it ('returns the input url', function(){
       var router = { };
       var u = new UriUtil(router, '[path]');
-      u.self().should.equal('[path]');
+      u.self().should.equal('http://localhost/[path]');
     });
   });
   describe('#parse', function(){

@@ -6,8 +6,8 @@ var UriUtil = function(router, urlstr, protocol, host){
   this._router = router;
   this._self = urlstr;
   this._params = null;
-  this._protocol = protocol;
-  this._host = host;
+  this._protocol = protocol || 'http';
+  this._host = host || 'localhost';
 };
 
 
@@ -56,9 +56,9 @@ UriUtil.prototype.pathJoin = function(){
 
 UriUtil.prototype.links = function(){
   var links = this.namedKids();
-  links.self = this._self;
+  links.self = this.absolute(this._self);
   try {
-    links.parent = this.parent();
+    links.parent = this.absolute(this.parent());
   } catch (ex){
     if (ex.name != 'NoParentUrl'){
       throw ex;
@@ -74,7 +74,12 @@ UriUtil.prototype.parent = function(inUrl){
 
 UriUtil.prototype.namedKids = function(inUrl){
   var url = inUrl || this._self;
-  return this._router.getNamedChildUrls(url);
+  var kids = this._router.getNamedChildUrls(url);
+  var that = this;
+  _.each(kids, function(v, k){
+    kids[k] = that.absolute(v);
+  });
+  return kids;
 };
 UriUtil.prototype.kids = function(inUrl){
   var url = inUrl || this._self;
@@ -97,7 +102,7 @@ UriUtil.prototype.get = function(nameOrPath, varDict){
 };
 
 UriUtil.prototype.self = function(){
-  return this._self;
+  return this.absolute(this._self);
 };
 
 UriUtil.prototype.param = function(key, defaultValue){
