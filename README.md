@@ -29,6 +29,121 @@ and put this in it:
 
 "req" and "res" are simply express's request and response objects.
 
+
+## The "uri" API
+Each method you define has access to a 'uri' module that understands the context of each particular request 
+that it's used in.  The module makes a number of convenient methods available for dealing with uri's and 
+generally making the parsing of uri's simpler and the creation of new uri's simple.  Here are example usages:
+
+# General Usage:
+
+```javascript
+  exports.handler = {
+    GET : function(req, res){
+      res.send(this.uri.self());   // this will return the current url
+    }
+  }
+```
+
+# Api specifics:
+
+```javascript
+this.uri.absolute(path)
+```
+Takes a relative path and returns an absolute path.
+
+```javascript
+this.uri.help()
+```
+returns an object containing a bunch of method names from this module and their values.  Useful for debugging.
+
+
+```javascript
+this.uri.self()
+```
+returns the current uri (as an absolute uri).
+
+```javascript
+this.uri.params()
+```
+returns an object containing the name/value pairs of variables extracted from the uri's "path" (NOT 
+including querystring).  An optional uri may be passed in, but the default is to use the current 
+request's uri. 
+
+```javascript
+this.uri.param("someparam");
+```
+Retrieves the specified param value by the input param name from the object returned by this.uri.params() 
+(see above).  
+
+```javascript
+this.uri.urlEncode(somestr);
+```
+take a string and return a url-encoded version of it
+
+```javascript
+this.uri.urlDecode(someEncodedStr)
+```
+take a url-encoded string and return a decoded version of it.
+
+
+```javascript
+this.uri.query();
+};
+```
+Get the querystring data off the current url as an object with the name/value pairs in the querystring.  An 
+alternative url can optionally be passed in.
+
+```javascript
+this.uri.queryString(someObj);
+```
+Take an input object and create a querystring of the name/value pairs in the object.
+
+```javascript
+this.uri.pathJoin("asdf", ["qwer", "tyui"], "1234");
+```
+Takes a list of strings and arrays of strings and returns a forward-slash-delimited path of all the pieces
+in the order that they appear (without a trailing slash).
+
+
+```javascript
+this.uri.links();
+```
+Returns a dictionary of links that the router knows about for this resource, usually including parent and self
+links and possibly child urls.
+
+```javascript
+this.uri.parent();
+```
+Get the parent URI of the current URI.  An optional URI may be passed in to get its' parent's URI instead.
+
+
+```javascript
+this.uri.namedKids();
+```
+Get a dictionary of all the child urls with their names.
+
+
+```javascript
+this.uri.kids();
+```
+Get a dictionary of all the child urls with their names if the have names.
+
+
+```javascript
+this.uri.parse();
+```
+Returns the result of node's url.parse ( http://nodejs.org/docs/v0.9.0/api/url.html#url_url_parse_urlstr_parsequerystring_slashesdenotehost ) 
+for the current URI.  An optional URI can be passed to use that one instead.  
+
+
+
+```javascript
+this.url.get(); = function(nameOrPath, varDict){
+```
+Gets a url by name, or path.  An optional dictionary may be passed of variables to fille in necessary path variables.
+
+
 ## Values
 ### Make the hard stuff simple
 * Get the HTTP/REST-Nerd stuff (serialization, authentication, hypermedia, status codes) right so 
