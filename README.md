@@ -69,6 +69,20 @@ the "Hello World" example from above into it.
 6.  Hit http://localhost:8080/ and be completely floored by the greatest API of all time.
 
 
+## How routing works
+Your resource directory and its subdirectories are routed to URLs, so that the organization on the filesystem 
+dictates your urls.  This means you don't have to maintain a list of routes anywhere, you know exactly where to 
+find everything and you have a simple convention for code organization.
+
+# The base path
+The base path is the URI path under which all of your resources will be served. It's called "resourcePath" in 
+your application config (see the quick start for an example of setting it to '/').  It doesn't need to be set 
+to '/', for instance -- you could set it to /api, and then the quick start example would serve from /api instead.
+
+# The _index.js file.
+The server won't start without an _index.js file.  It's the resource that handles requests to your base path.
+
+
 ## The "uri" API
 Each method you define has access to a 'uri' module that understands the context of each particular request 
 that it's used in.  The module makes a number of convenient methods available for dealing with uri's and 
