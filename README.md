@@ -52,7 +52,6 @@ $P.expressStart(function(err){
   console.log('Percolator running on ' + $P.port);
 });
 ```
-
 2.  Create a "resources" sub-directory in your project directory.  This is where you'll put all your "resources", 
 which are essentially handlers for all the methods of each url.  If you've used a server-side MVC framework like 
 Rails, you can think of "resources" as "controllers" for now. 
