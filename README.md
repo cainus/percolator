@@ -11,8 +11,9 @@ It aims to be a great tool for building public-quality APIs, as well as being
 better suited for apps that perform all of their view logic on the client-side,
 like mobile apps and single-page apps.
 
+Is this project ready to use?  Kind-of-sort-of.  Not in Production though.
 
-## Quick Examples:
+## Quick Example:
 
 ### Hello World
 To create a simple read-only /helloworld resource that responds with "Hello
@@ -28,6 +29,43 @@ and put this in it:
 ```
 
 "req" and "res" are simply express's request and response objects.
+
+## Quick Start:
+1.  Create a server.js in your project directory, and copy this code below into it:
+
+```javascript
+var Percolator = require('Percolator').Percolator;
+
+var resourceDir = __dirname + '/resources';
+
+var app = {
+  protocol : 'http',
+  resourceDir : resourceDir,
+  resourcePath : '/',
+  staticDir : __dirname + '/static',
+  port : 8080
+};
+var $P = new Percolator(app);
+
+$P.expressStart(function(err){
+  if (err) {console.log(err);throw err;}
+  console.log('Percolator running on ' + $P.port);
+});
+```
+
+2.  Create a "resources" sub-directory in your project directory.  This is where you'll put all your "resources", 
+which are essentially handlers for all the methods of each url.  If you've used a server-side MVC framework like 
+Rails, you can think of "resources" as "controllers" for now. 
+
+3.  Create your first resource.  Just create a file named _index.js in the 'resources' directory and copy/paste 
+the "Hello World" example from above into it.
+
+4.  Run the server:
+```
+  node server.js
+```
+
+5.  Hit http://localhost:8080/ and be completely floored by the greatest API of all time.
 
 
 ## The "uri" API
