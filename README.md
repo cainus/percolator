@@ -14,9 +14,8 @@ like mobile apps and single-page apps.
 Is this project ready to use?  Kind-of-sort-of.  Not in Production though.
 
 ## Hello World Quick Start:
-*
-  npm install Percolator
-*  Create a server.js in your project directory, and copy this code below into it:
+*  `npm install Percolator`
+*  Create a `server.js` in your project directory, and copy this code below into it:
 
 ```javascript
 var Percolator = require('Percolator').Percolator;
@@ -37,11 +36,11 @@ $P.expressStart(function(err){
   console.log('Percolator running on ' + $P.port);
 });
 ```
-*  Create a "resources" sub-directory in your project directory.  This is where you'll put all your "resources", 
+*  Create a `resources` sub-directory in your project directory.  This is where you'll put all your "resources", 
 which are essentially handlers for all the methods of each url.  If you've used a server-side MVC framework like 
 Rails, you can think of "resources" as "controllers" for now. 
 
-*  Create your first resource.  Just create a file named _index.js in the 'resources' directory and copy/paste 
+*  Create your first resource.  Just create a file named _index.js in the `resources` directory and copy/paste 
 this "Hello World" example into it.
 
 ```javascript
@@ -83,7 +82,7 @@ dictates your urls.  This means you don't have to maintain a list of routes anyw
 find everything and you have a simple convention for code organization.
 
 ### The base path
-The base path is the URI path under which all of your resources will be served. It's called "resourcePath" in 
+The base path is the URI path under which all of your resources will be served. It's called `resourcePath` in 
 your application config (see the quick start for an example of setting it to '/').  It doesn't need to be set 
 to '/', for instance -- you could set it to /api, and then the quick start example would serve from /api instead.
 
