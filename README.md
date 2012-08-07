@@ -59,7 +59,7 @@ this "Hello World" example into it.
 
 6.  Hit http://localhost:8080/ and be completely floored by the greatest API of all time.
 
-# What's a "resource"?
+## What's a "resource"?
 Resources are where you put your code for handling http requests (and their responses).  They're somewhat similar 
 to controllers in server-side MVC frameworks like Ruby on Rails.
 
