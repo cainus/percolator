@@ -158,7 +158,7 @@ Get the querystring data off the current url as an object with the name/value pa
 alternative url can optionally be passed in.
 
 ```javascript
-this.uri.queryString(someObj);
+this.uri.queryString({somevar : "somevalue"}});
 ```
 Take an input object and create a querystring of the name/value pairs in the object.
 
