@@ -100,7 +100,7 @@ Each method you define has access to a 'uri' module that understands the context
 that it's used in.  The module makes a number of convenient methods available for dealing with uri's and 
 generally making the parsing of uri's simpler and the creation of new uri's simple.  Here are example usages:
 
-# General Usage:
+### General Usage:
 
 ```javascript
   exports.handler = {
@@ -110,7 +110,7 @@ generally making the parsing of uri's simpler and the creation of new uri's simp
   }
 ```
 
-# Api specifics:
+### Api specifics:
 
 ```javascript
 this.uri.absolute(path)
