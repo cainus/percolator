@@ -14,9 +14,9 @@ like mobile apps and single-page apps.
 Is this project ready to use?  Kind-of-sort-of.  Not in Production though.
 
 ## Hello World Quick Start:
-1. 
+*
   npm install Percolator
-2.  Create a server.js in your project directory, and copy this code below into it:
+*  Create a server.js in your project directory, and copy this code below into it:
 
 ```javascript
 var Percolator = require('Percolator').Percolator;
@@ -37,11 +37,11 @@ $P.expressStart(function(err){
   console.log('Percolator running on ' + $P.port);
 });
 ```
-3.  Create a "resources" sub-directory in your project directory.  This is where you'll put all your "resources", 
+*  Create a "resources" sub-directory in your project directory.  This is where you'll put all your "resources", 
 which are essentially handlers for all the methods of each url.  If you've used a server-side MVC framework like 
 Rails, you can think of "resources" as "controllers" for now. 
 
-4.  Create your first resource.  Just create a file named _index.js in the 'resources' directory and copy/paste 
+*  Create your first resource.  Just create a file named _index.js in the 'resources' directory and copy/paste 
 this "Hello World" example into it.
 
 ```javascript
@@ -52,12 +52,12 @@ this "Hello World" example into it.
   }
 ```
 
-5.  Run the server:
+*  Run the server:
 ```
   node server.js
 ```
 
-6.  Hit http://localhost:8080/ and be completely floored by the greatest API of all time.
+*  Hit http://localhost:8080/ and be completely floored by the greatest API of all time.
 
 ## What's a "resource"?
 Resources are where you put your code for handling http requests (and their responses).  They're somewhat similar 
