@@ -13,24 +13,7 @@ like mobile apps and single-page apps.
 
 Is this project ready to use?  Kind-of-sort-of.  Not in Production though.
 
-## Quick Example:
-
-### Hello World
-To create a simple read-only /helloworld resource that responds with "Hello
-World!", create a file in the root 'resources' directory called "helloworld.js"
-and put this in it:
-
-```javascript
-  exports.handler = {
-    GET : function(req, res){
-      res.send('Hello World!');
-    }
-  }
-```
-
-"req" and "res" are simply express's request and response objects.
-
-## Quick Start:
+## Hello World Quick Start:
 1. 
   npm install Percolator
 2.  Create a server.js in your project directory, and copy this code below into it:
@@ -59,7 +42,15 @@ which are essentially handlers for all the methods of each url.  If you've used 
 Rails, you can think of "resources" as "controllers" for now. 
 
 4.  Create your first resource.  Just create a file named _index.js in the 'resources' directory and copy/paste 
-the "Hello World" example from above into it.
+this "Hello World" example into it.
+
+```javascript
+  exports.handler = {
+    GET : function(req, res){
+      res.end('Hello World!');
+    }
+  }
+```
 
 5.  Run the server:
 ```
@@ -68,19 +59,40 @@ the "Hello World" example from above into it.
 
 6.  Hit http://localhost:8080/ and be completely floored by the greatest API of all time.
 
+# What's a "resource"?
+Resources are where you put your code for handling http requests (and their responses).  They're somewhat similar 
+to controllers in server-side MVC frameworks like Ruby on Rails.
+
+A single resource handles all the HTTP methods for a single URL path.  Any object that provides the HTTP methods 
+can be used and just has to be exported as a javascript module.  Our "Hello World" example is just providing the 
+GET method, so when your users use other methods like POST and DELETE on it will just respond with 405 errors.  
+You can easily implement any other HTTP method that you want, by just defining the function by that name (use all 
+caps!).
+
+Resources are just node modules that Percolator automaticaly require()s.  You have to export them as "handler" 
+like in the "Hello World" example above."
+
+Any particular method that you implement takes request and response parameters, in that order (The "Hello World"
+example just calls them 'req' and 'res' respectively)).  These are the [request]( http://nodejs.org/api/http.html#http_class_http_serverrequest )
+and [response]( http://nodejs.org/api/http.html#http_class_http_serverresponse ) objects from node itself.
+
 
 ## How routing works
 Your resource directory and its subdirectories are routed to URLs, so that the organization on the filesystem 
 dictates your urls.  This means you don't have to maintain a list of routes anywhere, you know exactly where to 
 find everything and you have a simple convention for code organization.
 
-# The base path
+### The base path
 The base path is the URI path under which all of your resources will be served. It's called "resourcePath" in 
 your application config (see the quick start for an example of setting it to '/').  It doesn't need to be set 
 to '/', for instance -- you could set it to /api, and then the quick start example would serve from /api instead.
 
-# The _index.js file.
+### The _index.js file.
 The server won't start without an _index.js file.  It's the resource that handles requests to your base path.
+
+### Adding other routes to a path
+Just add more files to the directory!  Adding ./resources/newone.js will make the handler in that file available 
+at the /newone url . 
 
 
 ## The "uri" API
