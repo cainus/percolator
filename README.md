@@ -29,9 +29,9 @@ var app = {
   staticDir : __dirname + '/static',
   port : 8080
 };
-var $P = new Percolator(app);
+var server = new Percolator(app);
 
-$P.expressStart(function(err){
+server.expressStart(function(err){
   if (err) {console.log(err);throw err;}
   console.log('Percolator running on ' + $P.port);
 });
