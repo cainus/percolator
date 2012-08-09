@@ -108,6 +108,9 @@ resource methods as `this.app`.  Required parameters for this config object are:
 It's also important to note that you can add your own parameters as well.  It's a great way to instantiate shared 
 resources (like a database connection) in the main application and pass it to all resources.
 
+You're obviously going to want to limit the number of `app` variables that you add beyond the necessary ones, but
+certain types of objects might make sense in that shared space.
+
 ## The "uri" API
 Each method you define has access to a 'uri' module that understands the context of each particular request 
 that it's used in.  The module makes a number of convenient methods available for dealing with uri's and 
