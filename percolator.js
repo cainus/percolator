@@ -9,6 +9,7 @@ var _ = require('underscore');
 
 Percolator = function(options){
   options = options || {};
+  var that = this;
   this.statusman = new StatusManager();
   this.options = _.extend({port : 3000,
                            protocol : 'http',
@@ -23,11 +24,12 @@ Percolator = function(options){
   var protocol = this.protocol;
   this.router.onRequest = function(handler, req, res, cb){
     handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
+    handler.status = that.statusman.createResponder(req, res);
+    handler.repr = that._getRepr(req, res);
     cb(null, handler);
   };
   this.assignErrorHandlers();
   this.registerMediaTypes();
-  var that = this;
   this.expressServer = express.createServer();
   if (!!options.staticDir){
     this.staticDir = options.staticDir;
@@ -38,6 +40,18 @@ Percolator = function(options){
     that.decorateResource(resource);
   });
 };
+
+Percolator.prototype._getRepr = function(req, res){
+  var mediaTypes = this.mediaTypes;
+  var accept = req.headers.accept;
+  return function(data){
+    // TODO what if request.headers.accept isn't set at all??
+    var obj = mediaTypes.out(accept, data);
+    res.setHeader('content-type', obj.type);
+    res.send(obj.content);
+  };
+};
+
 
 Percolator.prototype._getMethods = function(resource){
   var serverSupportedMethods = ["GET", "POST", 
@@ -51,26 +65,6 @@ Percolator.prototype._getMethods = function(resource){
   }
   methods = _.union(additionalMethods, methods);
   return methods;
-};
-
-Percolator.prototype.setRepresenterMethod = function(resource){
-  // set repr() for all resources
-  var mediaTypes = this.mediaTypes;
-  resource.repr = function(req, res, data){
-    // TODO what if request.headers.accept isn't set at all??
-    console.log('mediaTypes: ', mediaTypes);
-    var obj = mediaTypes.out(req.headers.accept, data);
-    res.setHeader('content-type', obj.type);
-    res.send(obj.content);
-  };
-};
-
-Percolator.prototype.setStatusMethod = function(resource){
-  // set status() object for all resources
-  var that = this;
-  resource.status = function(req, res){
-    return that.statusman.createResponder(req, res);
-  };
 };
 
 Percolator.prototype.setOptionsHandler = function(resource){
