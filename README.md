@@ -38,6 +38,8 @@ server.listen(function(err){
 *  See your "Hello World" output at http://localhost:8080/ and be completely floored by the greatest 
 API of all time.  Or not.
 
+## Hello World Refactored:
+
 While this is pretty simple, it's also not super-interesting.  One of the interesting features of 
 Percolator is that it lets you load your routes from external files instead:
 
