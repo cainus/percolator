@@ -35,13 +35,29 @@ server.listen(function(err){
   node server.js
 ```
 
-*  See your "Hello World" output at http://localhost:8080/ and be completely floored by the greatest 
+*  See your "Hello World" output at http://localhost:3000/ and be completely floored by the greatest 
 API of all time.  Or not.
 
 ## Hello World Refactored:
 
 While this is pretty simple, it's also not super-interesting.  One of the interesting features of 
-Percolator is that it lets you load your routes from external files instead:
+Percolator is that it lets you load your route-handling code from external files instead:
+
+* Move your "Hello World" handler into a file at the path `./resources/_index.js` by first creating the 
+`resources` directory and then the `_index.js` file in it and then copying the handler logic into `_index.js`
+like so:
+
+```javascript
+  exports.handler = {
+    GET : function(req, res){
+      res.end('Hello World!');
+    }
+  }
+```
+We'll call files like that "resources" from now on.
+
+
+* Change your server.js to call `routeDirectory()` instead of `server.router.route()` like so:
 
 ```javascript
 var Percolator = require('./percolator');
@@ -55,26 +71,13 @@ server.routeDirectory(__dirname + '/resources', function(err){
 });
 
 ```
-*  Create a `resources` sub-directory in your project directory.  This is where you'll put all your "resources", 
-which are essentially handlers for all the methods of each url.
-
-*  Create your first resource.  Just create a file named _index.js in the `resources` directory and copy/paste 
-this "Hello World" example into it.
-
-```javascript
-  exports.handler = {
-    GET : function(req, res){
-      res.end('Hello World!');
-    }
-  }
-```
 
 *  Run the server:
 ```
   node server.js
 ```
 
-*  See your "Hello World" output at http://localhost:8080/ .
+*  See your "Hello World" output at http://localhost:3000/ .
 
 ## What's a "resource"?
 Resources are where you put your code for handling http requests (and their responses).  
