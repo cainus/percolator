@@ -104,9 +104,6 @@ Percolator.prototype.decorateResource = function(resource){
     console.log(abs);
     return abs;
   };
-  this.setRepresenterMethod(resource);
-  this.setStatusMethod(resource);
-
 };
 
 // register error handlers for each content type
