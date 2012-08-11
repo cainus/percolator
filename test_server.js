@@ -18,30 +18,39 @@ var express = require('express');
 
 var app = {
   protocol : 'http',
-  resourceDir : __dirname + '/test/test_fixtures/resources',
   resourcePath : '/api',
   staticDir : __dirname + '/static',
   port : 8080
 };
 var server = new Percolator(app);
-
-server.use(express.favicon());
-server.use(express['static'](app.staticDir));
-server.use(express.bodyParser());
+server.use(express.bodyParser());  // TODO does this work for PUT?!?!
 server.use(function(req, res, next){
   console.log(req.method, ' ', req.url);
   next();
 });
 
-server.routeDirectory(app.resourceDir, function(err){
-  console.log("routing resources in " + app.resourceDir);
+server.expressServer.get('/asdfasdf', function(req, res){
+  res.send("booyakabooyaka");
+});
+
+
+var resourceDir = __dirname + '/test/test_fixtures/resources';
+server.routeDirectory(resourceDir, function(err){
+  console.log("routed resources in " + resourceDir);
+
+  server.router.route('/inside', 
+                      { GET : function(req, res){ 
+                                res.send("muahahah!"); 
+                              }
+                      }).as('inside');
+
   if (err) {
     console.log("Routing error");
     console.log(err);
     return;
   }
-  server.listen(app.port, function(err){
+  server.listen(function(err){
     if (err) {console.log(err);throw err;}
-    console.log('Percolator running on ' + app.port);
+    console.log('Percolator running on ' + server.port);
   });
 });

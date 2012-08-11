@@ -8,23 +8,19 @@ var JsonResponder = require('./StatusManager').JsonResponder;
 var _ = require('underscore');
 
 Percolator = function(options){
+  options = options || {};
   this.statusman = new StatusManager();
-  this.options = options;
+  this.options = _.extend({port : 3000,
+                           protocol : 'http',
+                           resourcePath : '/'
+                          }, options);
   this.mediaTypes = new Reaper();
-  this.port = options.port || 80;
-  this.protocol = options.protocol || 'http';
-  var protocol = this.protocol;
-  this.resourceDir = options.resourceDir || './resources';
-  this.resourcePath = options.resourcePath || '/api';
-  this.staticDir = options.staticDir || './static';
-  this.options = _.extend(options,
-                             {port : this.port,
-                              protocol : this.protocol,
-                              resourcePath : this.resourcePath,
-                              staticDir : this.staticDir,
-                              resourceDir : this.resourceDir});
+  this.port = this.options.port;
+  this.protocol = this.options.protocol;
+  this.resourcePath = this.options.resourcePath;
   this.router = new Router(this.resourcePath);
   var router = this.router;
+  var protocol = this.protocol;
   this.router.onRequest = function(handler, req, res, cb){
     handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
     cb(null, handler);
@@ -32,7 +28,12 @@ Percolator = function(options){
   this.assignErrorHandlers();
   this.registerMediaTypes();
   var that = this;
-  this.server = express.createServer();
+  this.expressServer = express.createServer();
+  if (!!options.staticDir){
+    this.staticDir = options.staticDir;
+    this.expressServer.use(express['static'](this.staticDir));
+  }
+  this.expressServer.use(express.bodyParser());  // TODO does this work for PUT?!?!
   this.router.on("route", function(resource){
     that.decorateResource(resource);
   });
@@ -169,12 +170,12 @@ Percolator.prototype.registerMediaTypes = function(){
 };
 
 Percolator.prototype.use = function(middleware){
-  this.server.use(middleware);
+  this.expressServer.use(middleware);
 };
 
-Percolator.prototype.listen = function(port, cb){
+Percolator.prototype.listen = function(cb){
   this.use(this.router.connectMiddleware);
-  this.server.listen(port, cb);
+  this.expressServer.listen(this.port, cb);
 };
 
 module.exports = Percolator;
