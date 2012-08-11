@@ -18,27 +18,43 @@ Is this project ready to use?  Kind-of-sort-of.  Not in Production though.
 *  Create a `server.js` in your project directory, and copy this code below into it:
 
 ```javascript
-var Percolator = require('Percolator').Percolator;
+var Percolator = require('./percolator');
 
-var resourceDir = __dirname + '/resources';
-
-var app = {
-  protocol : 'http',
-  resourceDir : resourceDir,
-  resourcePath : '/',
-  staticDir : __dirname + '/static',
-  port : 8080
-};
-var server = new Percolator(app);
-
-server.expressStart(function(err){
-  if (err) {console.log(err);throw err;}
-  console.log('Percolator running on ' + $P.port);
+var server = new Percolator();
+server.router.route('/', {  GET : function(req, res){
+                              res.end("Hello World!");
+                            }});
+server.listen(function(err){
+  console.log('server is listening on port ', server.port);
 });
+
+```
+
+*  Run the server:
+```
+  node server.js
+```
+
+*  See your "Hello World" output at http://localhost:8080/ and be completely floored by the greatest 
+API of all time.  Or not.
+
+While this is pretty simple, it's also not super-interesting.  One of the interesting features of 
+Percolator is that it lets you load your routes from external files instead:
+
+```javascript
+var Percolator = require('./percolator');
+
+var server = new Percolator();
+server.routeDirectory(__dirname + '/resources', function(err){
+  if (!!err) {console.log(err);}
+  server.listen(function(err){
+    console.log('server is listening on port ', server.port);
+  });
+});
+
 ```
 *  Create a `resources` sub-directory in your project directory.  This is where you'll put all your "resources", 
-which are essentially handlers for all the methods of each url.  If you've used a server-side MVC framework like 
-Rails, you can think of "resources" as "controllers" for now. 
+which are essentially handlers for all the methods of each url.
 
 *  Create your first resource.  Just create a file named _index.js in the `resources` directory and copy/paste 
 this "Hello World" example into it.
@@ -56,11 +72,10 @@ this "Hello World" example into it.
   node server.js
 ```
 
-*  Hit http://localhost:8080/ and be completely floored by the greatest API of all time.
+*  See your "Hello World" output at http://localhost:8080/ .
 
 ## What's a "resource"?
-Resources are where you put your code for handling http requests (and their responses).  They're somewhat similar 
-to controllers in server-side MVC frameworks like Ruby on Rails.
+Resources are where you put your code for handling http requests (and their responses).  
 
 A single resource handles all the HTTP methods for a single URL path.  Any object that provides the HTTP methods 
 can be used and just has to be exported as a javascript module.  Our "Hello World" example is just providing the 
