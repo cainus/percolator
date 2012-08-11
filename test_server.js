@@ -1,5 +1,6 @@
 var _ = require('underscore');
-var Percolator = require('./percolator').Percolator;
+var Percolator = require('./percolator');
+var express = require('express');
 
 // TODO collections proof-of-concept - POST, PUT, DELETE
 // TODO make status man do conneg
@@ -14,27 +15,33 @@ var Percolator = require('./percolator').Percolator;
 // TODO better errors when you try to getUrl an unknown route
 // TODO better way to see all routes
 
-var server;
-
-
-// PERCOLATOR: protocol and port
-
-// TODO what if you want to do more with express?
-
-var resourceDir = __dirname + '/test/test_fixtures/resources';
-console.log("routing resources in " + resourceDir);
 
 var app = {
   protocol : 'http',
-  resourceDir : resourceDir,
+  resourceDir : __dirname + '/test/test_fixtures/resources',
   resourcePath : '/api',
   staticDir : __dirname + '/static',
   port : 8080
 };
-var $P = new Percolator(app);
+var server = new Percolator(app);
 
-$P.expressStart(function(err){
-  if (err) {console.log(err);throw err;}
-  console.log('Percolator running on ' + $P.port);
+server.use(express.favicon());
+server.use(express['static'](app.staticDir));
+server.use(express.bodyParser());
+server.use(function(req, res, next){
+  console.log(req.method, ' ', req.url);
+  next();
 });
 
+server.routeDirectory(app.resourceDir, function(err){
+  console.log("routing resources in " + app.resourceDir);
+  if (err) {
+    console.log("Routing error");
+    console.log(err);
+    return;
+  }
+  server.listen(app.port, function(err){
+    if (err) {console.log(err);throw err;}
+    console.log('Percolator running on ' + app.port);
+  });
+});

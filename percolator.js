@@ -30,6 +30,12 @@ Percolator = function(options){
     cb(null, handler);
   };
   this.assignErrorHandlers();
+  this.registerMediaTypes();
+  var that = this;
+  this.server = express.createServer();
+  this.router.on("route", function(resource){
+    that.decorateResource(resource);
+  });
 };
 
 Percolator.prototype._getMethods = function(resource){
@@ -50,6 +56,8 @@ Percolator.prototype.setRepresenterMethod = function(resource){
   // set repr() for all resources
   var mediaTypes = this.mediaTypes;
   resource.repr = function(req, res, data){
+    // TODO what if request.headers.accept isn't set at all??
+    console.log('mediaTypes: ', mediaTypes);
     var obj = mediaTypes.out(req.headers.accept, data);
     res.setHeader('content-type', obj.type);
     res.send(obj.content);
@@ -77,14 +85,8 @@ Percolator.prototype.setOptionsHandler = function(resource){
 };
 
 // run the directory router and call the callback afterward
-Percolator.prototype.getRoutes = function(cb){
-  var that = this;
-  this.router.on("route", function(resource){
-    that.decorateResource(resource);
-  });
-  this.router.routeDirectory(this.resourceDir, function(err){
-    cb(err);
-  });
+Percolator.prototype.routeDirectory = function(directory, cb){
+  this.router.routeDirectory(directory, cb);
 };
 
 
@@ -124,10 +126,7 @@ Percolator.prototype.assignErrorHandlers = function(){
 
   router.handle404 = function(req, res){
     // TODO fix resource.fetch to use this handle404 instead of default!!!
-    console.log("four oh four");
     var responder = statusman.createResponder(req, res);
-    console.log('responder.notFound');
-    console.log(responder.notFound);
     responder.notFound();
   };
 
@@ -159,11 +158,7 @@ Percolator.prototype.registerStatusResponder = function(type, responder){
   this.statusman.register(type, responder);
 };
 
-
-Percolator.prototype.expressStart = function(cb){
-
-  var that = this;
-
+Percolator.prototype.registerMediaTypes = function(){
   var jsonType = require('./mediaTypes/json');
   this.registerMediaType('application/json', jsonType.fromString, jsonType.toString);
   //var xmlType = require('./mediaTypes/xml');
@@ -171,25 +166,15 @@ Percolator.prototype.expressStart = function(cb){
 
   this.registerStatusResponder('application/json',  JsonResponder);
 
-  this.getRoutes(function(err){
-    if (err) {return cb(err);}
-
-    var server = express.createServer();
-
-    server.configure(function(){
-        server.use(express.favicon());
-        server.use(express['static'](that.options.staticDir));
-        server.use(express.bodyParser());
-        server.use(function(req, res, next){
-          console.log(req.method, ' ', req.url);
-          next();
-        });
-        server.use(that.router.connectMiddleware);
-    });
-
-    server.listen(that.port);
-    return cb(null, server);
-  });
 };
 
-exports.Percolator = Percolator;
+Percolator.prototype.use = function(middleware){
+  this.server.use(middleware);
+};
+
+Percolator.prototype.listen = function(port, cb){
+  this.use(this.router.connectMiddleware);
+  this.server.listen(port, cb);
+};
+
+module.exports = Percolator;
