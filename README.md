@@ -18,7 +18,7 @@ Is this project ready to use?  Kind-of-sort-of.  Not in Production though.
 *  Create a `server.js` in your project directory, and copy this code below into it:
 
 ```javascript
-var Percolator = require('./percolator');
+var Percolator = require('Percolator');
 
 var server = new Percolator();
 server.router.route('/', {  GET : function(req, res){
@@ -60,7 +60,7 @@ We'll call files like that "resources" from now on.
 * Change your server.js to call `routeDirectory()` instead of `server.router.route()` like so:
 
 ```javascript
-var Percolator = require('./percolator');
+var Percolator = require('Percolator');
 
 var server = new Percolator();
 server.routeDirectory(__dirname + '/resources', function(err){
