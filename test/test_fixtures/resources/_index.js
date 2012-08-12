@@ -11,7 +11,7 @@ exports.handler = new resource({
     console.log(req);
     var that = this;
     var app = this.app;
-    this.repr(req, res, {
+    this.repr({
       _links: that.uri.links()
     });
   }

@@ -9,36 +9,36 @@ var _ = require('underscore');
 
 Percolator = function(options){
   options = options || {};
-  var that = this;
-  this.statusman = new StatusManager();
-  this.options = _.extend({port : 3000,
-                           protocol : 'http',
-                           resourcePath : '/'
-                          }, options);
-  this.mediaTypes = new Reaper();
+  this.options = options;
+  this.options.port = this.options.port || 3000;
+  this.options.protocol = this.options.protocol || 'http';
+  this.options.resourcePath = this.options.resourcePath || '/';
   this.port = this.options.port;
   this.protocol = this.options.protocol;
   this.resourcePath = this.options.resourcePath;
   this.router = new Router(this.resourcePath);
   var router = this.router;
   var protocol = this.protocol;
+  var that = this;
+  this.statusman = new StatusManager();
+  this.mediaTypes = new Reaper();
   this.router.onRequest = function(handler, req, res, cb){
-    handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
-    handler.status = that.statusman.createResponder(req, res);
-    handler.repr = that._getRepr(req, res);
-    cb(null, handler);
-  };
-  this.assignErrorHandlers();
-  this.registerMediaTypes();
-  this.expressServer = express.createServer();
-  if (!!options.staticDir){
-    this.staticDir = options.staticDir;
-    this.expressServer.use(express['static'](this.staticDir));
-  }
-  this.expressServer.use(express.bodyParser());  // TODO does this work for PUT?!?!
-  this.router.on("route", function(resource){
-    that.decorateResource(resource);
-  });
+      handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
+      handler.status = that.statusman.createResponder(req, res);
+      handler.repr = that._getRepr(req, res);
+      cb(null, handler);
+    };
+    this.assignErrorHandlers();
+    this.registerMediaTypes();
+    this.expressServer = express.createServer();
+    if (!!options.staticDir){
+      this.staticDir = options.staticDir;
+      this.expressServer.use(express['static'](this.staticDir));
+    }
+    this.expressServer.use(express.bodyParser());  // TODO does this work for PUT?!?!
+    this.router.on("route", function(resource){
+      that.decorateResource(resource);
+    });
 };
 
 Percolator.prototype._getRepr = function(req, res){

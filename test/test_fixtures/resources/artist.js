@@ -35,7 +35,7 @@ var artistCollection = new resource({
     var parentUrl = this.router.getParentUrl(req.url);
     parentUrl = this.getAbsoluteUrl(req.headers.host, parentUrl);
     out._links = this.uri.links();
-    this.repr(req, res, out)
+    this.repr(out)
   }
 });
 
@@ -68,7 +68,7 @@ exports.member = new resource({
       parent : {href : parentUrl}
     } }
     var out = _.extend(item, row);
-    this.repr(req, res, out);
+    this.repr(out);
   }
 
 });
