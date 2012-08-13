@@ -97,9 +97,11 @@ and [response]( http://nodejs.org/api/http.html#http_class_http_serverresponse )
 
 
 ## How routing works
-Your resource directory and its subdirectories are routed to URLs, so that the organization on the filesystem 
-dictates your urls.  This means you don't have to maintain a list of routes anywhere, you know exactly where to 
-find everything and you have a simple convention for code organization.
+Your resource directory and the files and subdirectories in it are routed to URLs, so that the organization on 
+the filesystem dictates your urls.  This means:
+* you don't have to maintain a list of routes anywhere
+* you know exactly where to find everything 
+* you have a simple convention for code organization.
 
 ### The base path
 The base path is the URI path under which all of your resources will be served. It's called `resourcePath` in 
