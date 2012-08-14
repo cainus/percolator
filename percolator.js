@@ -23,22 +23,30 @@ Percolator = function(options){
   this.statusman = new StatusManager();
   this.mediaTypes = new Reaper();
   this.router.onRequest = function(handler, req, res, cb){
-      handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
-      handler.status = that.statusman.createResponder(req, res);
-      handler.repr = that._getRepr(req, res);
-      cb(null, handler);
-    };
-    this.assignErrorHandlers();
-    this.registerMediaTypes();
-    this.expressServer = express.createServer();
-    if (!!options.staticDir){
-      this.staticDir = options.staticDir;
-      this.expressServer.use(express['static'](this.staticDir));
+    // check the mediatype here?  406 if invalid?
+    handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
+    handler.status = that.statusman.createResponder(req, res);
+    handler.repr = that._getRepr(req, res);
+    cb(null, handler);
+  };
+  this.assignErrorHandlers();
+  this.registerMediaTypes();
+  this.expressServer = express.createServer();
+  if (!!options.staticDir){
+    this.staticDir = options.staticDir;
+    this.expressServer.use(express['static'](this.staticDir));
+  }
+  this.expressServer.use(function(req, res, next){
+    if (!that.mediaTypes.isRegistered(req.headers.accept)){
+      that.statusman.createResponder(req, res).notAcceptable();
+    } else {
+      return next();
     }
-    this.expressServer.use(express.bodyParser());  // TODO does this work for PUT?!?!
-    this.router.on("route", function(resource){
-      that.decorateResource(resource);
-    });
+  });
+  this.expressServer.use(express.bodyParser());  // TODO does this work for PUT?!?!
+  this.router.on("route", function(resource){
+    that.decorateResource(resource);
+  });
 };
 
 Percolator.prototype._getRepr = function(req, res){
