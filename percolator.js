@@ -54,7 +54,7 @@ Percolator.prototype._getRepr = function(req, res){
   var accept = req.headers.accept;
   return function(data){
     // TODO what if request.headers.accept isn't set at all??
-    var obj = mediaTypes.out(accept, data);
+    var obj = mediaTypes.output(accept, data);
     res.setHeader('content-type', obj.type);
     res.send(obj.content);
   };
