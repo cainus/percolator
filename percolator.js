@@ -23,7 +23,6 @@ Percolator = function(options){
   this.statusman = new StatusManager();
   this.mediaTypes = new Reaper();
   this.router.onRequest = function(handler, req, res, cb){
-    // check the mediatype here?  406 if invalid?
     handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
     handler.status = that.statusman.createResponder(req, res);
     handler.repr = that._getRepr(req, res);
@@ -37,7 +36,8 @@ Percolator = function(options){
     this.expressServer.use(express['static'](this.staticDir));
   }
   this.expressServer.use(function(req, res, next){
-    if (!that.mediaTypes.isRegistered(req.headers.accept)){
+    var accept = req.headers.accept || '*/*';
+    if (!that.mediaTypes.isAcceptable(accept)){
       that.statusman.createResponder(req, res).notAcceptable();
     } else {
       return next();
