@@ -3,12 +3,15 @@ var Router = require('detour').Router;
 var Reaper = require('reaper').Reaper;
 var UriUtil = require('./uriUtil').UriUtil;
 var express = require('express');
+var http = require('http');
+var https = require('https');
 var StatusManager = require('./StatusManager').StatusManager;
 var JsonResponder = require('./StatusManager').JsonResponder;
 var _ = require('underscore');
 
 Percolator = function(options){
   options = options || {};
+  this.server = null;
   this.options = options;
   this.options.port = this.options.port || 3000;
   this.options.protocol = this.options.protocol || 'http';
@@ -172,9 +175,19 @@ Percolator.prototype.use = function(middleware){
   this.expressServer.use(middleware);
 };
 
+Percolator.prototype.use = function(middleware){
+  this.expressServer.use(middleware);
+};
+
 Percolator.prototype.listen = function(cb){
   this.use(this.router.connectMiddleware);
-  this.expressServer.listen(this.port, cb);
+  var protocolLibrary = this.protocol === 'https' ? https : http;
+  this.server = protocolLibrary.createServer(this.expressServer);
+  this.server.listen(this.port, cb);
+};
+
+Percolator.prototype.close = function(cb){
+  this.server.close(cb);
 };
 
 module.exports = Percolator;
