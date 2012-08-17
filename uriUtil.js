@@ -48,17 +48,30 @@ UriUtil.prototype.pathJoin = function(){
 	// put a fwd-slash between all pieces and remove any redundant slashes
 	// additionally remove the trailing slash
   var pieces = _.flatten(_.toArray(arguments));
+  var first = nodeUrl.parse(pieces[0]);
+  var prefix = '/';
+  if (!!first.protocol){
+    pieces[0] = first.path;
+    prefix = first.protocol + '//' + first.host;
+  }
   var joined = pieces.join('/').replace(/\/+/g, '/');
 	joined = joined.replace(/\/$/, '');
-  if ((joined.length === 0) || (joined[0] != '/')){ joined = '/' + joined; }
+  if (joined[0] === '/'){ 
+    joined.substring(1);
+  }
+  joined = prefix + joined;
   return joined;
 };
 
 UriUtil.prototype.links = function(){
-  var links = this.namedKids();
-  links.self = this.absolute(this._self);
+  var kids = this.namedKids();
+  var links = {};
+  _.each(kids, function(v, k){
+    links[k] = { href : v};
+  });
+  links.self = {href : this.absolute(this._self)};
   try {
-    links.parent = this.absolute(this.parent());
+    links.parent = {href : this.absolute(this.parent())};
   } catch (ex){
     if (ex.name != 'NoParentUrl'){
       throw ex;

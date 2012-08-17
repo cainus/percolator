@@ -64,6 +64,11 @@ describe('UriUtil', function(){
       u.pathJoin(['qwer', '/asdf'], 'qwer/1234/', '/1234/')
               .should.equal('/qwer/asdf/qwer/1234/1234');
     });
+    it ("returns a single path, even if the first is a full url ", function(){
+      var u = new UriUtil({}, '[path]');
+      u.pathJoin(['http://qwer.ca:8080/gg', '/asdf'], 'qwer/1234/', '/1234/')
+              .should.equal('http://qwer.ca:8080/gg/asdf/qwer/1234/1234');
+    });
   });
   describe('#links', function(){
     it ("returns parent, self, and child links", function(){
@@ -80,7 +85,10 @@ describe('UriUtil', function(){
         }
       };
       var u = new UriUtil(router, '[path]');
-      u.links().should.eql({self : 'http://localhost/[path]', parent : 'http://localhost/parent[path]', somechild : 'http://localhost/child[path]'});
+      u.links().should.eql({self : {href : 'http://localhost/[path]'}, 
+                           parent : {href :'http://localhost/parent[path]'}, 
+                           somechild : {href : 'http://localhost/child[path]'}
+      });
       calledNamedChildUrls.should.equal(true);
       calledParentUrls.should.equal(true);
     });
@@ -98,7 +106,8 @@ describe('UriUtil', function(){
         }
       };
       var u = new UriUtil(router, '[path]');
-      u.links().should.eql({self : 'http://localhost/[path]', somechild : 'http://localhost/child[path]'});
+      u.links().should.eql({self : {href : 'http://localhost/[path]'}, 
+                            somechild : {href : 'http://localhost/child[path]'}});
       
       calledNamedChildUrls.should.equal(true);
       calledParentUrls.should.equal(true);
@@ -254,6 +263,11 @@ describe('UriUtil', function(){
       var router = { };
       var u = new UriUtil(router, '[path]');
       u.self().should.equal('http://localhost/[path]');
+    });
+    it ('returns the input url even with a querystring', function(){
+      var router = { };
+      var u = new UriUtil(router, '[path]?asdf=1234');
+      u.self().should.equal('http://localhost/[path]?asdf=1234');
     });
   });
   describe('#parse', function(){
