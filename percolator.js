@@ -1,4 +1,3 @@
-//var fs = require('fs');
 var Router = require('detour').Router;
 var Reaper = require('reaper').Reaper;
 var UriUtil = require('./uriUtil').UriUtil;
