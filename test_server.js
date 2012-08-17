@@ -29,18 +29,13 @@ server.use(function(req, res, next){
   next();
 });
 
-server.expressServer.get('/asdfasdf', function(req, res){
-  res.send("booyakabooyaka");
-});
-
-
 var resourceDir = __dirname + '/test/test_fixtures/resources';
 server.routeDirectory(resourceDir, function(err){
   console.log("routed resources in " + resourceDir);
 
   server.router.route('/inside', 
                       { GET : function(req, res){ 
-                                res.send("muahahah!"); 
+                                res.end("muahahah!"); 
                               }
                       }).as('inside');
 

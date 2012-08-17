@@ -2,7 +2,7 @@
 var Router = require('detour').Router;
 var Reaper = require('reaper').Reaper;
 var UriUtil = require('./uriUtil').UriUtil;
-var express = require('express');
+var connect = require('connect');
 var http = require('http');
 var https = require('https');
 var StatusManager = require('./StatusManager').StatusManager;
@@ -33,12 +33,12 @@ Percolator = function(options){
   };
   this.assignErrorHandlers();
   this.registerMediaTypes();
-  this.expressServer = express.createServer();
+  this.middlewareManager = connect();
   if (!!options.staticDir){
     this.staticDir = options.staticDir;
-    this.expressServer.use(express['static'](this.staticDir));
+    this.middlewareManager.use(connect['static'](this.staticDir));
   }
-  this.expressServer.use(function(req, res, next){
+  this.middlewareManager.use(function(req, res, next){
     var accept = req.headers.accept || '*/*';
     if (!that.mediaTypes.isAcceptable(accept)){
       that.statusman.createResponder(req, res).notAcceptable();
@@ -46,7 +46,29 @@ Percolator = function(options){
       return next();
     }
   });
-  this.expressServer.use(express.bodyParser());  // TODO does this work for PUT?!?!
+  //this.middlewareManager.use(connect.bodyParser());  // TODO does this work for PUT?!?!
+  this.middlewareManager.use(this.mediaTypes.connectMiddleware());
+  this.middlewareManager.use(function(err, req, res, next){
+    if (!!err) {
+      if (err.match(/^Parse Error:/)){
+        that.statusman.createResponder(req, res).badRequest(err);
+        return;
+      }
+      if (err === "Missing Content-Type"){
+        that.statusman.createResponder(req, res).unsupportedMediaType("None provided.");
+        return;
+      }
+      if (err === "Unregistered content-type."){
+        that.statusman.createResponder(req, res).unsupportedMediaType(req.headers['content-type']);
+        return;
+      } 
+      console.log("post mediaTypes middleware error:");
+      console.log(err);
+      return next(err);
+    } else {
+      console.log("wasn't an error!");
+    }
+  });
   this.router.on("route", function(resource){
     that.decorateResource(resource);
   });
@@ -59,7 +81,7 @@ Percolator.prototype._getRepr = function(req, res){
     // TODO what if request.headers.accept isn't set at all??
     var obj = mediaTypes.output(accept, data);
     res.setHeader('content-type', obj.type);
-    res.send(obj.content);
+    res.end(obj.content);
   };
 };
 
@@ -172,17 +194,17 @@ Percolator.prototype.registerMediaTypes = function(){
 };
 
 Percolator.prototype.use = function(middleware){
-  this.expressServer.use(middleware);
+  this.middlewareManager.use(middleware);
 };
 
 Percolator.prototype.use = function(middleware){
-  this.expressServer.use(middleware);
+  this.middlewareManager.use(middleware);
 };
 
 Percolator.prototype.listen = function(cb){
   this.use(this.router.connectMiddleware);
   var protocolLibrary = this.protocol === 'https' ? https : http;
-  this.server = protocolLibrary.createServer(this.expressServer);
+  this.server = protocolLibrary.createServer(this.middlewareManager);
   this.server.listen(this.port, cb);
 };
 
