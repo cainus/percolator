@@ -37,6 +37,13 @@ unaltered request and response objects from node.js, so it should be easily exte
 * Continue to allow full control of request handling and response generation.
 * Minimal "magic", and no code generators.
 
+### Focus on helping create great APIs
+* There are no plans to support server-generated dynamic HTML.  [Express](http://expressjs.com) is already great 
+at that.
+* There are no plans to support specific database drivers or ORM.  Of course these can still be added to your app 
+quite easily but in this day and age, it would be silly for an API framework to assume what kind of persistence 
+you want to use, or even that you require persistence at all.
+
 ## Some glaring limitations being worked on:
 * Other representation formats than just "application/json", and a better factoring to 
 allow custom media-types (per resource, even) if the user wishes.
