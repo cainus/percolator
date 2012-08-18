@@ -2,82 +2,17 @@
 [![Build
 Status](https://secure.travis-ci.org/cainus/percolator.png?branch=master)](http://travis-ci.org/cainus/percolator)
 
-Percolator is a framework for quickly and easily building quality http APIs with node.js.  
+Percolator is a new kind of web application framework (for node.js) for fun and fast development of quality APIs.  
 
-It is intended for developers who want to build great APIs, but don't want to
-have to write tedious boiler plate code over-and-over to achieve it.
-
-It aims to be a great tool for building public-quality APIs, as well as being
-better suited for apps that perform all of their view logic on the client-side,
-like mobile apps and single-page apps.
+It's great for:
+* quality, public-facing APIs
+* single page apps
+* mobile apps
 
 Is this project ready to use?  Kind-of-sort-of.  Not in Production though.
 
-## Hello World Quick Start:
-*  `npm install Percolator`
-*  Create a `server.js` in your project directory, and copy this code below into it:
-
-```javascript
-var Percolator = require('Percolator');
-
-var server = new Percolator();
-server.router.route('/', {  GET : function(req, res){
-                              res.end("Hello World!");
-                            }});
-server.listen(function(err){
-  console.log('server is listening on port ', server.port);
-});
-
-```
-
-*  Run the server:
-```
-  node server.js
-```
-
-*  See your "Hello World" output at http://localhost:3000/ and be completely floored by the greatest 
-API of all time.  Or not.
-
-## Hello World Refactored:
-
-While this is pretty simple, it's also not super-interesting.  One of the interesting features of 
-Percolator is that it lets you load your route-handling code from external files instead:
-
-* Move your "Hello World" handler into a file at the path `./resources/_index.js` by first creating the 
-`resources` directory and then the `_index.js` file in it and then copying the handler logic into `_index.js`
-like so:
-
-```javascript
-  exports.handler = {
-    GET : function(req, res){
-      res.end('Hello World!');
-    }
-  }
-```
-We'll call files like that "resources" from now on.
-
-
-* Change your server.js to call `routeDirectory()` instead of `server.router.route()` like so:
-
-```javascript
-var Percolator = require('Percolator');
-
-var server = new Percolator();
-server.routeDirectory(__dirname + '/resources', function(err){
-  if (!!err) {console.log(err);}
-  server.listen(function(err){
-    console.log('server is listening on port ', server.port);
-  });
-});
-
-```
-
-*  Run the server:
-```
-  node server.js
-```
-
-*  See your "Hello World" output at http://localhost:3000/ .
+## Hello World: ##
+https://github.com/cainus/percolator/wiki/Hello-World
 
 ## What's a "resource"?
 Resources are where you put your code for handling http requests (and their responses).  
