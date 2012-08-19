@@ -62,7 +62,7 @@ JsonResponder.prototype.created = function(url){
   url = url || '';
   this.res.setHeader('Location', url);
   this.res.writeHead(201);
-  this.res.end(out);
+  this.res.end();
 };
 
 JsonResponder.prototype.movedPermanently = function(url){
@@ -73,7 +73,7 @@ JsonResponder.prototype.redirect = function(url){
   url = url || '';
   this.res.setHeader('Location', url);
   this.res.writeHead(301);
-  this.res.end(out);
+  this.res.end();
 };
 
 JsonResponder.prototype.OPTIONS = function(methods){
