@@ -11,41 +11,37 @@ exports.handler = new MongoResource(app, 'artist', {
 
 
 */
-var resource = require('resorcery').resource;
+var Resource = require('resorcery').resource;
 var collection = require('resorcery').collection;
 
 var artists = {
   '1234' : {"name" : "Neil Young", created : new Date()},
   '4567' : {"name" : "Joe Strummer", created : new Date()}
 };
-var artistCollection = new resource({
+var artistCollection = new Resource({
   POST : function(req, res){
     // TODO real implementation
     console.log('post');
     res.end();
   },
   GET : function(req, res){
-    console.log('get');
-    var out = { artist : [] }
-    var linkPrefix = this.getAbsoluteUrl(req.headers.host, req.url);
+    var out = { artist : [] };
+    var that = this;
     _.each(artists, function(v, k){
-       var item = _.extend({ _links : { artist : {href : linkPrefix + "/" + k}} }, v)
+       var item = _.extend({ _links : { self : {href : that.uri.get('artist*', {'artist' : k})} }}, v);
        out.artist.push(item);
     });
-    var parentUrl = this.router.getParentUrl(req.url);
-    parentUrl = this.getAbsoluteUrl(req.headers.host, parentUrl);
     out._links = this.uri.links();
-    this.repr(out)
+    this.repr(out);
   }
 });
 
 exports.handler = artistCollection;
-exports.member = new resource({
+exports.member = new Resource({
 
   fetch : function(req, cb){
     console.log("in fetch");
-    var id = this.router.pathVariables(req.url).artist;
-    console.log('id');
+    var id = this.uri.params().artist;
     console.log(id);
     var row = artists[id];
     console.log("row: ", row);
@@ -58,17 +54,10 @@ exports.member = new resource({
 
   GET : function(req, res){
     console.log("fetched: ", this.fetched);
-    var id = this.router.pathVariables(req.url).artist;
+    var id = this.uri.param('artist');
     var row = artists[id];
-    var selfLink = this.getAbsoluteUrl(req.headers.host, req.url);
-    var parentUrl = this.router.getParentUrl(req.url);
-    parentUrl = this.getAbsoluteUrl(req.headers.host, parentUrl);
-    var item = { _links : { 
-      self : {href : selfLink},
-      parent : {href : parentUrl}
-    } }
-    var out = _.extend(item, row);
-    this.repr(out);
+    row._links = this.uri.links();
+    this.repr(row);
   }
 
 });

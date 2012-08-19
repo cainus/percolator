@@ -107,9 +107,9 @@ UriUtil.prototype.parse = function(inUrl){
 UriUtil.prototype.get = function(nameOrPath, varDict){
   if (!!nameOrPath){
     if (!!varDict){
-      return this._router.getUrl(nameOrPath, varDict);
+      return this.absolute(this._router.getUrl(nameOrPath, varDict));
     }
-    return this._router.getUrl(nameOrPath);
+    return this.absolute(this._router.getUrl(nameOrPath));
   }
   return this._self;
 };

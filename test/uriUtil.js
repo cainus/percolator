@@ -6,8 +6,6 @@ var UriUtil = require('../uriUtil').UriUtil;
 /*
  
 TODO?
-uri.append( path )  // auto adds path to current url 
-                    // should just use get() with path vars instead?
 uri.renameRel(oldname, newname)  // rename a key in links
 uri.resolve()  (url.resolve)
 uri.format()  (url.format)
@@ -171,7 +169,7 @@ describe('UriUtil', function(){
         return url;
       } };
       var u = new UriUtil(router, '[path]');
-      u.get('somename').should.equal('somename');
+      u.get('somename').should.equal('http://localhost/somename');
       called.should.equal(true);
     });
     it ("calls the router's getUrl if it has two parameters", function(){
@@ -181,7 +179,7 @@ describe('UriUtil', function(){
         return url + '_' + vars.var1;
       } };
       var u = new UriUtil(router, '[path]');
-      u.get('somename', {var1 : 'val1'}).should.equal('somename_val1');
+      u.get('somename', {var1 : 'val1'}).should.equal('http://localhost/somename_val1');
       called.should.equal(true);
     });
   });

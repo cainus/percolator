@@ -14,7 +14,8 @@ StatusManager.prototype.createResponder = function(req, res){
 };
 
 
-// TODO make default test/plain, text/html, application/xml responders
+// TODO make default text/plain, text/html, application/xml,
+// application/octet-sctream, form-url-encoded responders
 
 var JsonResponder = function(req, res){
   this.req = req;
@@ -22,11 +23,6 @@ var JsonResponder = function(req, res){
 };
 
 var errors = {
-  'internalServer' : {type : 500, message : 'Internal Server Error'},
-  'notImplemented' :      {type : 501, message : 'Not Implemented'},
-  'badGateway' :          {type : 502, message : 'Bad Gateway'},
-  'serviceUnavailable' :  {type : 503, message : 'Service Unavailable'},
-  'gatewayTimeout' :  {type : 504, message : 'Gateway Timeout'},
   'badRequest' :          {type : 400, message : 'Bad Request'},
   'unauthenticated' :     {type : 401, message : 'Unauthenticated'},
   'forbidden' :           {type : 403, message : 'Forbidden'},
@@ -41,7 +37,12 @@ var errors = {
   'requestUriTooLong' :   {type : 414, message : 'Request URI Too Long'},
   'unsupportedMediaType' : {type : 415, message : 'Unsupported Media Type'},
   'unprocessableEntity' : {type : 422, message : 'Unprocessable Entity'},
-  'tooManyRequests' :     {type : 429, message : 'Too Many Requests'}
+  'tooManyRequests' :     {type : 429, message : 'Too Many Requests'},
+  'internalServerError' : {type : 500, message : 'Internal Server Error'},
+  'notImplemented' :      {type : 501, message : 'Not Implemented'},
+  'badGateway' :          {type : 502, message : 'Bad Gateway'},
+  'serviceUnavailable' :  {type : 503, message : 'Service Unavailable'},
+  'gatewayTimeout' :  {type : 504, message : 'Gateway Timeout'}
 };
 
 
@@ -56,6 +57,24 @@ _.each(errors, function(v, k){
     this.res.end(out);
   };
 });
+
+JsonResponder.prototype.created = function(url){
+  url = url || '';
+  this.res.setHeader('Location', url);
+  this.res.writeHead(201);
+  this.res.end(out);
+};
+
+JsonResponder.prototype.movedPermanently = function(url){
+  this.redirect(url);
+};
+
+JsonResponder.prototype.redirect = function(url){
+  url = url || '';
+  this.res.setHeader('Location', url);
+  this.res.writeHead(301);
+  this.res.end(out);
+};
 
 JsonResponder.prototype.OPTIONS = function(methods){
     this.res.setHeader('Allow', methods.join(","));
