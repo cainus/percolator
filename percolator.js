@@ -168,7 +168,7 @@ Percolator.prototype.assignErrorHandlers = function(){
     console.log(ex);
     console.log(req.method, ' ', req.url);
     console.log(ex.stack);
-    statusman.createResponder(req, res).internalServer();
+    statusman.createResponder(req, res).internalServerError();
   };
 
 
