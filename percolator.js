@@ -4,6 +4,7 @@ var UriUtil = require('./uriUtil').UriUtil;
 var connect = require('connect');
 var http = require('http');
 var https = require('https');
+var EventEmitter = require('events').EventEmitter;
 var StatusManager = require('./StatusManager').StatusManager;
 var JsonResponder = require('./StatusManager').JsonResponder;
 var _ = require('underscore');
@@ -23,6 +24,9 @@ Percolator = function(options){
   var protocol = this.protocol;
   var that = this;
   this.statusman = new StatusManager();
+  this.statusman.on('error', function(errorObject){
+    that.emit("errorResponse", errorObject);
+  });
   this.mediaTypes = new Reaper();
   this.router.onRequest = function(handler, req, res, cb){
     handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
@@ -45,7 +49,6 @@ Percolator = function(options){
       return next();
     }
   });
-  //this.middlewareManager.use(connect.bodyParser());  // TODO does this work for PUT?!?!
   this.middlewareManager.use(this.mediaTypes.connectMiddleware());
   this.middlewareManager.use(function(err, req, res, next){
     if (!!err) {
@@ -72,6 +75,8 @@ Percolator = function(options){
     that.decorateResource(resource);
   });
 };
+
+Percolator.prototype = Object.create(EventEmitter.prototype);
 
 Percolator.prototype._getRepr = function(req, res){
   var mediaTypes = this.mediaTypes;
@@ -151,7 +156,7 @@ Percolator.prototype.assignErrorHandlers = function(){
   router.handle404 = function(req, res){
     // TODO fix resource.fetch to use this handle404 instead of default!!!
     var responder = statusman.createResponder(req, res);
-    responder.notFound();
+    responder.notFound(req.url);
   };
 
   router.handle405 = function(req, res){
@@ -190,10 +195,6 @@ Percolator.prototype.registerMediaTypes = function(){
 
   this.registerStatusResponder('application/json',  JsonResponder);
 
-};
-
-Percolator.prototype.use = function(middleware){
-  this.middlewareManager.use(middleware);
 };
 
 Percolator.prototype.use = function(middleware){

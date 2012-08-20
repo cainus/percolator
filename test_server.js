@@ -44,6 +44,14 @@ server.routeDirectory(resourceDir, function(err){
     console.log(err);
     return;
   }
+  server.on("response", function(data){
+    console.log("response");
+    console.log(data);
+  });
+  server.on("errorResponse", function(data){
+    console.log("error response");
+    console.log(data.req.method, data.req.url, data.type, data.message, data.detail);
+  });
   server.listen(function(err){
     if (err) {console.log(err);throw err;}
     console.log('Percolator running on ' + server.port);

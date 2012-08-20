@@ -1,8 +1,10 @@
 _ = require('underscore');
+var EventEmitter = require('events').EventEmitter;
 
 var StatusManager = function(){
   this.registry = {};
 };
+StatusManager.prototype = Object.create(EventEmitter.prototype);
 
 StatusManager.prototype.register = function(contentType, responder){
   this.registry[contentType] = responder;
@@ -10,16 +12,17 @@ StatusManager.prototype.register = function(contentType, responder){
 
 StatusManager.prototype.createResponder = function(req, res){
   // TODO make this do conneg and pick a responder from the registry!
-  return new JsonResponder(req, res);
+  return new JsonResponder(this, req, res);
 };
 
 
 // TODO make default text/plain, text/html, application/xml,
 // application/octet-sctream, form-url-encoded responders
 
-var JsonResponder = function(req, res){
+var JsonResponder = function(statusManager, req, res){
   this.req = req;
   this.res = res;
+  this.statusManager = statusManager;
 };
 
 var errors = {
@@ -54,6 +57,7 @@ _.each(errors, function(v, k){
     this.res.setHeader('Content-Type', 'application/json');
     this.res.writeHead(v.type);
     var out = JSON.stringify(obj);
+    this.statusManager.emit("error", { req : this.req, res : this.res, type : v.type, message : v.message, detail : detail } );
     this.res.end(out);
   };
 });

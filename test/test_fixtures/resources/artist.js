@@ -20,8 +20,6 @@ var artists = {
 };
 var artistCollection = new Resource({
   POST : function(req, res){
-    // TODO real implementation
-    console.log('post');
     res.end();
   },
   GET : function(req, res){
@@ -40,11 +38,8 @@ exports.handler = artistCollection;
 exports.member = new Resource({
 
   fetch : function(req, cb){
-    console.log("in fetch");
     var id = this.uri.params().artist;
-    console.log(id);
     var row = artists[id];
-    console.log("row: ", row);
     if (!!row){
       cb(null, row);
     } else {
@@ -53,7 +48,6 @@ exports.member = new Resource({
   },
 
   GET : function(req, res){
-    console.log("fetched: ", this.fetched);
     var id = this.uri.param('artist');
     var row = artists[id];
     row._links = this.uri.links();
