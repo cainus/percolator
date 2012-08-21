@@ -6,7 +6,7 @@ var http = require('http');
 var https = require('https');
 var EventEmitter = require('events').EventEmitter;
 var StatusManager = require('./StatusManager').StatusManager;
-var JsonResponder = require('./StatusManager').JsonResponder;
+var JsonResponder = require('./JsonResponder');
 var _ = require('underscore');
 
 Percolator = function(options){
