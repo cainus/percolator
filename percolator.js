@@ -138,7 +138,6 @@ Percolator.prototype.decorateResource = function(resource){
   // PERCOLATOR: set getAbsoluteUrl() for all resources?
   resource.getAbsoluteUrl = function(hostname, path){
     var abs = this.app.protocol + '://' + hostname + path;
-    console.log(abs);
     return abs;
   };
 };
