@@ -1,6 +1,5 @@
 var _ = require('underscore');
 var Percolator = require('./percolator');
-var express = require('express');
 
 // TODO collections proof-of-concept - POST, PUT, DELETE
 // TODO make status man do conneg
@@ -23,7 +22,6 @@ var app = {
   port : 8080
 };
 var server = new Percolator(app);
-server.use(express.bodyParser());  // TODO does this work for PUT?!?!
 server.use(function(req, res, next){
   console.log(req.method, ' ', req.url);
   next();

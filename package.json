@@ -22,7 +22,6 @@
           "connect" : "2.4.3",
           "detour" : "0.9.0",
           "reaper" : "0.2.3",
-          "walk" : "2.1.1",
           "elementtree" : "0.1.1"
       },
       "devDependencies" : {
