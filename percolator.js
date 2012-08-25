@@ -34,7 +34,7 @@ Percolator = function(options){
     handler.repr = that._getRepr(req, res);
     cb(null, handler);
   };
-  this.assignErrorHandlers();
+  this._assignErrorHandlers();
   this.registerMediaTypes();
   this.middlewareManager = connect();
   if (!!options.staticDir){
@@ -72,7 +72,7 @@ Percolator = function(options){
     }
   });
   this.router.on("route", function(resource){
-    that.decorateResource(resource);
+    that._decorateResource(resource);
   });
 };
 
@@ -104,7 +104,7 @@ Percolator.prototype._getMethods = function(resource){
   return methods;
 };
 
-Percolator.prototype.setOptionsHandler = function(resource){
+Percolator.prototype._setOptionsHandler = function(resource){
   // tell each resource how to respond to OPTIONS
   if (!!resource.input){
     var that = this;
@@ -122,10 +122,10 @@ Percolator.prototype.routeDirectory = function(directory, cb){
 };
 
 
-Percolator.prototype.decorateResource = function(resource){
+Percolator.prototype._decorateResource = function(resource){
 
   resource.router = this.router;
-  this.setOptionsHandler(resource);
+  this._setOptionsHandler(resource);
   // PERCOLATOR: tell each resource how to handle 404s.
   // THINK: shouldn't each resource know about all errors?
   if (!resource.handle404){
@@ -143,7 +143,7 @@ Percolator.prototype.decorateResource = function(resource){
 };
 
 // register error handlers for each content type
-Percolator.prototype.assignErrorHandlers = function(){
+Percolator.prototype._assignErrorHandlers = function(){
   // tell the router about the error handlers it can use
   var statusman = this.statusman;
   var router = this.router;
