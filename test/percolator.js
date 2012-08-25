@@ -12,6 +12,7 @@ function closeServer(server, cb){
     } catch(ex) {
       cb();
     }
+    setTimeout(cb, 1500); // not sure why, but travis-ci appears to need this.
 }
 
 
