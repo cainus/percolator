@@ -5,7 +5,13 @@ var Percolator = require('../percolator');
 
 
 function closeServer(server, cb){
-  server.close();
+  if (!!server){
+    try {
+      server.close();
+    } catch(ex){
+    
+    }
+  }
   return cb();
 }
 
