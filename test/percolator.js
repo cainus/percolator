@@ -5,14 +5,16 @@ var Percolator = require('../percolator');
 
 
 function closeServer(server, cb){
+    var timeout = setTimeout(cb, 1500); // not sure why, but travis-ci appears to need this.
     try {
       server.close(function(err){
-        cb();
+        clearTimeout(timeout);
+        return cb();
       });
     } catch(ex) {
-      cb();
+      clearTimeout(timeout);
+      return cb();
     }
-    setTimeout(cb, 1500); // not sure why, but travis-ci appears to need this.
 }
 
 
