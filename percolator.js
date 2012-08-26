@@ -29,10 +29,30 @@ Percolator = function(options){
   });
   this.mediaTypes = new Reaper();
   this.router.onRequest = function(handler, req, res, cb){
-    handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
-    handler.status = that.statusman.createResponder(req, res);
-    handler.repr = that._getRepr(req, res);
-    cb(null, handler);
+    that.mediaTypes.connectMiddleware(handler)(req, res, function(err){
+      if (!!err) {
+        if (err.match(/^Parse Error:/)){
+          that.statusman.createResponder(req, res).badRequest(err);
+          return;
+        }
+        if (err === "Missing Content-Type"){
+          that.statusman.createResponder(req, res).unsupportedMediaType("None provided.");
+          return;
+        }
+        if (err === "Unregistered content-type."){
+          that.statusman.createResponder(req, res).unsupportedMediaType(req.headers['content-type']);
+          return;
+        } 
+        console.log("post mediaTypes middleware error:");
+        console.log(err);
+        return next(err);
+      } else {
+        handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
+        handler.status = that.statusman.createResponder(req, res);
+        handler.repr = that._getRepr(req, res);
+        cb(null, handler);
+      }
+    });
   };
   this._assignErrorHandlers();
   this.registerMediaTypes();
@@ -49,34 +69,17 @@ Percolator = function(options){
       return next();
     }
   });
-  this.middlewareManager.use(this.mediaTypes.connectMiddleware());
-  this.middlewareManager.use(function(err, req, res, next){
-    if (!!err) {
-      if (err.match(/^Parse Error:/)){
-        that.statusman.createResponder(req, res).badRequest(err);
-        return;
-      }
-      if (err === "Missing Content-Type"){
-        that.statusman.createResponder(req, res).unsupportedMediaType("None provided.");
-        return;
-      }
-      if (err === "Unregistered content-type."){
-        that.statusman.createResponder(req, res).unsupportedMediaType(req.headers['content-type']);
-        return;
-      } 
-      console.log("post mediaTypes middleware error:");
-      console.log(err);
-      return next(err);
-    } else {
-      console.log("wasn't an error!");
-    }
-  });
   this.router.on("route", function(resource){
     that._decorateResource(resource);
   });
 };
 
 Percolator.prototype = Object.create(EventEmitter.prototype);
+
+
+Percolator.prototype.route = function(path, handler){
+  this.router.route(path, handler);
+};
 
 Percolator.prototype._getRepr = function(req, res){
   var mediaTypes = this.mediaTypes;

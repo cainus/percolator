@@ -94,6 +94,35 @@ describe('Percolator', function(){
 
   
   describe('when managing a body', function(){
+    it ("parsed body gets added to the handler", function(done){
+      var that = this;
+      this.server = new Percolator({port : this.port});
+      this.server.router.route('/', {  GET : function(req, res){
+                                    res.end("Hello World!");
+                                  },
+
+                                  PUT : function(req, res){
+                                    this.body.thisisa.should.equal('TEST');
+                                    this.rawBody.should.equal('{"thisisa":"TEST"}');
+                                    res.end("Hello World!");
+                                  }});
+      this.server.listen(function(err){
+        if (err) {
+          throw err;
+        }
+        hottap("http://localhost:" + that.server.port + "/").request("PUT", 
+                                                 {"content-type":"application/json"},
+                                                 '{"thisisa":"TEST"}',
+                                                 function(err, response){
+                                                    if (err) {
+                                                      throw err;
+                                                    }
+                                                    response.status.should.equal(200);
+                                                    response.body.should.equal("Hello World!");
+                                                    done();
+                                                 });
+      });
+    });
     it ("responds 415 when Content-Type is unsupported", function(done){
       var that = this;
       this.server = new Percolator({port : this.port});
@@ -161,7 +190,7 @@ describe('Percolator', function(){
     it ("responds 400 when Content-Type is json, but body doesn't contain JSON", function(done){
       var that = this;
       this.server = new Percolator({port : this.port});
-      this.server.router.route('/', {  GET : function(req, res){
+      this.server.route('/', {  GET : function(req, res){
                                     res.end("Hello World!");
                                   },
 
