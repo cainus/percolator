@@ -16,6 +16,7 @@ Percolator = function(options){
   this.options.port = this.options.port || 3000;
   this.options.protocol = this.options.protocol || 'http';
   this.options.resourcePath = this.options.resourcePath || '/';
+  this.options.parseBody = this.options.parseBody || false;
   this.port = this.options.port;
   this.protocol = this.options.protocol;
   this.resourcePath = this.options.resourcePath;
@@ -29,30 +30,37 @@ Percolator = function(options){
   });
   this.mediaTypes = new Reaper();
   this.router.onRequest = function(handler, req, res, cb){
-    that.mediaTypes.connectMiddleware(handler)(req, res, function(err){
-      if (!!err) {
-        if (err.match(/^Parse Error:/)){
-          that.statusman.createResponder(req, res).badRequest(err);
-          return;
+    handler.req = req;
+    handler.res = res;
+    handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
+    handler.status = that.statusman.createResponder(req, res);
+    handler.repr = that._getRepr(req, res);
+    if (!!that.options.parseBody){
+      that.mediaTypes.connectMiddleware(handler)(req, res, function(err){
+        if (!!err) {
+          if (err.match(/^Parse Error:/)){
+            that.statusman.createResponder(req, res).badRequest(err);
+            return;
+          }
+          if (err === "Missing Content-Type"){
+            that.statusman.createResponder(req, res).unsupportedMediaType("None provided.");
+            return;
+          }
+          if (err === "Unregistered content-type."){
+            that.statusman.createResponder(req, res).unsupportedMediaType(req.headers['content-type']);
+            return;
+          } 
+          console.log("post mediaTypes middleware error:");
+          console.log(err);
+          return cb(err);
+        } else {
+          cb(null, handler);
         }
-        if (err === "Missing Content-Type"){
-          that.statusman.createResponder(req, res).unsupportedMediaType("None provided.");
-          return;
-        }
-        if (err === "Unregistered content-type."){
-          that.statusman.createResponder(req, res).unsupportedMediaType(req.headers['content-type']);
-          return;
-        } 
-        console.log("post mediaTypes middleware error:");
-        console.log(err);
-        return next(err);
-      } else {
-        handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
-        handler.status = that.statusman.createResponder(req, res);
-        handler.repr = that._getRepr(req, res);
-        cb(null, handler);
-      }
-    });
+      });
+    } else {
+      handler.onBody = bodyParser(handler, req);
+      cb(null, handler);
+    }
   };
   this._assignErrorHandlers();
   this.registerMediaTypes();
@@ -212,6 +220,31 @@ Percolator.prototype.listen = function(cb){
 
 Percolator.prototype.close = function(cb){
   this.server.close(cb);
+};
+
+
+var bodyParser = function(handler, req){
+  var onBody = function(){
+    var cb = _.last(arguments);
+    // last arg must be a callback
+    // example "accept only" (throws errors for unsupported types ) 
+    //   onBody(['application/json', application/xml'], function(err, type, body){ ... });
+    // example "accept all types"
+    //   onBody(function(err, type, body){ ... });
+    // TODO: max-size parameter?
+    // TODO: whether parseBody is true or not, we should use the same handler either way.
+    // TODO: reaper kind of sucks.
+    var body = '';
+    req.on('data', function(data){
+      body += data;
+    });
+    req.on('end', function(){
+      handler.rawBody = body;
+      handler.body = body;
+      return cb(body);
+    });
+  };
+  return onBody;
 };
 
 module.exports = Percolator;

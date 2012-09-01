@@ -93,10 +93,44 @@ describe('Percolator', function(){
   });
 
   
-  describe('when managing a body', function(){
+  describe('when managing a text/plain body', function(){
     it ("parsed body gets added to the handler", function(done){
       var that = this;
       this.server = new Percolator({port : this.port});
+      this.server.router.route('/', {  GET : function(req, res){
+                                    res.end("Hello World!");
+                                  },
+
+                                  POST : function(req, res){
+                                    var that = this;
+                                    this.onBody(function(body){
+                                      that.body.should.equal('wakka wakka wakka');
+                                      that.rawBody.should.equal('wakka wakka wakka');
+                                      that.res.end("Hello World!");
+                                    });
+                                  }});
+      this.server.listen(function(err){
+        if (err) {
+          throw err;
+        }
+        hottap("http://localhost:" + that.server.port + "/").request("POST", 
+                                                 {"content-type":"text/plain"},
+                                                 'wakka wakka wakka',
+                                                 function(err, response){
+                                                    if (err) {
+                                                      throw err;
+                                                    }
+                                                    response.status.should.equal(200);
+                                                    response.body.should.equal("Hello World!");
+                                                    done();
+                                                 });
+      });
+    });
+  });
+  describe('when managing a json body', function(){
+    it ("parsed body gets added to the handler", function(done){
+      var that = this;
+      this.server = new Percolator({port : this.port, parseBody : true});
       this.server.router.route('/', {  GET : function(req, res){
                                     res.end("Hello World!");
                                   },
@@ -125,7 +159,7 @@ describe('Percolator', function(){
     });
     it ("responds 415 when Content-Type is unsupported", function(done){
       var that = this;
-      this.server = new Percolator({port : this.port});
+      this.server = new Percolator({port : this.port, parseBody : true});
       this.server.router.route('/', {  GET : function(req, res){
                                     res.end("Hello World!");
                                   },
@@ -157,7 +191,7 @@ describe('Percolator', function(){
     });
     it ("responds 415 when Content-Type is missing on PUT", function(done){
       var that = this;
-      this.server = new Percolator({port : this.port});
+      this.server = new Percolator({port : this.port, parseBody : true});
       this.server.router.route('/', {  GET : function(req, res){
                                     res.end("Hello World!");
                                   },
@@ -189,7 +223,7 @@ describe('Percolator', function(){
     });
     it ("responds 400 when Content-Type is json, but body doesn't contain JSON", function(done){
       var that = this;
-      this.server = new Percolator({port : this.port});
+      this.server = new Percolator({port : this.port, parseBody : true});
       this.server.route('/', {  GET : function(req, res){
                                     res.end("Hello World!");
                                   },
