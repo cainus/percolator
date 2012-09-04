@@ -9,6 +9,28 @@ var StatusManager = require('./StatusManager').StatusManager;
 var JsonResponder = require('./JsonResponder');
 var _ = require('underscore');
 
+var fetchMiddleware = function($, cb){
+    
+    // TODO extract this into a middleware, or context decorator
+    // if handler has a fetch defined, call it.
+    var success = true;
+    if (!!$.fetch && (typeof($.fetch) == 'function')){
+      $.fetch($, function(err, fetched){
+        if (err){
+          // if it returns an error, throw a 404
+          success = false;
+          $.status.notFound($.req.url);
+        }
+        // if it returns an object set handler.fetched
+        $.fetched = fetched;
+      });
+    }
+    if (success){
+      cb();  // never an error, if cb() ever gets called.
+    }
+};
+
+
 Percolator = function(options){
   options = options || {};
   this.server = null;
@@ -30,38 +52,46 @@ Percolator = function(options){
   });
   this.mediaTypes = new Reaper();
   this.router.onRequest = function(handler, req, res, cb){
-    handler.req = req;
-    handler.res = res;
     handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
     handler.status = that.statusman.createResponder(req, res);
     handler.repr = that._getRepr(req, res);
-    if (!!that.options.parseBody){
-      that.mediaTypes.connectMiddleware(handler)(req, res, function(err){
-        if (!!err) {
-          if (err.match(/^Parse Error:/)){
-            that.statusman.createResponder(req, res).badRequest(err);
-            return;
+    handler.req = req;
+    handler.res = res;
+    fetchMiddleware(handler, function(){
+      if (!!that.options.parseBody){
+        that.mediaTypes.connectMiddleware(handler)(req, res, function(err){
+          if (!!err) {
+            if (err.match(/^Parse Error:/)){
+              that.statusman.createResponder(req, res).badRequest(err);
+              return;
+            }
+            if (err === "Missing Content-Type"){
+              that.statusman.createResponder(req, res).unsupportedMediaType("None provided.");
+              return;
+            }
+            if (err === "Unregistered content-type."){
+              that.statusman.createResponder(req, res).unsupportedMediaType(req.headers['content-type']);
+              return;
+            } 
+            console.log("post mediaTypes middleware error:");
+            console.log(err);
+            return cb(err);
+          } else {
+            cb(null, handler);
           }
-          if (err === "Missing Content-Type"){
-            that.statusman.createResponder(req, res).unsupportedMediaType("None provided.");
-            return;
-          }
-          if (err === "Unregistered content-type."){
-            that.statusman.createResponder(req, res).unsupportedMediaType(req.headers['content-type']);
-            return;
-          } 
-          console.log("post mediaTypes middleware error:");
-          console.log(err);
-          return cb(err);
-        } else {
-          cb(null, handler);
-        }
-      });
-    } else {
-      handler.onBody = bodyParser(handler, req);
-      cb(null, handler);
-    }
+        });
+      } else {
+        handler.onBody = bodyParser(handler, req);
+        cb(null, handler);
+      }
+    });
   };
+  // TODO create a handler.onAuthenticate that allows the user to
+  //      set his own auth scheme (that returns a user!) in the server.js
+  //      - should auto-401 when fails.
+  //      - should run if authAll is true OR
+  //      - should run in handlers when handler.onAuthenticate is called
+  //      - should return the authenticated user as 'authenticated'
   this._assignErrorHandlers();
   this.registerMediaTypes();
   this.middlewareManager = connect();
@@ -246,5 +276,6 @@ var bodyParser = function(handler, req){
   };
   return onBody;
 };
+
 
 module.exports = Percolator;

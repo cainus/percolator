@@ -1,45 +1,30 @@
-/*
-
-var Percolator = require('../../../');
-var MongoResource = Percolator.MongoResource;
-
-var app = {}
-exports.handler = new MongoResource(app, 'artist', {
-        'name' : { type: String, match: /[a-zA-z0-9\.]/, required : true },
-        'created' :  { type: Date, default: Date.now, required : true }
-})
-
-
-*/
-var Resource = require('resorcery').resource;
-var collection = require('resorcery').collection;
 
 var artists = {
   '1234' : {"name" : "Neil Young", created : new Date()},
   '4567' : {"name" : "Joe Strummer", created : new Date()}
 };
-var artistCollection = new Resource({
-  POST : function(req, res){
-    res.end();
+exports.handler = {
+  POST : function($){
+    $.res.end();
   },
-  GET : function(req, res){
+  GET : function($){
     var out = { artist : [] };
-    var that = this;
     _.each(artists, function(v, k){
-       var item = _.extend({ _links : { self : {href : that.uri.get('artist*', {'artist' : k})} }}, v);
+       var item = _.extend({ _links : { self : {href : $.uri.get('artist*', {'artist' : k})} }}, v);
        out.artist.push(item);
     });
-    out._links = this.uri.links();
-    this.repr(out);
+    out._links = $.uri.links();
+    $.repr(out);
   }
-});
+};
 
-exports.handler = artistCollection;
-exports.member = new Resource({
+exports.member = {
 
-  fetch : function(req, cb){
-    var id = this.uri.params().artist;
+  fetch : function(handler, cb){
+    var id = handler.uri.params().artist;
+    console.log("id was: ", id);
     var row = artists[id];
+    console.log("row was: ", row);
     if (!!row){
       cb(null, row);
     } else {
@@ -47,11 +32,9 @@ exports.member = new Resource({
     }
   },
 
-  GET : function(req, res){
-    var id = this.uri.param('artist');
-    var row = artists[id];
-    row._links = this.uri.links();
-    this.repr(row);
+  GET : function($){
+    $.fetched._links = this.uri.links();
+    this.repr($.fetched);
   }
 
-});
+};

@@ -33,8 +33,8 @@ describe('Percolator', function(){
   it ("can respond to simple requests", function(done){
     var that = this;
     this.server = new Percolator({port : 3000});
-    this.server.router.route('/', {  GET : function(req, res){
-                                             res.end("Hello World!");
+    this.server.router.route('/', {  GET : function($){
+                                             $.res.end("Hello World!");
                                            }});
     this.server.listen(function(err){
       if (err) {
@@ -72,8 +72,8 @@ describe('Percolator', function(){
       var that = this;
       var port = 9090;  // set non-default here
       this.server = new Percolator({port : port});
-      this.server.router.route('/', {  GET : function(req, res){
-                                               res.end("Hello World!");
+      this.server.router.route('/', {  GET : function($){
+                                               $.res.end("Hello World!");
                                              }});
       this.server.listen(function(err){
         if (err) {
@@ -97,16 +97,15 @@ describe('Percolator', function(){
     it ("parsed body gets added to the handler", function(done){
       var that = this;
       this.server = new Percolator({port : this.port});
-      this.server.router.route('/', {  GET : function(req, res){
-                                    res.end("Hello World!");
+      this.server.router.route('/', {  GET : function($){
+                                    $.res.end("Hello World!");
                                   },
 
-                                  POST : function(req, res){
-                                    var that = this;
+                                  POST : function($){
                                     this.onBody(function(body){
-                                      that.body.should.equal('wakka wakka wakka');
-                                      that.rawBody.should.equal('wakka wakka wakka');
-                                      that.res.end("Hello World!");
+                                      $.body.should.equal('wakka wakka wakka');
+                                      $.rawBody.should.equal('wakka wakka wakka');
+                                      $.res.end("Hello World!");
                                     });
                                   }});
       this.server.listen(function(err){
@@ -131,14 +130,14 @@ describe('Percolator', function(){
     it ("parsed body gets added to the handler", function(done){
       var that = this;
       this.server = new Percolator({port : this.port, parseBody : true});
-      this.server.router.route('/', {  GET : function(req, res){
-                                    res.end("Hello World!");
+      this.server.router.route('/', {  GET : function($){
+                                    $.res.end("Hello World!");
                                   },
 
-                                  PUT : function(req, res){
+                                  PUT : function($){
                                     this.body.thisisa.should.equal('TEST');
                                     this.rawBody.should.equal('{"thisisa":"TEST"}');
-                                    res.end("Hello World!");
+                                    $.res.end("Hello World!");
                                   }});
       this.server.listen(function(err){
         if (err) {
@@ -160,12 +159,12 @@ describe('Percolator', function(){
     it ("responds 415 when Content-Type is unsupported", function(done){
       var that = this;
       this.server = new Percolator({port : this.port, parseBody : true});
-      this.server.router.route('/', {  GET : function(req, res){
-                                    res.end("Hello World!");
+      this.server.router.route('/', {  GET : function($){
+                                    $.res.end("Hello World!");
                                   },
 
-                                  PUT : function(req, res){
-                                    res.end("Hello World!");
+                                  PUT : function($){
+                                    $.res.end("Hello World!");
                                   }});
       this.server.listen(function(err){
         if (err) {
@@ -192,12 +191,12 @@ describe('Percolator', function(){
     it ("responds 415 when Content-Type is missing on PUT", function(done){
       var that = this;
       this.server = new Percolator({port : this.port, parseBody : true});
-      this.server.router.route('/', {  GET : function(req, res){
-                                    res.end("Hello World!");
+      this.server.router.route('/', {  GET : function($){
+                                    $.res.end("Hello World!");
                                   },
 
-                                  PUT : function(req, res){
-                                    res.end("Hello World!");
+                                  PUT : function($){
+                                    $.res.end("Hello World!");
                                   }});
       this.server.listen(function(err){
         if (err) {
@@ -224,12 +223,12 @@ describe('Percolator', function(){
     it ("responds 400 when Content-Type is json, but body doesn't contain JSON", function(done){
       var that = this;
       this.server = new Percolator({port : this.port, parseBody : true});
-      this.server.route('/', {  GET : function(req, res){
-                                    res.end("Hello World!");
+      this.server.route('/', {  GET : function($){
+                                    $.res.end("Hello World!");
                                   },
 
-                                  PUT : function(req, res){
-                                    res.end("Hello World!");
+                                  PUT : function($){
+                                    $.res.end("Hello World!");
                                   }});
       this.server.listen(function(err){
         if (err) {
