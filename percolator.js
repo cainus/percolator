@@ -9,6 +9,7 @@ var StatusManager = require('./StatusManager').StatusManager;
 var JsonResponder = require('./JsonResponder');
 var fetchContextHelper = require('./ContextHelpers/Fetch');
 var authenticateContextHelper = require('./ContextHelpers/Authenticate');
+var bodyContextHelper = require('./ContextHelpers/Body');
 var _ = require('underscore');
 
 /*
@@ -73,8 +74,9 @@ Percolator = function(options){
             }
           });
         } else {
-          handler.onBody = bodyParser(handler, req);
-          cb(null, handler);
+          handler.onBody = bodyContextHelper(handler, function(){
+            cb(null, handler);
+          });
         }
       });
     });
@@ -106,6 +108,8 @@ Percolator.prototype.route = function(path, handler){
   this.router.route(path, handler);
 };
 
+
+// TODO kinda sucks.  kill meeeeeeeeeeeeee.
 Percolator.prototype._getRepr = function(req, res){
   var mediaTypes = this.mediaTypes;
   var accept = req.headers.accept;
@@ -132,6 +136,7 @@ Percolator.prototype._getMethods = function(resource){
   return methods;
 };
 
+// TODO:  better as a pre-route middleware? contextHelper? something else?
 Percolator.prototype._setOptionsHandler = function(resource){
   // tell each resource how to respond to OPTIONS
   if (!!resource.input){
@@ -240,30 +245,14 @@ Percolator.prototype.close = function(cb){
 };
 
 
-// TODO onBodyContextHelper
-var bodyParser = function(handler, req){
-  var onBody = function(){
-    var cb = _.last(arguments);
-    // last arg must be a callback
-    // example "accept only" (throws errors for unsupported types ) 
-    //   onBody(['application/json', application/xml'], function(err, type, body){ ... });
-    // example "accept all types"
-    //   onBody(function(err, type, body){ ... });
-    // TODO: max-size parameter?
-    // TODO: whether parseBody is true or not, we should use the same handler either way.
-    // TODO: reaper kind of sucks.
-    var body = '';
-    req.on('data', function(data){
-      body += data;
-    });
-    req.on('end', function(){
-      handler.rawBody = body;
-      handler.body = body;
-      return cb(body);
-    });
-  };
-  return onBody;
-};
+// what about body parsing based on content-type?
+// example "accept only" (throws errors for unsupported types ) 
+//   onBody(['application/json', application/xml'], function(err, type, body){ ... });
+// example "accept all types"
+//   onBody(function(err, type, body){ ... });
+// TODO: max-size parameter?
+// TODO: whether parseBody is true or not, we should use the same handler either way.
+// TODO: reaper kind of sucks.
 
 
 module.exports = Percolator;
