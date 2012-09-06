@@ -7,52 +7,20 @@ var https = require('https');
 var EventEmitter = require('events').EventEmitter;
 var StatusManager = require('./StatusManager').StatusManager;
 var JsonResponder = require('./JsonResponder');
+var fetchContextHelper = require('./ContextHelpers/Fetch');
+var authenticateContextHelper = require('./ContextHelpers/Authenticate');
 var _ = require('underscore');
 
-var authenticateContextHelper = function($, cb){
-    // if handler has a fetch defined, call it.
-    var authenticate = $.authenticate || $.app.authenticate;
-    if (!!authenticate && (typeof(authenticate) == 'function')){
-      authenticate($, function(err, authenticated){
-        if (!!err){
-          if (err === true){
-            // if it returns an error, throw a 401
-            return $.status.unauthenticated();
-          } else {
-            return $.status.internalServerError(err);
-          }
-        }
-        // if it returns an object set handler.fetched
-        $.authenticated = authenticated;
-        cb();  // no error
-      });
-    } else {
-      cb();  // no error if no authenticate()
-    }
+/*
 
-};
+public interface?
+.route()
+.routeDirectory()
+.use()
+.listen()
+.close()
 
-var fetchContextHelper = function($, cb){
-    // if handler has a fetch defined, call it.
-    if (!!$.fetch && (typeof($.fetch) == 'function')){
-      $.fetch($, function(err, fetched){
-        if (!!err){
-          if (err === true){
-            // if it returns an error, throw a 404
-            return $.status.notFound($.req.url);
-          } else {
-            return $.status.internalServerError(err);
-          }
-        }
-        // if it returns an object set handler.fetched
-        $.fetched = fetched;
-        cb();  // no error
-      });
-    } else {
-      cb();  // no error if no fetch()
-    }
-};
-
+*/
 
 Percolator = function(options){
   options = options || {};
@@ -111,10 +79,6 @@ Percolator = function(options){
       });
     });
   };
-  // TODO create a handler.onAuthenticate that allows the user to
-  //      set his own auth scheme (that returns a user!) in the server.js
-  //      - should run if authAll is true OR
-  //      - should run in handlers when handler.onAuthenticate is called
   this._assignErrorHandlers();
   this.registerMediaTypes();
   this.middlewareManager = connect();
@@ -276,6 +240,7 @@ Percolator.prototype.close = function(cb){
 };
 
 
+// TODO onBodyContextHelper
 var bodyParser = function(handler, req){
   var onBody = function(){
     var cb = _.last(arguments);
