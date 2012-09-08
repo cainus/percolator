@@ -184,7 +184,7 @@ describe('UriUtil', function(){
     });
   });
   describe('#param', function(){
-    it ("calls the router's pathVariables(self) and returns the value for the given key", function(){
+    it ("calls the router's pathVariables(self) and returns the urldecoded value for the given key", function(){
       var called = false;
       var router = { pathVariables : function(url){
         called = true;

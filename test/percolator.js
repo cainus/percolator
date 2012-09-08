@@ -33,7 +33,7 @@ describe('Percolator', function(){
   it ("can respond to simple requests", function(done){
     var that = this;
     this.server = new Percolator({port : 3000});
-    this.server.router.route('/', {  GET : function($){
+    this.server.route('/', {  GET : function($){
                                              $.res.end("Hello World!");
                                            }});
     this.server.listen(function(err){
@@ -72,9 +72,9 @@ describe('Percolator', function(){
       var that = this;
       var port = 9090;  // set non-default here
       this.server = new Percolator({port : port});
-      this.server.router.route('/', {  GET : function($){
-                                               $.res.end("Hello World!");
-                                             }});
+      this.server.route('/', {  GET : function($){
+                                            $.res.end("Hello World!");
+                                }});
       this.server.listen(function(err){
         if (err) {
           throw err;
