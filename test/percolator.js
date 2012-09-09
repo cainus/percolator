@@ -1,4 +1,4 @@
-var assert = require('assert');
+var should = require('should');
 var hottap = require('hottap').hottap;
 var _ = require('underscore');
 var Percolator = require('../percolator');
@@ -52,6 +52,76 @@ describe('Percolator', function(){
     });
   });
 
+  it ("passes options on to the context's 'app' namespace", function(done){
+    var that = this;
+    this.server = new Percolator({port : 3000});
+    this.server.route('/', {  GET : function($){
+                                             $.app.port.should.equal(3000);
+                                             $.res.end("Hello World!");
+                                           }});
+    this.server.listen(function(err){
+      if (err) {
+        throw err;
+      }
+      var url = "http://localhost:" + that.server.port + "/";
+      hottap(url).request("GET",
+                               function(err, response){
+                                  if (err) {
+                                    throw err;
+                                  }
+                                  response.status.should.equal(200);
+                                  done();
+                               });
+    });
+  });
+
+  it ("adds a router reference to every context", function(done){
+    var that = this;
+    this.server = new Percolator({port : 3000});
+    this.server.route('/', {  GET : function($){
+                                             should.exist($.router);
+                                             $.res.end("Hello World!");
+                                           }});
+    this.server.listen(function(err){
+      if (err) {
+        throw err;
+      }
+      var url = "http://localhost:" + that.server.port + "/";
+      hottap(url).request("GET",
+                               function(err, response){
+                                  if (err) {
+                                    throw err;
+                                  }
+                                  response.status.should.equal(200);
+                                  done();
+                               });
+    });
+  });
+
+  it ("OPTIONS for a GET returns, GET, HEAD, OPTIONS", function(done){
+    var that = this;
+    this.server = new Percolator({port : 3000});
+    this.server.route('/', {  GET : function($){
+                                             $.res.end("Hello World!");
+                                           }});
+    this.server.listen(function(err){
+      if (err) {
+        throw err;
+      }
+      var url = "http://localhost:" + that.server.port + "/";
+      hottap(url).request("OPTIONS",
+                               function(err, response){
+                                  if (err) {
+                                    throw err;
+                                  }
+                                  var body = JSON.parse(response.body);
+                                  body['allowed methods'].should.eql(["OPTIONS","HEAD","GET"]);
+                                  response.headers.allow.should.equal('OPTIONS,HEAD,GET');
+                                  response.status.should.equal(200);
+                                  done();
+                               });
+    });
+  });
 
   // can't run this on travis-ci for some reason.  
   /*

@@ -10,15 +10,16 @@ exports.handler = {
   GET : function($){
     var out = { artist : [] };
     _.each(artists, function(v, k){
-       var item = _.extend({ _links : { self : {href : $.uri.get('artist*', {'artist' : k})} }}, v);
-       out.artist.push(item);
+      var self = $.uri.get('artist*', {'artist' : k});
+      var item = _.extend({ _links : { self : {href : self } }}, v);
+      out.artist.push(item);
     });
     out._links = $.uri.links();
     $.repr(out);
   }
 };
 
-exports.member = {
+exports.wildcard = {
 
   fetch : function(handler, cb){
     var id = handler.uri.params().artist;

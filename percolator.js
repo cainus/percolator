@@ -44,6 +44,8 @@ Percolator = function(options){
   });
   this.mediaTypes = new Reaper();
   this.router.onRequest = function(handler, req, res, cb){
+    handler.app = that.options;
+    handler.router = router;
     handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
     handler.status = that.statusman.createResponder(req, res);
     handler.repr = that._getRepr(req, res);
@@ -97,9 +99,11 @@ Percolator = function(options){
     }
   });
   this.router.on("route", function(resource){
-    that._decorateResource(resource);
+    // set the OPTIONS method at route-time, so the router won't 405 it.
+    that._setOptionsHandler(resource);
   });
 };
+
 
 Percolator.prototype = Object.create(EventEmitter.prototype);
 
@@ -139,13 +143,11 @@ Percolator.prototype._getMethods = function(resource){
 // TODO:  better as a pre-route middleware? contextHelper? something else?
 Percolator.prototype._setOptionsHandler = function(resource){
   // tell each resource how to respond to OPTIONS
-  if (!!resource.input){
     var that = this;
-    resource.input.OPTIONS = function(req, res){
-      var responder = that.statusman.createResponder(req, res);
-      return responder.OPTIONS(that._getMethods(resource.input));
+    resource.OPTIONS = function($){
+      var responder = that.statusman.createResponder($.req, $.res);
+      return responder.OPTIONS(that._getMethods(resource));
     };
-  }
 
 };
 
@@ -154,26 +156,6 @@ Percolator.prototype.routeDirectory = function(directory, cb){
   this.router.routeDirectory(directory, cb);
 };
 
-
-Percolator.prototype._decorateResource = function(resource){
-
-  resource.router = this.router;
-  this._setOptionsHandler(resource);
-  // PERCOLATOR: tell each resource how to handle 404s.
-  // THINK: shouldn't each resource know about all errors?
-  if (!resource.handle404){
-    resource.handle404 = function(req, res){
-      this.router.handle404(req, res);
-    };
-  }
-  // PERCOLATOR: set 'app' for all resources
-  resource.app = this.options;
-  // PERCOLATOR: set getAbsoluteUrl() for all resources?
-  resource.getAbsoluteUrl = function(hostname, path){
-    var abs = this.app.protocol + '://' + hostname + path;
-    return abs;
-  };
-};
 
 // register error handlers for each content type
 Percolator.prototype._assignErrorHandlers = function(){

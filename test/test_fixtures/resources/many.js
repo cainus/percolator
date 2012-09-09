@@ -4,7 +4,7 @@ exports.handler = {
   }
 };
 
-exports.member = {
+exports.wildcard = {
   GET : function($){
     $.res.end('1234');
   }
