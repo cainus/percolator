@@ -98,7 +98,32 @@ describe('Percolator', function(){
     });
   });
 
-  it ("OPTIONS for a GET returns, GET, HEAD, OPTIONS", function(done){
+  it ("HEAD for a GET-only resource returns the same headers, blank resource", function(done){
+    var that = this;
+    this.server = new Percolator({port : 3000});
+    this.server.route('/', {  GET : function($){
+                                       $.res.setHeader('Content-Type', 'text/plain');
+                                       $.res.end('yo yo yo');
+                                     }});
+    this.server.listen(function(err){
+      if (err) {
+        throw err;
+      }
+      var url = "http://localhost:" + that.server.port + "/";
+      hottap(url).request("HEAD", 
+                               function(err, response){
+                                 if (err) {
+                                   throw err;
+                                 }
+                                 response.headers['content-type'].should.equal('text/plain');
+                                 response.body.should.equal("");
+                                 response.status.should.equal(204);
+                                 done();
+                               });
+    });
+  });
+
+  it ("OPTIONS for a GET-only resource returns, GET, HEAD, OPTIONS", function(done){
     var that = this;
     this.server = new Percolator({port : 3000});
     this.server.route('/', {  GET : function($){
