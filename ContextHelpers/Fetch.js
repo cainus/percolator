@@ -15,10 +15,10 @@ else other than setting $.fetched for you.
 
 
 
-var FetchContextHelper = function($, cb){
+var FetchContextHelper = function($, handler, cb){
 
-  if (!!$.fetch && (typeof($.fetch) == 'function')){
-    $.fetch($, function(err, fetched){
+  if (!!handler.fetch && (typeof(handler.fetch) == 'function')){
+    handler.fetch($, function(err, fetched){
       if (err === true){
         // if it returns an error, throw a 404
         return $.status.notFound($.req.url);

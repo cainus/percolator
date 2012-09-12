@@ -5,7 +5,8 @@ var bch = require('../ContextHelpers/Body');
 describe("BodyContextHelper", function(){
   it ("sets onBody on the object", function(done){
     var $ = { };
-    bch($, function(){
+    var handler = {};
+    bch($, handler, function(){
       (typeof $.onBody).should.equal('function');
       done();
     });
@@ -19,8 +20,9 @@ describe("BodyContextHelper", function(){
         }
       }
     };
+    var handler = {};
     var $ = { req : fakeReq };
-    bch($, function(){
+    bch($, handler, function(){
       $.onBody(function(err, body){
         body.should.equal("a bunch of fake data");
         done();

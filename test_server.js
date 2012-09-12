@@ -18,13 +18,13 @@ var Percolator = require('./percolator');
 var app = {
   protocol : 'http',
   resourcePath : '/api',
-  staticDir : __dirname + '/static',
+  staticDir : __dirname + '/test/test_fixtures/static',
   port : 8080
 };
 var server = new Percolator(app);
-server.use(function(req, res, next){
-  console.log(req.method, ' ', req.url);
-  next();
+server.onRequest(function(context, cb){
+  console.log(' <-- ', context.req.method, ' ', context.req.url);
+  cb(context);
 });
 
 var resourceDir = __dirname + '/test/test_fixtures/resources';

@@ -11,6 +11,7 @@ var fetchContextHelper = require('./ContextHelpers/Fetch');
 var authenticateContextHelper = require('./ContextHelpers/Authenticate');
 var bodyContextHelper = require('./ContextHelpers/Body');
 var _ = require('underscore');
+var fs = require('fs');
 
 /*
 
@@ -34,6 +35,9 @@ Percolator = function(options){
   this.port = this.options.port;
   this.protocol = this.options.protocol;
   this.resourcePath = this.options.resourcePath;
+  if (!!options.staticDir){
+    this.staticDir = options.staticDir;
+  }
   this.router = new Router(this.resourcePath);
   var router = this.router;
   var protocol = this.protocol;
@@ -43,53 +47,30 @@ Percolator = function(options){
     that.emit("errorResponse", errorObject);
   });
   this.mediaTypes = new Reaper();
-  this.router.onRequest = function(handler, req, res, cb){
-    handler.app = that.options;
-    handler.router = router;
-    handler.uri = new UriUtil(router, req.url, protocol, req.headers.host);
-    handler.status = that.statusman.createResponder(req, res);
-    handler.repr = that._getRepr(req, res);
+  this.onRequestHandler = function(context, cb){
+    cb(context);  // do nothing with it by default
+  };
+  this.router.onRequest = function(handler, cb){ // TODO detour should send a context and a handler
+    var req = handler.req;
+    var res = handler.res;
+    var context = { req : req , res : res };
+    context.app = that.options;
+    context.router = router;
+    context.uri = new UriUtil(router, req.url, protocol, req.headers.host);
+    context.status = that.statusman.createResponder(req, res);
+    context.repr = that._getRepr(req, res);
     handler.req = req;
     handler.res = res;
-    authenticateContextHelper(handler, function(){
-      fetchContextHelper(handler, function(){
-        if (!!that.options.parseBody){
-          that.mediaTypes.connectMiddleware(handler)(req, res, function(err){
-            if (!!err) {
-              if (err.match(/^Parse Error:/)){
-                that.statusman.createResponder(req, res).badRequest(err);
-                return;
-              }
-              if (err === "Missing Content-Type"){
-                that.statusman.createResponder(req, res).unsupportedMediaType("None provided.");
-                return;
-              }
-              if (err === "Unregistered content-type."){
-                that.statusman.createResponder(req, res).unsupportedMediaType(req.headers['content-type']);
-                return;
-              } 
-              console.log("post mediaTypes middleware error:");
-              console.log(err);
-              return cb(err);
-            } else {
-              cb(null, handler);
-            }
-          });
-        } else {
-          handler.onBody = bodyContextHelper(handler, function(){
-            cb(null, handler);
-          });
-        }
-      });
+    that.onRequestHandler(context, function(context){
+      handler = _.extend(context, handler); // TODO don't mash these together!
+      that.defaultContextHandler(context, handler, cb);
     });
   };
   this._assignErrorHandlers();
   this.registerMediaTypes();
   this.middlewareManager = connect();
-  if (!!options.staticDir){
-    this.staticDir = options.staticDir;
-    this.middlewareManager.use(connect['static'](this.staticDir));
-  }
+
+  // TODO TDD:  accept stuff won't work any more due to no more connect
   this.middlewareManager.use(function(req, res, next){
     var accept = req.headers.accept || '*/*';
     if (!that.mediaTypes.isAcceptable(accept)){
@@ -99,17 +80,60 @@ Percolator = function(options){
     }
   });
   this.router.on("route", function(resource){
+    // TODO regression?  there's no more route event.
     // set the OPTIONS method at route-time, so the router won't 405 it.
     that._setOptionsHandler(resource);
   });
 };
 
-
 Percolator.prototype = Object.create(EventEmitter.prototype);
+
+// TODO better name?
+Percolator.prototype.defaultContextHandler = function(context, handler, cb){
+  var that = this;
+  var req = context.req;
+  var res = context.res;
+  authenticateContextHelper(context, handler, function(){
+    fetchContextHelper(context, handler, function(){
+      if (!!that.options.parseBody){
+        that.mediaTypes.connectMiddleware(context)(req, res, function(err){
+          if (!!err) {
+            if (err.match(/^Parse Error:/)){
+              that.statusman.createResponder(req, res).badRequest(err);
+              return;
+            }
+            if (err === "Missing Content-Type"){
+              that.statusman.createResponder(req, res).unsupportedMediaType("None provided.");
+              return;
+            }
+            if (err === "Unregistered content-type."){
+              that.statusman.createResponder(req, res).unsupportedMediaType(req.headers['content-type']);
+              return;
+            } 
+            console.log("post mediaTypes middleware error:");
+            console.log(err);
+            return cb(err);
+          } else {
+            cb(null, handler);
+          }
+        });
+      } else {
+        handler.onBody = bodyContextHelper(context, handler, function(){
+          cb(null, handler);
+        });
+      }
+    });
+  });
+};
+
 
 
 Percolator.prototype.route = function(path, handler){
   this.router.route(path, handler);
+};
+
+Percolator.prototype.onRequest = function(handler){
+  this.onRequestHandler = handler;
 };
 
 
@@ -163,32 +187,35 @@ Percolator.prototype._assignErrorHandlers = function(){
   var statusman = this.statusman;
   var router = this.router;
 
+  // TODO TDD! change this to on414 and make the callback take a context instead!
   router.handle414 = function(req, res){
     statusman.createResponder(req, res).requestUriTooLong();
   };
 
-  router.handle404 = function(req, res){
-    // TODO fix resource.fetch to use this handle404 instead of default!!!
-    var responder = statusman.createResponder(req, res);
-    responder.notFound(req.url);
-  };
+  router.on404(function($){
+    // TODO TDD! fix resource.fetch to use this handle404 instead of default!!!
+    var responder = statusman.createResponder($.req, $.res);
+    responder.notFound($.req.url);
+  });
 
+  // TODO TDD! change this to on405 and make the callback take a context instead!
   router.handle405 = function(req, res){
     statusman.createResponder(req, res).methodNotAllowed();
   };
 
+  // TODO TDD! change this to on501 and make the callback take a context instead!
   router.handle501 = function(req, res){
     statusman.createResponder(req, res).notImplemented();
   };
 
-  router.handle500 = function(req, res, ex){
+  router.on500(function(context, ex){
     console.log("===============================");
     console.log("Uncaught Exception");
     console.log(ex);
-    console.log(req.method, ' ', req.url);
+    console.log(context.req.method, ' ', context.req.url);
     console.log(ex.stack);
-    statusman.createResponder(req, res).internalServerError();
-  };
+    statusman.createResponder(context.req, context.res).internalServerError();
+  });
 
 
 };
@@ -211,15 +238,41 @@ Percolator.prototype.registerMediaTypes = function(){
 
 };
 
-Percolator.prototype.use = function(middleware){
-  this.middlewareManager.use(middleware);
-};
 
+function ensureStaticDir(dir, cb){
+  if (dir){
+    fs.exists(dir, function(exists){
+      if (!exists){
+        return cb("Your staticDir path could not be found.");
+      } else {
+        return cb();
+      }
+    });
+  } else {
+    return cb();
+  }
+}
 Percolator.prototype.listen = function(cb){
-  this.use(this.router.connectMiddleware);
+  var that = this;
+  var router = this.router;
   var protocolLibrary = this.protocol === 'https' ? https : http;
-  this.server = protocolLibrary.createServer(this.middlewareManager);
-  this.server.listen(this.port, cb);
+  ensureStaticDir(that.staticDir, function(err){
+    if (!!err) {
+      return cb(err);
+    } else {
+      var server = protocolLibrary.createServer(function(req, res){
+        if (!!that.staticDir){
+          connect['static'](that.staticDir)(req, res, function(){
+            router.dispatch({req : req, res : res});
+          });
+        } else {
+          router.dispatch({req : req, res : res});
+        }
+      });
+      server.listen(that.port, cb);
+      that.server = server;
+    }
+  });
 };
 
 Percolator.prototype.close = function(cb){

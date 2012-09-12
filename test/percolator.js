@@ -29,6 +29,27 @@ describe('Percolator', function(){
   });
   
 
+  it ("exposes an onRequest hook for additionally handling requests", function(done){
+    var that = this;
+    var url = "http://localhost:3000/";
+    this.server = new Percolator({port : 3000});
+    this.server.route('/', {  GET : function($){
+                                             $.res.end("Hello World!");
+                                           }});
+    this.server.onRequest(function(context, cb){
+      context.req.url.should.equal('/');
+      cb(context);
+      done();
+    });
+    this.server.listen(function(err){
+      if (err) {
+        throw err;
+      }
+      hottap(url).request("GET",
+                               function(err, response){
+                               });
+    });
+  });
 
   it ("can respond to simple requests", function(done){
     var that = this;
@@ -52,10 +73,46 @@ describe('Percolator', function(){
     });
   });
 
+  it ("can respond to static requests", function(done){
+    var that = this;
+    var staticDir = __dirname + '/test_fixtures/static';
+    this.server = new Percolator({port : 3000, staticDir : staticDir});
+    this.server.route('/', {  GET : function($){
+                                             $.res.end("Hello World!");
+                                           }});
+    this.server.listen(function(err){
+      if (err) {
+        throw err;
+      }
+      var url = "http://localhost:" + that.server.port + "/static.txt";
+      hottap(url).request("GET",
+                               function(err, response){
+                                  if (err) {
+                                    throw err;
+                                  }
+                                  response.status.should.equal(200);
+                                  response.body.should.equal("Yep.\n");
+                                  done();
+                               });
+    });
+  });
+
+  it ("throws an error when staticDir is set, but the dir doesn't exist.", function(done){
+    var that = this;
+    var staticDir = __dirname + '/test_fixtures/NO_EXIST';
+    this.server = new Percolator({port : 3000, staticDir : staticDir});
+    this.server.listen(function(err){
+      if (err) {
+        err.should.equal("Your staticDir path could not be found.");
+        done();
+      }
+    });
+  });
   it ("passes options on to the context's 'app' namespace", function(done){
     var that = this;
     this.server = new Percolator({port : 3000});
     this.server.route('/', {  GET : function($){
+                                             should.exist($.app);
                                              $.app.port.should.equal(3000);
                                              $.res.end("Hello World!");
                                            }});
@@ -189,7 +246,7 @@ describe('Percolator', function(){
 
   
   describe('when managing a text/plain body', function(){
-    it ("parsed body gets added to the handler", function(done){
+    it ("parsed body gets added to the context", function(done){
       var that = this;
       this.server = new Percolator({port : this.port});
       this.server.router.route('/', {  GET : function($){
@@ -197,7 +254,7 @@ describe('Percolator', function(){
                                   },
 
                                   POST : function($){
-                                    this.onBody(function(err, body){
+                                    $.onBody(function(err, body){
                                       body.should.equal('wakka wakka wakka');
                                       $.res.end("Hello World!");
                                     });
@@ -221,7 +278,7 @@ describe('Percolator', function(){
     });
   });
   describe('when managing a json body', function(){
-    it ("parsed body gets added to the handler", function(done){
+    it ("parsed body gets added to the context", function(done){
       var that = this;
       this.server = new Percolator({port : this.port, parseBody : true});
       this.server.router.route('/', {  GET : function($){
@@ -229,8 +286,8 @@ describe('Percolator', function(){
                                   },
 
                                   PUT : function($){
-                                    this.body.thisisa.should.equal('TEST');
-                                    this.rawBody.should.equal('{"thisisa":"TEST"}');
+                                    $.body.thisisa.should.equal('TEST');
+                                    $.rawBody.should.equal('{"thisisa":"TEST"}');
                                     $.res.end("Hello World!");
                                   }});
       this.server.listen(function(err){

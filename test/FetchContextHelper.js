@@ -4,25 +4,28 @@ var fch = require('../ContextHelpers/Fetch');
 describe("FetchContextHelper", function(done){
   it ("does nothing if the context has no fetch method", function(done){
     var $ = {};
-    fch($, function(err){
+    var handler = {};
+    fch($, handler, function(err){
       should.not.exist(err);
       should.not.exist($.fetched);
       done();
     });
   });
   it ("runs the object's fetch method if it has one", function(done){
-    var $ = { fetch : function(context, cb){ done(); }};
-    fch($, function(err, fetch){
+    var handler = { fetch : function(context, cb){ done(); }};
+    var $ = {};
+    fch($, handler, function(err, fetch){
 
     });
   });
   it ("sets fetched on the object", function(done){
-    var $ = {
+    var handler = {
               fetch : function(context, cb){
                         cb(null, '1234');  // we fetched 1234
                       }
             };
-    fch($, function(err){
+    var $ = {};
+    fch($, handler, function(err){
       should.not.exist(err);
       $.fetched.should.equal('1234');
       done();
@@ -30,10 +33,12 @@ describe("FetchContextHelper", function(done){
   });
   it ("responds with a notFound status if the err is true", function(done){
     var inputUrl = '';
-    var $ = {
+    var handler = {
               fetch : function(context, cb){
                         cb(true);  // true is a notFound error
-                      },
+                      }
+    };
+    var $ = {
               status : {
                 notFound : function(url){ 
                   should.not.exist($.fetched);
@@ -45,16 +50,18 @@ describe("FetchContextHelper", function(done){
                 url : '5678'
               }
             };
-    fch($, function(){
+    fch($, handler, function(){
       should.fail("this should never get called");
     });
   });
   it ("responds with an internalServerError if the err is non-true/non-falsey", function(done){
     var inputUrl = '';
-    var $ = {
+    var handler = {
               fetch : function(context, cb){
                         cb({some : 'error'});  // not falsey, not strict true
-                      },
+                      }
+    };
+    var $ = {
               status : {
                 internalServerError : function(detail){ 
                   should.not.exist($.fetched);
@@ -63,7 +70,7 @@ describe("FetchContextHelper", function(done){
                 }
               }
             };
-    fch($, function(){
+    fch($, handler, function(){
       should.fail("this should never get called");
     });
   });

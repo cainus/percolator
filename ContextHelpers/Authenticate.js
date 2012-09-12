@@ -1,9 +1,9 @@
 
 
-var AuthenticateContextHelper = function($, cb){
-  //  if handler has a fetch defined, call it.
-  if (!!$.authenticate && (typeof($.authenticate) == 'function')){
-    $.authenticate($, function(err, authenticated){
+var AuthenticateContextHelper = function($, handler, cb){
+  //  if handler has an authenticate defined, call it.
+  if (!!handler.authenticate && (typeof(handler.authenticate) == 'function')){
+    handler.authenticate($, function(err, authenticated){
       if (err === true){
         // if it returns an error, throw a 401
         return $.status.unauthenticated();

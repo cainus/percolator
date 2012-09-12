@@ -14,7 +14,7 @@
  */
 
 
-var BodyContextHelper = function($, cb){
+var BodyContextHelper = function($, handler, cb){
   $.onBody = function(onBodyCB){
     var body = '';
     $.req.on('data', function(data){
