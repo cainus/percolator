@@ -47,48 +47,38 @@ Percolator = function(options){
     that.emit("errorResponse", errorObject);
   });
   this.mediaTypes = new Reaper();
-  this.onRequestHandler = function(context, cb){
+  this.onRequestHandler = function(handler, context, cb){
     cb(context);  // do nothing with it by default
   };
-  this.router.onRequest = function(handler, cb){ // TODO detour should send a context and a handler
-    var req = handler.req;
-    var res = handler.res;
-    var context = { req : req , res : res };
+  this.router.onRequest = function(handler, context, cb){
     context.app = that.options;
     context.router = router;
+    var req = context.req;
+    var res = context.res;
     context.uri = new UriUtil(router, req.url, protocol, req.headers.host);
     context.status = that.statusman.createResponder(req, res);
     context.repr = that._getRepr(req, res);
-    handler.req = req;
-    handler.res = res;
-    that.onRequestHandler(context, function(context){
-      handler = _.extend(context, handler); // TODO don't mash these together!
-      that.defaultContextHandler(context, handler, cb);
+    that.onRequestHandler(handler, context, function(context){
+      var accept = context.req.headers.accept || '*/*';
+      if (!that.mediaTypes.isAcceptable(accept)){
+        that.statusman.createResponder(context.req, context.res).notAcceptable();
+      } else {
+        that.defaultContextHandler(context, handler, cb);
+      }
     });
   };
   this._assignErrorHandlers();
   this.registerMediaTypes();
-  this.middlewareManager = connect();
 
-  // TODO TDD:  accept stuff won't work any more due to no more connect
-  this.middlewareManager.use(function(req, res, next){
-    var accept = req.headers.accept || '*/*';
-    if (!that.mediaTypes.isAcceptable(accept)){
-      that.statusman.createResponder(req, res).notAcceptable();
-    } else {
-      return next();
-    }
-  });
-  this.router.on("route", function(resource){
-    // TODO regression?  there's no more route event.
+  this.router.setResourceDecorator(function(resource){
     // set the OPTIONS method at route-time, so the router won't 405 it.
     that._setOptionsHandler(resource);
+    return resource;
   });
 };
 
 Percolator.prototype = Object.create(EventEmitter.prototype);
 
-// TODO better name?
 Percolator.prototype.defaultContextHandler = function(context, handler, cb){
   var that = this;
   var req = context.req;
@@ -114,12 +104,12 @@ Percolator.prototype.defaultContextHandler = function(context, handler, cb){
             console.log(err);
             return cb(err);
           } else {
-            cb(null, handler);
+            cb(null, context);
           }
         });
       } else {
-        handler.onBody = bodyContextHelper(context, handler, function(){
-          cb(null, handler);
+        context.onBody = bodyContextHelper(context, handler, function(){
+          cb(null, context);
         });
       }
     });
@@ -129,7 +119,7 @@ Percolator.prototype.defaultContextHandler = function(context, handler, cb){
 
 
 Percolator.prototype.route = function(path, handler){
-  this.router.route(path, handler);
+  return this.router.route(path, handler);
 };
 
 Percolator.prototype.onRequest = function(handler){
@@ -187,26 +177,23 @@ Percolator.prototype._assignErrorHandlers = function(){
   var statusman = this.statusman;
   var router = this.router;
 
-  // TODO TDD! change this to on414 and make the callback take a context instead!
-  router.handle414 = function(req, res){
-    statusman.createResponder(req, res).requestUriTooLong();
-  };
+  router.on414(function($){
+    statusman.createResponder($.req, $.res).requestUriTooLong();
+  });
 
   router.on404(function($){
-    // TODO TDD! fix resource.fetch to use this handle404 instead of default!!!
+    // TODO fix resource.fetch to use this handle404 instead of default!!!
     var responder = statusman.createResponder($.req, $.res);
     responder.notFound($.req.url);
   });
 
-  // TODO TDD! change this to on405 and make the callback take a context instead!
-  router.handle405 = function(req, res){
-    statusman.createResponder(req, res).methodNotAllowed();
-  };
+  router.on405(function($){
+    statusman.createResponder($.req, $.res).methodNotAllowed();
+  });
 
-  // TODO TDD! change this to on501 and make the callback take a context instead!
-  router.handle501 = function(req, res){
-    statusman.createResponder(req, res).notImplemented();
-  };
+  router.on501(function($){
+    statusman.createResponder($.req, $.res).notImplemented();
+  });
 
   router.on500(function(context, ex){
     console.log("===============================");

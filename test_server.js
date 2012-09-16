@@ -4,7 +4,6 @@ var Percolator = require('./percolator');
 // TODO collections proof-of-concept - POST, PUT, DELETE
 // TODO make status man do conneg
 // TODO producers of app/json should respond to requests for app/blah+json
-// TODO res and req on the resource object itself (and not passed in?)
 // TODO get a specific mediatype in there
 // TODO don't use in/out for mediatype handlers
 // == low priority ==
@@ -22,7 +21,7 @@ var app = {
   port : 8080
 };
 var server = new Percolator(app);
-server.onRequest(function(context, cb){
+server.onRequest(function(handler, context, cb){
   console.log(' <-- ', context.req.method, ' ', context.req.url);
   cb(context);
 });
@@ -31,7 +30,7 @@ var resourceDir = __dirname + '/test/test_fixtures/resources';
 server.routeDirectory(resourceDir, function(err){
   console.log("routed resources in " + resourceDir);
 
-  server.router.route('/inside', 
+  server.route('/inside', 
                       { GET : function($){ 
                                 $.res.end("muahahah!"); 
                               }

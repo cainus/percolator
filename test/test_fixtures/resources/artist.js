@@ -34,8 +34,8 @@ exports.wildcard = {
   },
 
   GET : function($){
-    $.fetched._links = this.uri.links();
-    this.repr($.fetched);
+    $.fetched._links = $.uri.links();
+    $.repr($.fetched);
   }
 
 };

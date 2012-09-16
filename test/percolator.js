@@ -27,19 +27,105 @@ describe('Percolator', function(){
   afterEach(function(done){
     closeServer(this.server, done);
   });
-  
+
+  it("has default error handlers for 404s", function(done){
+      var that = this;
+      var url = "http://localhost:3000/DOES_NOT_EXIST";
+      this.server = new Percolator({port : 3000});
+      this.server.route('/', {  GET : function($){
+                                               $.res.end("Hello World!");
+                                             }});
+    this.server.listen(function(err){
+      if (err) {
+        console.log("listen err: ", err);
+        throw err;
+      }
+      hottap(url).request("GET",
+                               function(err, response){
+                                 response.status.should.equal(404);
+                                 JSON.parse(response.body).error.type.should.equal(404);
+                                 should.not.exist(err);
+                                 done();
+                               });
+    });
+  });
+  it("has default error handlers for 405s", function(done){
+      var that = this;
+      var url = "http://localhost:3000/";
+      this.server = new Percolator({port : 3000});
+      this.server.route('/', {  GET : function($){
+                                               $.res.end("Hello World!");
+                                             }});
+    this.server.listen(function(err){
+      if (err) {
+        console.log("listen err: ", err);
+        throw err;
+      }
+      hottap(url).request("DELETE",
+                               function(err, response){
+                                 response.status.should.equal(405);
+                                 JSON.parse(response.body).error.type.should.equal(405);
+                                 should.not.exist(err);
+                                 done();
+                               });
+    });
+  });
+  it("has default error handlers for 501s", function(done){
+      var that = this;
+      var url = "http://localhost:3000/";
+      this.server = new Percolator({port : 3000});
+      this.server.route('/', {  GET : function($){
+                                               $.res.end("Hello World!");
+                                             }});
+    this.server.listen(function(err){
+      if (err) {
+        console.log("listen err: ", err);
+        throw err;
+      }
+      hottap(url).request("TRACE",
+                               function(err, response){
+                                 response.status.should.equal(501);
+                                 JSON.parse(response.body).error.type.should.equal(501);
+                                 should.not.exist(err);
+                                 done();
+                               });
+    });
+  });
+  it("has a default error handler for 414s", function(done){
+      var that = this;
+      var bigpath = "1";
+      _.times(4097, function(){bigpath += '1';});
+      var url = "http://localhost:3000/" + bigpath;
+      this.server = new Percolator({port : 3000});
+      this.server.route('/', {  GET : function($){
+                                               $.res.end("Hello World!");
+                                             }});
+    this.server.listen(function(err){
+      if (err) {
+        console.log("listen err: ", err);
+        throw err;
+      }
+      hottap(url).request("GET",
+                               function(err, response){
+                                 response.status.should.equal(414);
+                                 JSON.parse(response.body).error.type.should.equal(414);
+                                 should.not.exist(err);
+                                 done();
+                               });
+    });
+  });
 
   it ("exposes an onRequest hook for additionally handling requests", function(done){
     var that = this;
     var url = "http://localhost:3000/";
     this.server = new Percolator({port : 3000});
     this.server.route('/', {  GET : function($){
-                                             $.res.end("Hello World!");
+                                             $.res.end("Hello World! " + $.decorated);
                                            }});
-    this.server.onRequest(function(context, cb){
+    this.server.onRequest(function(handler, context, cb){
       context.req.url.should.equal('/');
+      context.decorated = true;
       cb(context);
-      done();
     });
     this.server.listen(function(err){
       if (err) {
@@ -47,6 +133,9 @@ describe('Percolator', function(){
       }
       hottap(url).request("GET",
                                function(err, response){
+                                 response.status.should.equal(200);
+                                 response.body.should.equal("Hello World! true");
+                                 done();
                                });
     });
   });
@@ -222,7 +311,7 @@ describe('Percolator', function(){
   describe('#ctor', function(){
     it ("can override the default port", function(done){
       var that = this;
-      var port = 9090;  // set non-default here
+      var port = 3001;  // set non-default here
       this.server = new Percolator({port : port});
       this.server.route('/', {  GET : function($){
                                             $.res.end("Hello World!");
