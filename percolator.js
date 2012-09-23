@@ -1,9 +1,5 @@
-var Router = require('detour').Router;
 var Reaper = require('reaper').Reaper;
 var UriUtil = require('./uriUtil').UriUtil;
-var connect = require('connect');
-var http = require('http');
-var https = require('https');
 var EventEmitter = require('events').EventEmitter;
 var StatusManager = require('./StatusManager').StatusManager;
 var JsonResponder = require('./JsonResponder');
@@ -12,21 +8,11 @@ var authenticateContextHelper = require('./ContextHelpers/Authenticate');
 var bodyContextHelper = require('./ContextHelpers/Body');
 var _ = require('underscore');
 var fs = require('fs');
+var Server = require('oneone').Server;
 
-/*
-
-public interface?
-.route()
-.routeDirectory()
-.use()
-.listen()
-.close()
-
-*/
 
 Percolator = function(options){
   options = options || {};
-  this.server = null;
   this.options = options;
   this.options.port = this.options.port || 3000;
   this.options.protocol = this.options.protocol || 'http';
@@ -35,11 +21,10 @@ Percolator = function(options){
   this.port = this.options.port;
   this.protocol = this.options.protocol;
   this.resourcePath = this.options.resourcePath;
+  this.newServer = new Server(this.port, this.protocol, this.resourcePath);
   if (!!options.staticDir){
     this.staticDir = options.staticDir;
   }
-  this.router = new Router(this.resourcePath);
-  var router = this.router;
   var protocol = this.protocol;
   var that = this;
   this.statusman = new StatusManager();
@@ -50,9 +35,10 @@ Percolator = function(options){
   this.onRequestHandler = function(handler, context, cb){
     cb(context);  // do nothing with it by default
   };
-  this.router.onRequest = function(handler, context, cb){
+  this.newServer.onRequest(function(handler, context, cb){
     context.app = that.options;
-    context.router = router;
+    var router = that.newServer.router;
+    context.router = router;  // TODO is there any use-case for this?  delete?
     var req = context.req;
     var res = context.res;
     context.uri = new UriUtil(router, req.url, protocol, req.headers.host);
@@ -66,15 +52,18 @@ Percolator = function(options){
         that.defaultContextHandler(context, handler, cb);
       }
     });
-  };
+  });
   this._assignErrorHandlers();
   this.registerMediaTypes();
 
-  this.router.setResourceDecorator(function(resource){
-    // set the OPTIONS method at route-time, so the router won't 405 it.
-    that._setOptionsHandler(resource);
+  this.newServer.onOPTIONS(function(resource){
+    resource.OPTIONS = function($){
+      var responder = that.statusman.createResponder($.req, $.res);
+      return responder.OPTIONS(that._getMethods(resource));
+    };
     return resource;
   });
+
 };
 
 Percolator.prototype = Object.create(EventEmitter.prototype);
@@ -119,7 +108,7 @@ Percolator.prototype.defaultContextHandler = function(context, handler, cb){
 
 
 Percolator.prototype.route = function(path, handler){
-  return this.router.route(path, handler);
+  return this.newServer.route(path, handler);
 };
 
 Percolator.prototype.onRequest = function(handler){
@@ -154,48 +143,36 @@ Percolator.prototype._getMethods = function(resource){
   return methods;
 };
 
-// TODO:  better as a pre-route middleware? contextHelper? something else?
-Percolator.prototype._setOptionsHandler = function(resource){
-  // tell each resource how to respond to OPTIONS
-    var that = this;
-    resource.OPTIONS = function($){
-      var responder = that.statusman.createResponder($.req, $.res);
-      return responder.OPTIONS(that._getMethods(resource));
-    };
-
-};
-
-// run the directory router and call the callback afterward
+// route a directory call the callback afterward
 Percolator.prototype.routeDirectory = function(directory, cb){
-  this.router.routeDirectory(directory, cb);
+  this.newServer.routeDirectory(directory, cb);
 };
 
 
 // register error handlers for each content type
 Percolator.prototype._assignErrorHandlers = function(){
-  // tell the router about the error handlers it can use
+  // tell the newServer about the error handlers it can use
   var statusman = this.statusman;
-  var router = this.router;
 
-  router.on414(function($){
+  this.newServer.on414(function($){
     statusman.createResponder($.req, $.res).requestUriTooLong();
   });
 
-  router.on404(function($){
+  this.newServer.on404(function($){
     // TODO fix resource.fetch to use this handle404 instead of default!!!
     var responder = statusman.createResponder($.req, $.res);
     responder.notFound($.req.url);
   });
 
-  router.on405(function($){
+  this.newServer.on405(function($){
     statusman.createResponder($.req, $.res).methodNotAllowed();
   });
 
-  router.on501(function($){
+  this.newServer.on501(function($){
     statusman.createResponder($.req, $.res).notImplemented();
   });
 
-  router.on500(function(context, ex){
+  this.newServer.on500(function(context, ex){
     console.log("===============================");
     console.log("Uncaught Exception");
     console.log(ex);
@@ -218,52 +195,26 @@ Percolator.prototype.registerStatusResponder = function(type, responder){
 Percolator.prototype.registerMediaTypes = function(){
   var jsonType = require('./mediaTypes/json');
   this.registerMediaType('application/json', jsonType.fromString, jsonType.toString);
-  //var xmlType = require('./mediaTypes/xml');
-  // this.registerMediaType('application/xml', xmlType.in, xmlType.out);
-
   this.registerStatusResponder('application/json',  JsonResponder);
-
 };
 
 
-function ensureStaticDir(dir, cb){
-  if (dir){
-    fs.exists(dir, function(exists){
-      if (!exists){
-        return cb("Your staticDir path could not be found.");
-      } else {
-        return cb();
-      }
-    });
-  } else {
-    return cb();
-  }
-}
 Percolator.prototype.listen = function(cb){
   var that = this;
-  var router = this.router;
-  var protocolLibrary = this.protocol === 'https' ? https : http;
-  ensureStaticDir(that.staticDir, function(err){
-    if (!!err) {
-      return cb(err);
-    } else {
-      var server = protocolLibrary.createServer(function(req, res){
-        if (!!that.staticDir){
-          connect['static'](that.staticDir)(req, res, function(){
-            router.dispatch({req : req, res : res});
-          });
-        } else {
-          router.dispatch({req : req, res : res});
-        }
-      });
-      server.listen(that.port, cb);
-      that.server = server;
-    }
-  });
+  if (!!this.staticDir){
+    this.newServer.staticRoute(this.staticDir, function(err){
+      if (!!err){
+        cb("Your staticDir path could not be found.");
+      }
+      that.newServer.listen(cb);
+    });
+  } else {
+      that.newServer.listen(cb);
+  }
 };
 
 Percolator.prototype.close = function(cb){
-  this.server.close(cb);
+  this.newServer.close(cb);
 };
 
 

@@ -338,7 +338,7 @@ describe('Percolator', function(){
     it ("parsed body gets added to the context", function(done){
       var that = this;
       this.server = new Percolator({port : this.port});
-      this.server.router.route('/', {  GET : function($){
+      this.server.route('/', {  GET : function($){
                                     $.res.end("Hello World!");
                                   },
 
@@ -370,7 +370,7 @@ describe('Percolator', function(){
     it ("parsed body gets added to the context", function(done){
       var that = this;
       this.server = new Percolator({port : this.port, parseBody : true});
-      this.server.router.route('/', {  GET : function($){
+      this.server.route('/', {  GET : function($){
                                     $.res.end("Hello World!");
                                   },
 
@@ -399,7 +399,7 @@ describe('Percolator', function(){
     it ("responds 415 when Content-Type is unsupported", function(done){
       var that = this;
       this.server = new Percolator({port : this.port, parseBody : true});
-      this.server.router.route('/', {  GET : function($){
+      this.server.route('/', {  GET : function($){
                                     $.res.end("Hello World!");
                                   },
 
@@ -431,7 +431,7 @@ describe('Percolator', function(){
     it ("responds 415 when Content-Type is missing on PUT", function(done){
       var that = this;
       this.server = new Percolator({port : this.port, parseBody : true});
-      this.server.router.route('/', {  GET : function($){
+      this.server.route('/', {  GET : function($){
                                     $.res.end("Hello World!");
                                   },
 

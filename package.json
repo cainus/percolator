@@ -2,7 +2,7 @@
       "name": "Percolator",
       "description" : "Percolator is a framework for quickly and easily building quality HTTP APIs in Node.js",
       "keywords" : ["api", "rest", "http", "resource", "hypermedia"], 
-      "version": "0.6.0",
+      "version": "0.7.0",
       "bugs": {
        "url": "https://github.com/cainus/percolator/issues"
       },
@@ -18,10 +18,8 @@
       ],
       "dependencies": {
           "underscore" : "1.3.3",
-          "connect" : "2.4.3",
-          "detour" : "0.13.1",
           "reaper" : "0.2.3",
-          "elementtree" : "0.1.1"
+          "oneone" : "0.2.1"
       },
       "devDependencies" : {
           "mockery" : "1.1.2",
