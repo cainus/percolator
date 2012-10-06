@@ -2,7 +2,7 @@ var should = require('should');
 var mockery = require('mockery');
 var hottap = require('hottap').hottap;
 var _ = require('underscore');
-var UriUtil = require('../uriUtil').UriUtil;
+var UriUtil = require('../index').UriUtil;
 /*
  
 TODO?
@@ -106,7 +106,6 @@ describe('UriUtil', function(){
       var u = new UriUtil(router, '[path]');
       u.links().should.eql({self : {href : 'http://localhost/[path]'}, 
                             somechild : {href : 'http://localhost/child[path]'}});
-      
       calledNamedChildUrls.should.equal(true);
       calledParentUrls.should.equal(true);
     });

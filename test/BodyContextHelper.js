@@ -1,5 +1,5 @@
 var should = require('should');
-var bch = require('../ContextHelpers/Body');
+var bch = require('../index').BodyContextHelper;
 
 
 describe("BodyContextHelper", function(){

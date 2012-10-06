@@ -1,5 +1,5 @@
 var should = require('should');
-var fch = require('../ContextHelpers/Authenticate');
+var fch = require('../index').AuthenticateContextHelper;
 
 describe("AuthenticateContextHelper", function(done){
   it ("does nothing if the context has no authenticate method", function(done){

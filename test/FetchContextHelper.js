@@ -1,5 +1,5 @@
 var should = require('should');
-var fch = require('../ContextHelpers/Fetch');
+var fch = require('../index').FetchContextHelper;
 
 describe("FetchContextHelper", function(done){
   it ("does nothing if the context has no fetch method", function(done){

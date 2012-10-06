@@ -1,5 +1,5 @@
 var _ = require('underscore');
-var Percolator = require('./percolator');
+var Percolator = require('./index').Percolator;
 
 // TODO collections proof-of-concept - POST, PUT, DELETE
 // TODO make status man do conneg
@@ -27,14 +27,14 @@ server.onRequest(function(handler, context, cb){
 });
 
 var resourceDir = __dirname + '/test/test_fixtures/resources';
-server.routeDirectory(resourceDir, function(err){
+server.routeDirectory(resourceDir, app.resourcePath, function(err){
   console.log("routed resources in " + resourceDir);
 
   server.route('/inside', 
                       { GET : function($){ 
                                 $.res.end("muahahah!"); 
                               }
-                      }).as('inside');
+                      });
 
   if (err) {
     console.log("Routing error");

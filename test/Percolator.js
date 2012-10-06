@@ -1,7 +1,7 @@
 var should = require('should');
 var hottap = require('hottap').hottap;
 var _ = require('underscore');
-var Percolator = require('../percolator');
+var Percolator = require('../index').Percolator;
 
 
 function closeServer(server, cb){
@@ -9,7 +9,7 @@ function closeServer(server, cb){
     try {
       server.close();
     } catch(ex){
-    
+
     }
   }
   return cb();
@@ -27,6 +27,7 @@ describe('Percolator', function(){
   afterEach(function(done){
     closeServer(this.server, done);
   });
+
 
   it("has default error handlers for 404s", function(done){
       var that = this;
@@ -309,6 +310,10 @@ describe('Percolator', function(){
   });*/
 
   describe('#ctor', function(){
+    it("can be created", function(){
+      var server = new Percolator({port : 3000});
+      should.exist(server);
+    });
     it ("can override the default port", function(done){
       var that = this;
       var port = 3001;  // set non-default here
