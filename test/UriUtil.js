@@ -69,14 +69,9 @@ describe('UriUtil', function(){
     });
   });
   describe('#links', function(){
-    it ("returns parent, self, and child links", function(){
-      var calledNamedChildUrls = false;
+    it ("returns parent and self links", function(){
       var calledParentUrls = false;
       var router = { 
-        getNamedChildUrls : function(url){
-          calledNamedChildUrls = true;
-          return {"somechild" : "child" + url};
-        },
         getParentUrl : function(url){
           calledParentUrls = true;
           return "parent" + url;
@@ -84,75 +79,21 @@ describe('UriUtil', function(){
       };
       var u = new UriUtil(router, '[path]');
       u.links().should.eql({self : {href : 'http://localhost/[path]'}, 
-                           parent : {href :'http://localhost/parent[path]'}, 
-                           somechild : {href : 'http://localhost/child[path]'}
+                           parent : {href :'http://localhost/parent[path]'}
       });
-      calledNamedChildUrls.should.equal(true);
       calledParentUrls.should.equal(true);
     });
-    it ("returns self, and child links if parent doesn't exist", function(){
-      var calledNamedChildUrls = false;
+    it ("returns self if parent doesn't exist", function(){
       var calledParentUrls = false;
       var router = { 
-        getNamedChildUrls : function(url){
-          calledNamedChildUrls = true;
-          return {"somechild" : "child" + url};
-        },
         getParentUrl : function(url){
           calledParentUrls = true;
           throw {name : 'NoParentUrl'};
         }
       };
       var u = new UriUtil(router, '[path]');
-      u.links().should.eql({self : {href : 'http://localhost/[path]'}, 
-                            somechild : {href : 'http://localhost/child[path]'}});
-      calledNamedChildUrls.should.equal(true);
+      u.links().should.eql({self : {href : 'http://localhost/[path]'}});
       calledParentUrls.should.equal(true);
-    });
-  });
-  describe('#kids', function(){
-    it ("calls the router's getChildUrls with the current url", function(){
-      var called = false;
-      var router = { getChildUrls : function(url){
-        called = true;
-        return url;
-      } };
-      var u = new UriUtil(router, '[path]');
-      u.kids().should.equal('[path]');
-      called.should.equal(true);
-    });
-    it ("calls the router's getChildUrls with the input url", function(){
-      var called = false;
-      var router = { getChildUrls : function(url){
-        called = true;
-        return url;
-      } };
-      var u = new UriUtil(router, '[path]');
-      u.kids('input').should.equal('input');
-      called.should.equal(true);
-    });
-  });
-  describe('#namedKids', function(){
-    it ("calls the router's getNamedChildUrls with the current url", function(){
-      var called = false;
-      var router = { getNamedChildUrls : function(url){
-        called = true;
-        return {somename : url};
-      } };
-      var u = new UriUtil(router, '[path]', 'https', 'somesite.com');
-      u.namedKids().somename.should.equal('https://somesite.com/[path]');
-      called.should.equal(true);
-    });
-
-    it ("calls the router's getNamedChildUrls with the input url", function(){
-      var called = false;
-      var router = { getNamedChildUrls : function(url){
-        called = true;
-        return {someurl :  url};
-      } };
-      var u = new UriUtil(router, '[path]', 'https', 'somesite.com');
-      u.namedKids('input').someurl.should.equal('https://somesite.com/input');
-      called.should.equal(true);
     });
   });
   describe('#get', function(){
@@ -234,7 +175,7 @@ describe('UriUtil', function(){
         return "[parent of " + str + "]";
       } };
       var u = new UriUtil(router, '[path]');
-      u.parent().should.equal("[parent of [path]]");
+      u.parent().should.equal("http://localhost/[parent of [path]]");
       called.should.equal(true);
     });
     it ("calls the router's getParentUrl() with a passed url", function(){
@@ -244,7 +185,7 @@ describe('UriUtil', function(){
         return "[parent of " + str + "]";
       } };
       var u = new UriUtil(router, '[path]');
-      u.parent('[other path]').should.equal("[parent of [other path]]");
+      u.parent('[other path]').should.equal("http://localhost/[parent of [other path]]");
       called.should.equal(true);
     });
   });
