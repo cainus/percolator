@@ -11,6 +11,24 @@ describe("BodyContextHelper", function(){
       done();
     });
   });
+  it ("sets the error param when there's an error", function(done){
+    var fakeReq = {
+      on : function(type, cb){
+        switch(type){
+          case 'error' : return cb('some error');
+          case 'data' : return cb("a bunch of fake data");
+        }
+      }
+    };
+    var handler = {};
+    var $ = { req : fakeReq };
+    bch($, handler, function(){
+      $.onBody(function(err, body){
+        err.should.equal('some error');
+        done();
+      });
+    });
+  });
   it ("sets a body param when successful", function(done){
     var fakeReq = {
       on : function(type, cb){
