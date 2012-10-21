@@ -1,30 +1,47 @@
-
-var artists = {
-  '1234' : {"name" : "Neil Young", created : new Date()},
-  '4567' : {"name" : "Joe Strummer", created : new Date()}
+var schema = {
+  description : "A musical artist",
+  type : "object",
+  properties : {
+    name : {
+      title : "The artist's name",
+      type : "string"
+    }
+  }
 };
+
+
 exports.handler = {
   POST : function($){
     $.res.end();
   },
   GET : function($){
-    var out = { artist : [] };
-    _.each(artists, function(v, k){
-      var self = $.uri.absolute('/api/artist/' + k);
-      var item = _.extend({ _links : { self : {href : self } }}, v);
-      out.artist.push(item);
-    });
-    out._links = $.uri.links();
-    $.repr(out);
+      $.jsonCollection($.app.artists)
+        .linkEach('self', function(item, name){
+          return $.uri.child(name);
+        })
+        .link('artist-add', $.uri.self(), {method : 'POST', schema : schema})
+        .send();
+    /*
+    TODO : 
+           get rid of uriutil.links
+           kill reaper and $.repr once send() works
+           can schema be re-used for validations?
+           create a badass collection object
+           tarantula - finds undocumented rels, unhittable endpoints, api errors, valid urls
+           viewer like jsonviewer
+           api time-cost report
+           adding prefixes for child links sucks.  how about $.uri.child('rest');
+           how to document rels easily?
+     */
   }
 };
 
 exports.wildcard = {
 
-  fetch : function(handler, cb){
-    var id = handler.uri.params().artist;
+  fetch : function($, cb){
+    var id = $.uri.params().artist;
     console.log("id was: ", id);
-    var row = artists[id];
+    var row = $.app.artists[id];
     console.log("row was: ", row);
     if (!!row){
       cb(null, row);
@@ -34,8 +51,15 @@ exports.wildcard = {
   },
 
   GET : function($){
+
+    console.log("FETCHED: ", $.fetched);
+    $.json($.fetched)
+      //.link( "artist-update", $.uri.self(),{method : 'PUT', schema : schema})
+      .send();
+      /*
     $.fetched._links = $.uri.links();
-    $.repr($.fetched);
+    $.fetched._forms = { "artist-update" : {method : 'PUT', action : $.uri.self(), schema : schema}};
+    $.repr($.fetched);*/
   }
 
 };

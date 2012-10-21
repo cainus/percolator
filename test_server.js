@@ -20,6 +20,12 @@ var app = {
   staticDir : __dirname + '/test/test_fixtures/static',
   port : 8080
 };
+
+app.artists = {
+  '1234' : {"name" : "Neil Young", created : new Date()},
+  '4567' : {"name" : "Joe Strummer", created : new Date()}
+};
+
 var server = new Percolator(app);
 server.onRequest(function(handler, context, cb){
   console.log(' <-- ', context.req.method, ' ', context.req.url);

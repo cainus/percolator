@@ -68,34 +68,6 @@ describe('UriUtil', function(){
               .should.equal('http://qwer.ca:8080/gg/asdf/qwer/1234/1234');
     });
   });
-  describe('#links', function(){
-    it ("returns parent and self links", function(){
-      var calledParentUrls = false;
-      var router = { 
-        getParentUrl : function(url){
-          calledParentUrls = true;
-          return "parent" + url;
-        }
-      };
-      var u = new UriUtil(router, '[path]');
-      u.links().should.eql({self : {href : 'http://localhost/[path]'}, 
-                           parent : {href :'http://localhost/parent[path]'}
-      });
-      calledParentUrls.should.equal(true);
-    });
-    it ("returns self if parent doesn't exist", function(){
-      var calledParentUrls = false;
-      var router = { 
-        getParentUrl : function(url){
-          calledParentUrls = true;
-          throw {name : 'NoParentUrl'};
-        }
-      };
-      var u = new UriUtil(router, '[path]');
-      u.links().should.eql({self : {href : 'http://localhost/[path]'}});
-      calledParentUrls.should.equal(true);
-    });
-  });
   describe('#get', function(){
     it ("returns the current url if there are no parameters", function(){
       var router = {};
@@ -195,6 +167,14 @@ describe('UriUtil', function(){
       var u = new UriUtil(router, '[path]', 'protocol', 'host.com');
       u.absolute('input').should.equal('protocol://host.com/input');
     });
+  });
+  describe('#child', function(){
+    it ("returns the given string as a sub path of self", function(){
+      var router = { };
+      var u = new UriUtil(router, '[path]');
+      u.child('asdf').should.equal('http://localhost/[path]/asdf');
+    });
+
   });
   describe('#self', function(){
     it ('returns the input url', function(){

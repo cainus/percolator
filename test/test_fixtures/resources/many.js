@@ -1,6 +1,7 @@
 exports.handler = {
   GET : function($){
-    $.repr({"items" : [{"hello" : "collectors", "links" : $.uri.absolute('/api/many/1234')}]});
+    $.jsonCollection([{"hello" : "collectors", "links" : $.uri.absolute('/api/many/1234')}])
+      .send();
   }
 };
 
