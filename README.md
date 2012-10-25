@@ -11,7 +11,7 @@ It's great for:
 
 Its goal is to help make RESTful APIs in JSON that aren't painful to write and aren't painful to use.
 
-Features: 
+####Features:#### 
 * Helps to generate JSON Hypermedia APIs quickly and easily (There will be some links in your json, and it will be awesome).
 * Helps to standardize your API with a very lightweight standard to simplify client development.
 * Helps to remove a lot of the tedious mind-numbing boilerplate of CRUD APIs
@@ -22,7 +22,7 @@ Features:
 * Can help organize your routes better.
 * Has very little magic and absolutely no code generators
 
-It does NOT:
+####It does NOT:####
 * Have a way of generating dynamic HTML.  You can certainly add that, but it's not included and probably won't be (Perhaps you'd be better off with [express](http://expressjs.com) if you need that capability).  Percolator can serve static assets (html, js css) though if you want to create a one-page app.
 * Have an opinion on how/if you manage persistence.  Add that however you want.  It just helps you with the API/HTTP end of things.
 * Use [connect](https://github.com/senchalabs/connect) or [express](http://expressjs.com), so it might not do things that you've come to expect from node frameworks that do.  It doesn't even have a serialized, synchronous middleware framework (though my opinion is that you don't need that).
