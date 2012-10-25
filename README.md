@@ -9,8 +9,6 @@ It's great for:
 * single page apps
 * mobile apps
 
-Percolator is an RESTful JSON API framework.
-
 Its goal is to help make RESTful APIs in JSON that aren't painful to write and aren't painful to use.
 
 Features: 
