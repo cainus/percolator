@@ -11,6 +11,7 @@ exports.HyperJsonCollection = require(dir + 'HyperJsonCollection');
 exports.JsonModule = require(dir + 'JsonModule');
 
 exports.AuthenticateContextHelper = require(helperDir + 'Authenticate');
+exports.BasicAuthenticateContextHelper = require(helperDir + 'BasicAuthenticate');
 exports.JsonContextHelper = require(helperDir + 'Json');
 exports.BodyContextHelper = require(helperDir + 'Body');
 exports.FetchContextHelper = require(helperDir + 'Fetch');
