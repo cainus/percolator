@@ -7,7 +7,7 @@ describe("AuthenticateContextHelper", function(done){
     var handler = {};
     fch($, handler, function(err){
       should.not.exist(err);
-      should.not.exist($.fetched);
+      should.not.exist($.authenticated);
       done();
     });
   });
@@ -22,7 +22,7 @@ describe("AuthenticateContextHelper", function(done){
     var $ = {};
     var handler  = {
               authenticate : function(context, cb){
-                        cb(null, '1234');  // we fetched 1234
+                        cb(null, '1234');  // we got 1234
                       }
             };
     fch($, handler, function(err){
@@ -60,7 +60,7 @@ describe("AuthenticateContextHelper", function(done){
     var $ = {
               status : {
                 internalServerError : function(detail){ 
-                  should.not.exist($.fetched);
+                  should.not.exist($.authenticated);
                   detail.should.eql({some : 'error'});
                   done();
                 }
