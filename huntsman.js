@@ -25,12 +25,14 @@ Huntsman.prototype.capture = function(url, method, headers, body, cb){
   if (this.debug){
     console.log('<-- ', method, headers, body);
   }
+  this.beenThere.push(method + "|" + url);
   hottap(url).request(method, headers, body, function(err, response){
     if (err){
       that.emit('error', err);
       if (that.stopOnError){
         that.shouldStop = true;
       }
+      cb(err);
     } else {
       if (that.debug){
         console.log('--> ', response);
@@ -38,18 +40,20 @@ Huntsman.prototype.capture = function(url, method, headers, body, cb){
       that.emit('response', response);
       if (response.headers['content-type'] === 'application/json'){
         console.log("harvesting");
-        that.harvest(response.body);
+        that.harvest(response.body, function(){
+          cb(response);
+        });
       } else {
         if (that.debug){
           console.log('--> (non-json response)');
         }
+        cb('non-json response', response);
       }
-      cb(err, response);
     }
   });
 };
 
-Huntsman.prototype.harvest = function(payload){
+Huntsman.prototype.harvest = function(payload, cb){
   var that = this;
   var obj = {};
   console.log("payload: ", payload);
@@ -69,8 +73,17 @@ Huntsman.prototype.harvest = function(payload){
     that.emit('link', rel, link);
     if (!!that.autoGET && !that.shouldStop){
       console.log("about to follow... ", link);
+      if (!that.hasBeenTo('GET', link.href)){
+        that.capture(link.href, 'GET', {}, '', function(){
+          cb();
+        }); 
+      }
     }
   });
+};
+
+Huntsman.prototype.hasBeenTo = function(method, url){
+  return (this.beenThere.indexOf(method + '|' + url) !== -1);
 };
 
 Huntsman.prototype.hunt = function(url){
@@ -101,6 +114,7 @@ hunter.on('response', function(response){
 });
 
 hunter.on('end', function(){
+  console.log(hunter.beenThere);
   console.log('done');
 });
 
