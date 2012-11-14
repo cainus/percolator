@@ -1,4 +1,4 @@
-# Percolator
+# ![Percolator](http://percolatorjs.com/img/hero-name.png)
 [![Build
 Status](https://secure.travis-ci.org/cainus/percolator.png?branch=master)](http://travis-ci.org/cainus/percolator)
 
