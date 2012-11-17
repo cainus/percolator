@@ -23,8 +23,8 @@ var app = {
 };
 
 app.artists = {
-  '1234' : {"name" : "Neil Young", created : new Date()},
-  '4567' : {"name" : "Joe Strummer", created : new Date()}
+  1 : {"name" : "Neil Young", created : new Date()},
+  2 : {"name" : "Joe Strummer", created : new Date()}
 };
 
 var server = new Percolator(app);

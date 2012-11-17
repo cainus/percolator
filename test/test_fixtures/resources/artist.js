@@ -1,5 +1,5 @@
 var JsonModule = require('../../../index').JsonModule;
-
+_ = require('underscore');
 
 module.exports = new JsonModule({
 
@@ -9,9 +9,18 @@ module.exports = new JsonModule({
     properties : {
       name : {
         title : "The artist's name",
-        type : "string"
+        type : "string",
+        required : true
       }
     }
+  },
+
+  create : function($, obj){
+    console.log(obj);
+    obj.created = new Date();
+    var newKey = parseInt(_.max(_.keys($.app.artists)), 10) + 1;
+    $.app.artists[newKey] = obj;
+    $.status.created($.uri.self());
   },
 
   list : function($, cb){
