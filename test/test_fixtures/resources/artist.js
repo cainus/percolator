@@ -15,12 +15,12 @@ module.exports = new JsonModule({
     }
   },
 
-  create : function($, obj){
+  create : function($, obj, cb){
     console.log(obj);
     obj.created = new Date();
     var newKey = parseInt(_.max(_.keys($.app.artists)), 10) + 1;
     $.app.artists[newKey] = obj;
-    $.status.created($.uri.self());
+    cb();
   },
 
   list : function($, cb){

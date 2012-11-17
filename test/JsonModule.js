@@ -160,8 +160,6 @@ describe("JsonModule", function(){
     should.not.exist(module.handler.POST);
   });
   it ("collection POST calls options.create()", function(done){
-    // the router will 405 a collection POST if the handler doesn't 
-    // implement .POST()
     var module = new JsonModule({
                                   list : function($, cb){ cb([]); },
                                    create : function($, obj){ 
@@ -170,6 +168,32 @@ describe("JsonModule", function(){
                                    }
                                 });
     var $ = {
+      onBody : function(cb){
+        cb(null, '{"age":37}');
+      }
+    };
+    module.handler.POST($);
+  });
+  it ("collection POST calls options.create() and its callback if specified", function(done){
+    var module = new JsonModule({
+                                  list : function($, cb){ cb([]); },
+                                  create : function($, obj, cb){ 
+                                    obj.should.eql({age:37});
+                                    return cb();
+                                  }
+                                });
+    var $ = {
+      status : {
+        created : function(url){
+          url.should.equal('self');
+          done();
+        }
+      },
+      uri : {
+        self : function(){
+          return 'self';
+        }
+      },
       onBody : function(cb){
         cb(null, '{"age":37}');
       }
