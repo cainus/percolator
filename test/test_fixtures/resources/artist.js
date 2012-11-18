@@ -16,10 +16,16 @@ module.exports = new JsonModule({
   },
 
   create : function($, obj, cb){
-    console.log(obj);
+    console.log('creating: ', obj);
     obj.created = new Date();
     var newKey = parseInt(_.max(_.keys($.app.artists)), 10) + 1;
     $.app.artists[newKey] = obj;
+    cb();
+  },
+
+  update : function($, id, obj, cb){
+    console.log('updating: ', id, obj);
+    $.app.artists[id] = obj;
     cb();
   },
 
