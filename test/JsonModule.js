@@ -140,7 +140,6 @@ describe("JsonModule", function(){
                                     list : function($, cb){ cb([]); }
                                     // missing update : function($, id, obj){ ... }
                                    });
-
       should.not.exist(module.wildcard.PUT);
     });
     it ("calls options.upsert() if it exists", function(done){
