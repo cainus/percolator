@@ -11,6 +11,32 @@ describe("JsonModule", function(){
       }
 
     });
+    it ("throws an error if upsert() and update() both exist", function(){
+      try {
+        var module = new JsonModule({
+                                      list : function($, cb){ cb([]); },
+                                      update : function($, id, obj){ },
+                                      upsert : function($, id, obj){ }
+                                     });
+        should.fail("expected exception was not raised");
+      } catch (ex){
+        ex.should.equal("JsonModule should not have create() or update() if it has upsert().");
+      }
+
+    });
+    it ("throws an error if upsert() and create() both exist", function(){
+      try {
+        var module = new JsonModule({
+                                      list : function($, cb){ cb([]); },
+                                      create : function($, id, obj){ },
+                                      upsert : function($, id, obj){ }
+                                     });
+        should.fail("expected exception was not raised");
+      } catch (ex){
+        ex.should.equal("JsonModule should not have create() or update() if it has upsert().");
+      }
+
+    });
   describe("when schema is set", function(){
     it ("collection GET outputs a create link", function(done){
         var module = new JsonModule({
@@ -46,8 +72,68 @@ describe("JsonModule", function(){
         module.handler.GET($);
     });
   });
+  describe("wildcard.DELETE", function(){
+    it ("doesn't exist if options has no destroy()", function(){
+      // the router will 405 a wildcard PUT if the handler doesn't
+      // implement .PUT()
+      var module = new JsonModule({
+                                    list : function($, cb){ cb([]); }
+                                    // missing update : function($, id, obj){ ... }
+                                   });
+
+      should.not.exist(module.wildcard.DELETE);
+    });
+    it ("calls options.destroy()", function(done){
+      var module = new JsonModule({
+                                    list : function($, cb){ cb([]); },
+                                    destroy : function($, id, cb){ 
+                                      id.should.equal('1234');
+                                      done();
+                                    }
+                                  });
+      var $ = {
+        uri : {
+          self : function(){
+            return 'http://collection/1234';
+          }
+        }
+      };
+      module.wildcard.DELETE($);
+    });
+    it ("calls options.destroy() and its callback if specified", function(done){
+      var headWritten = false;
+      var module = new JsonModule({
+                                    list : function($, cb){ cb([]); },
+                                    destroy : function($, id, cb){ 
+                                      id.should.equal('1234');
+                                      return cb();
+                                    }
+                                  });
+      var $ = {
+        res : {
+          writeHead : function(code){
+            headWritten = true;
+            code.should.equal(204);
+          },
+          end : function(){
+            headWritten.should.equal(true);
+            done();
+          }
+        },
+        uri : {
+          self : function(){
+            return 'http://collection/1234';
+          }
+        },
+        onBody : function(cb){
+          cb(null, '{"age":37}');
+        }
+      };
+      module.wildcard.DELETE($);
+    });
+  });
   describe("wildcard.PUT", function(){
-    it ("doesn't exist if options has no create()", function(){
+    it ("doesn't exist if options has no update() or upsert()", function(){
       // the router will 405 a wildcard PUT if the handler doesn't
       // implement .PUT()
       var module = new JsonModule({
@@ -57,7 +143,27 @@ describe("JsonModule", function(){
 
       should.not.exist(module.wildcard.PUT);
     });
-    it ("calls options.update()", function(done){
+    it ("calls options.upsert() if it exists", function(done){
+      var module = new JsonModule({
+                                    list : function($, cb){ cb([]); },
+                                    upsert : function($, id, obj){ 
+                                      obj.should.eql({age:37});
+                                      done();
+                                    }
+                                  });
+      var $ = {
+        uri : {
+          self : function(){
+            return 'http://collection/1234';
+          }
+        },
+        onBody : function(cb){
+          cb(null, '{"age":37}');
+        }
+      };
+      module.wildcard.PUT($);
+    });
+    it ("calls options.update() if it exists", function(done){
       var module = new JsonModule({
                                     list : function($, cb){ cb([]); },
                                     update : function($, id, obj){ 
