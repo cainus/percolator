@@ -2,12 +2,12 @@ var JsonModule = require('../index').JsonModule;
 var should = require('should');
 
 describe("JsonModule", function(){
-  it ("throws an exception if there's no list() passed in the options param", function(){
+  it ("throws an exception if there's no list() or collectionGET() passed in the options param", function(){
     try {
       var module = new JsonModule({});
       should.fail("expected exception was not raised");
     } catch(ex){
-      ex.should.equal("JsonModule needs an options array with a 'list' function.");
+      ex.should.equal("the options parameter should have a list() or collectionGET() function.");
     }
 
   });
@@ -20,14 +20,14 @@ describe("JsonModule", function(){
                                    });
       should.fail("expected exception was not raised");
     } catch (ex){
-      ex.should.equal("JsonModule should not have create() or update() if it has upsert().");
+      ex.should.equal("the options parameter should not have create() or update() if it has upsert().");
     }
 
   });
   describe("when schema is set", function(){
     it ("collection GET outputs a create link", function(done){
         var module = new JsonModule({
-                                      list : function($, cb){ cb([]); },
+                                      list : function($, cb){ cb([{"an" : "item"}]); },
                                       create : function($, obj){ },
                                       schema : { troof : true}
                                     });
@@ -38,7 +38,7 @@ describe("JsonModule", function(){
 
           jsonCollection : function(){
             return {
-              linkEach : function(){
+              linkEach : function(rel, cb){
                 return {
                   link : function(rel, href, opts){
                     rel.should.equal('create');
@@ -219,6 +219,54 @@ describe("JsonModule", function(){
       };
       module.wildcard.PUT($);
     });
+    it ("doesn't call options.update() if fetch() fails with some error", function(done){
+      var headerSet = false;
+      var headWritten = false;
+      var module = new JsonModule({
+                                    list : function($, cb){ cb([]); },
+                                    update : function($, id, obj, cb){ 
+                                      should.fail('update should not be called');
+                                    },
+                                    fetch : function($, cb){
+                                      cb("some error!");
+                                    }
+                                  });
+      var $ = {
+                status : {
+                  internalServerError : function(err){
+                    err.should.equal('some error!');
+                    done();
+                  }
+                }
+              };
+      module.wildcard.PUT($);
+    });
+    it ("doesn't call options.update() if fetch() doesn't find the uri", function(done){
+      var headerSet = false;
+      var headWritten = false;
+      var module = new JsonModule({
+                                    list : function($, cb){ cb([]); },
+                                    update : function($, id, obj, cb){ 
+                                      should.fail('update should not be called');
+                                    },
+                                    fetch : function($, cb){
+                                      cb(true);  // returning strict true
+                                                 // means "not found"
+                                    }
+                                  });
+      var $ = {
+                req : {
+                  url : 'http://someurl'
+                },
+                status : {
+                  notFound : function(url){
+                    url.should.equal('http://someurl');
+                    done();
+                  }
+                }
+              };
+      module.wildcard.PUT($);
+    });
     it ("calls options.update() and its callback if specified", function(done){
       var headerSet = false;
       var headWritten = false;
@@ -231,34 +279,125 @@ describe("JsonModule", function(){
                                     }
                                   });
       var $ = {
-        res : {
-          setHeader : function(name, value){
-            headerSet = true;
-            name.should.equal('Location');
-            value.should.equal('http://collection/1234');
-          },
-          writeHead : function(code){
-            headWritten = true;
-            code.should.equal(303);
-          },
-          end : function(){
-            headerSet.should.equal(true);
-            headWritten.should.equal(true);
-            done();
-          }
-        },
-        uri : {
-          self : function(){
-            return 'http://collection/1234';
-          }
-        },
-        onJson : function(schema, cb){
-          //TODO verify schema
-          cb(null, {"age":37});
-        }
-      };
+                res : {
+                  setHeader : function(name, value){
+                    headerSet = true;
+                    name.should.equal('Location');
+                    value.should.equal('http://collection/1234');
+                  },
+                  writeHead : function(code){
+                    headWritten = true;
+                    code.should.equal(303);
+                  },
+                  end : function(){
+                    headerSet.should.equal(true);
+                    headWritten.should.equal(true);
+                    done();
+                  }
+                },
+                uri : {
+                  self : function(){
+                    return 'http://collection/1234';
+                  }
+                },
+                onJson : function(schema, cb){
+                  //TODO verify schema
+                  cb(null, {"age":37});
+                }
+              };
       module.wildcard.PUT($);
     });
+  });
+  describe("handler.GET", function(){
+    it("is defined when collectionGET is defined", function(done){
+      var module = new JsonModule({
+                                    collectionGET : function($){ done(); }
+                                    // missing fetch and memberGET
+                                  });
+
+      should.exist(module.handler.GET);
+      var $ = {};
+      module.handler.GET($);
+    });
+  });
+  describe("wildcard.GET", function(){
+    it ("doesn't exist if there's no fetch() or memberGET", function(){
+      var module = new JsonModule({
+                                    list : function($, cb){ cb([]); }
+                                    // missing fetch and memberGET
+                                  });
+
+      should.not.exist(module.wildcard.GET);
+
+    });
+    it ("outputs a representation of a resource when fetch is defined", function(done){
+      var module = new JsonModule({
+                                    list : function($, cb){ cb([]); },
+                                    fetch : function($, cb){ 
+                                                cb(null, {"some":"obj"});
+                                            }
+                                  });
+
+      var $ = {
+        json : function(obj){
+          obj.should.eql({'some':'obj'});
+          return {
+            send : function(thing){
+              done();
+            }
+          };
+        }
+      };
+      module.wildcard.GET($);
+
+    });
+
+    it ("outputs with an update link if an updateSchema is defined", function(done){
+      var module = new JsonModule({
+                                    list : function($, cb){ cb([]); },
+                                    fetch : function($, cb){
+                                                cb(null, {"some":"obj"});
+                                            },
+                                    updateSchema : {
+                                      name : "somename"
+                                    }
+                                  });
+
+      var $ = {
+        uri : {
+          self : function(){return 'http://self';}
+        },
+        json : function(obj){
+          obj.should.eql({'some':'obj'});
+          return {
+            send : function(thing){
+              done();
+            },
+            link : function(rel, href, opts){
+              rel.should.equal("update");
+              href.should.equal("http://self");
+              opts.should.eql({method : 'PUT', schema : { name : "somename"}});
+            }
+          };
+        }
+      };
+      module.wildcard.GET($);
+
+    });
+    it ("is defined when memberGET is defined", function(done){
+      var module = new JsonModule({
+                                    list : function($, cb){ cb([]); },
+                                    memberGET : function($){ 
+                                      done();
+                                    }
+                                  });
+
+      var $ = {
+      };
+      module.wildcard.GET($);
+
+    });
+
   });
   describe("handler.POST", function(){
     it ("doesn't exist if options has no create()", function(){
