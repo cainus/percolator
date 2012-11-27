@@ -330,6 +330,37 @@ describe("JsonModule", function(){
       should.not.exist(module.wildcard.GET);
 
     });
+    it ("does not output an update link if there's no update()", function(done){
+      var module = new JsonModule({
+                                    list : function($, cb){ cb([]); },
+                                    fetch : function($, cb){
+                                                cb(null, {"some":"obj"});
+                                            },
+                                    updateSchema : {
+                                      name : "somename"
+                                    }
+                                  });
+
+      var $ = {
+        uri : {
+          self : function(){return 'http://self';}
+        },
+        json : function(obj){
+          obj.should.eql({'some':'obj'});
+          return {
+            send : function(thing){
+              done();
+            },
+            link : function(rel, href, opts){
+              console.log(arguments);
+              should.fail("there should be no additional calls to link() because there's not update() method.");
+            }
+          };
+        }
+      };
+      module.wildcard.GET($);
+    
+    });
     it ("outputs a representation of a resource when fetch is defined", function(done){
       var module = new JsonModule({
                                     list : function($, cb){ cb([]); },
