@@ -80,8 +80,8 @@ describe("JsonModule", function(){
                                   });
       var $ = {
         uri : {
-          self : function(){
-            return 'http://collection/1234';
+          pathEnd : function(){
+            return '1234';
           }
         }
       };
@@ -108,8 +108,8 @@ describe("JsonModule", function(){
           }
         },
         uri : {
-          self : function(){
-            return 'http://collection/1234';
+          pathEnd : function(){
+            return '1234';
           }
         },
         onBody : function(cb){
@@ -145,6 +145,9 @@ describe("JsonModule", function(){
         uri : {
           self : function(){
             return 'http://collection/1234';
+          },
+          pathEnd : function(){
+            return '1234';
           }
         },
         onJson : function(schema, cb){
@@ -172,6 +175,9 @@ describe("JsonModule", function(){
         uri : {
           self : function(){
             return 'http://collection/1234';
+          },
+          pathEnd : function(){
+            return '1234';
           }
         },
         res : {
@@ -210,7 +216,11 @@ describe("JsonModule", function(){
         uri : {
           self : function(){
             return 'http://collection/1234';
+          },
+          pathEnd : function(){
+            return '1234';
           }
+
         },
         onJson : function(schema, cb){
           // TODO: verify schema
@@ -227,11 +237,17 @@ describe("JsonModule", function(){
                                     update : function($, id, obj, cb){ 
                                       should.fail('update should not be called');
                                     },
-                                    fetch : function($, cb){
+                                    fetch : function($, id, cb){
+                                      id.should.equal('1234');
                                       cb("some error!");
                                     }
                                   });
       var $ = {
+                uri : {
+                  pathEnd : function(){
+                    return '1234';
+                  }
+                },
                 status : {
                   internalServerError : function(err){
                     err.should.equal('some error!');
@@ -249,7 +265,8 @@ describe("JsonModule", function(){
                                     update : function($, id, obj, cb){ 
                                       should.fail('update should not be called');
                                     },
-                                    fetch : function($, cb){
+                                    fetch : function($, id, cb){
+                                      id.should.equal('1234');
                                       cb(true);  // returning strict true
                                                  // means "not found"
                                     }
@@ -257,6 +274,11 @@ describe("JsonModule", function(){
       var $ = {
                 req : {
                   url : 'http://someurl'
+                },
+                uri : {
+                  pathEnd : function(){
+                    return '1234';
+                  }
                 },
                 status : {
                   notFound : function(url){
@@ -298,6 +320,9 @@ describe("JsonModule", function(){
                 uri : {
                   self : function(){
                     return 'http://collection/1234';
+                  },
+                  pathEnd : function(){
+                    return '1234';
                   }
                 },
                 onJson : function(schema, cb){
@@ -333,7 +358,8 @@ describe("JsonModule", function(){
     it ("does not output an update link if there's no update()", function(done){
       var module = new JsonModule({
                                     list : function($, cb){ cb([]); },
-                                    fetch : function($, cb){
+                                    fetch : function($, id, cb){
+                                                id.should.equal(1234);
                                                 cb(null, {"some":"obj"});
                                             },
                                     updateSchema : {
@@ -343,7 +369,8 @@ describe("JsonModule", function(){
 
       var $ = {
         uri : {
-          self : function(){return 'http://self';}
+          self : function(){return 'http://self';},
+          pathEnd : function(){  return 1234; }
         },
         json : function(obj){
           obj.should.eql({'some':'obj'});
@@ -359,17 +386,21 @@ describe("JsonModule", function(){
         }
       };
       module.wildcard.GET($);
-    
+
     });
     it ("outputs a representation of a resource when fetch is defined", function(done){
       var module = new JsonModule({
                                     list : function($, cb){ cb([]); },
-                                    fetch : function($, cb){ 
+                                    fetch : function($, id, cb){ 
+                                                id.should.equal(1234);
                                                 cb(null, {"some":"obj"});
                                             }
                                   });
 
       var $ = {
+        uri : {
+          pathEnd : function(){  return 1234; }
+        },
         json : function(obj){
           obj.should.eql({'some':'obj'});
           return {
@@ -382,11 +413,11 @@ describe("JsonModule", function(){
       module.wildcard.GET($);
 
     });
-
-    it ("outputs with an update link if an updateSchema is defined", function(done){
+    it ("outputs without an update link if update() is not defined", function(done){
       var module = new JsonModule({
                                     list : function($, cb){ cb([]); },
-                                    fetch : function($, cb){
+                                    fetch : function($, id, cb){
+                                                id.should.equal(1234);
                                                 cb(null, {"some":"obj"});
                                             },
                                     updateSchema : {
@@ -396,7 +427,8 @@ describe("JsonModule", function(){
 
       var $ = {
         uri : {
-          self : function(){return 'http://self';}
+          self : function(){return 'http://self';},
+          pathEnd : function(){  return 1234; }
         },
         json : function(obj){
           obj.should.eql({'some':'obj'});
@@ -405,9 +437,81 @@ describe("JsonModule", function(){
               done();
             },
             link : function(rel, href, opts){
+              should.fail("no link should be added!");
+            }
+          };
+        }
+      };
+      module.wildcard.GET($);
+
+    });
+
+    it ("outputs with an update link if update() is defined", function(done){
+      var createdUpdateLink = false;
+      var module = new JsonModule({
+                                    list : function($, cb){ cb([]); },
+                                    fetch : function($, id, cb){
+                                                id.should.equal(1234);
+                                                cb(null, {"some":"obj"});
+                                            },
+                                    update : function(){},
+                                    updateSchema : {
+                                      name : "somename"
+                                    }
+                                  });
+
+      var $ = {
+        uri : {
+          self : function(){return 'http://self';},
+          pathEnd : function(){  return 1234; }
+        },
+        json : function(obj){
+          obj.should.eql({'some':'obj'});
+          return {
+            send : function(thing){
+              createdUpdateLink.should.equal(true);
+              done();
+            },
+            link : function(rel, href, opts){
+              createdUpdateLink = true;
               rel.should.equal("update");
               href.should.equal("http://self");
               opts.should.eql({method : 'PUT', schema : { name : "somename"}});
+            }
+          };
+        }
+      };
+      module.wildcard.GET($);
+
+    });
+    it ("outputs with a delete link if destroy() is defined", function(done){
+      var createdDeleteLink = false;
+      var module = new JsonModule({
+                                    list : function($, cb){ cb([]); },
+                                    fetch : function($, id, cb){
+                                                id.should.equal(1234);
+                                                cb(null, {"some":"obj"});
+                                            },
+                                    destroy : function(){}
+                                  });
+
+      var $ = {
+        uri : {
+          self : function(){return 'http://self';},
+          pathEnd : function(){  return 1234; }
+        },
+        json : function(obj){
+          obj.should.eql({'some':'obj'});
+          return {
+            send : function(thing){
+              createdDeleteLink.should.equal(true);
+              done();
+            },
+            link : function(rel, href, opts){
+              createdDeleteLink = true;
+              rel.should.equal("delete");
+              href.should.equal("http://self");
+              opts.should.eql({method : 'DELETE'});
             }
           };
         }
