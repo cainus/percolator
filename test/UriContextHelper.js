@@ -164,6 +164,14 @@ describe('UriContextHelper', function(){
     });
 
   });
+  describe('#pathEnd', function(){
+    it ("returns the last subdirectory directory in the path", function(){
+      var router = { };
+      var u = new UriContextHelper(router, '[path]');
+      u.pathEnd('[path]/parent/sub/baby?asdf=qwer#hash').should.equal('baby');
+    });
+
+  });
   describe('#self', function(){
     it ('returns the input url', function(){
       var router = { };
