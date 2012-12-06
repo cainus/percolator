@@ -170,6 +170,11 @@ describe('UriContextHelper', function(){
       var u = new UriContextHelper(router, '[path]');
       u.pathEnd('[path]/parent/sub/baby?asdf=qwer#hash').should.equal('baby');
     });
+    it ("returns the last subdirectory directory in the path when the path ends witha  slash", function(){
+      var router = { };
+      var u = new UriContextHelper(router, '[path]');
+      u.pathEnd('[path]/parent/sub/baby/?asdf=qwer#hash').should.equal('baby');
+    });
 
   });
   describe('#self', function(){
