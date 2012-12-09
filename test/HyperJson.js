@@ -40,7 +40,7 @@ describe("HyperJson", function(){
       new HyperJson({
                       thisis : "a test",
                       _links : {  self : { href : "http://blah.com" }}
-                    })
+          })
           .link("self", "http://percolatorjs.com")
           .toObject().should.eql({ thisis : "a test", 
                                    _links : {

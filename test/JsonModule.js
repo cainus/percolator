@@ -32,6 +32,9 @@ describe("JsonModule", function(){
                                       schema : { troof : true}
                                     });
         var $ = {
+          app : {
+            autoLink : true
+          },
           uri : {
             self : function(){ return 'http://self'; }
           },
@@ -461,6 +464,9 @@ describe("JsonModule", function(){
                                   });
 
       var $ = {
+        app : {
+          autoLink : true
+        },
         uri : {
           self : function(){return 'http://self';},
           pathEnd : function(){  return 1234; }
@@ -494,8 +500,10 @@ describe("JsonModule", function(){
                                             },
                                     destroy : function(){}
                                   });
-
       var $ = {
+        app : {
+          autoLink : true
+        },
         uri : {
           self : function(){return 'http://self';},
           pathEnd : function(){  return 1234; }
