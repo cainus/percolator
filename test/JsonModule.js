@@ -11,19 +11,6 @@ describe("JsonModule", function(){
     }
 
   });
-  it ("throws an error if upsert() and update() both exist", function(){
-    try {
-      var module = new JsonModule({
-                                    list : function($, cb){ cb([]); },
-                                    update : function($, id, obj){ },
-                                    upsert : function($, id, obj){ }
-                                   });
-      should.fail("expected exception was not raised");
-    } catch (ex){
-      ex.should.equal("the options parameter should not have create() or update() if it has upsert().");
-    }
-
-  });
   describe("when schema is set", function(){
     it ("collection GET outputs a create link", function(done){
         var module = new JsonModule({
