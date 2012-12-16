@@ -14,7 +14,7 @@ describe("CRUDCollection", function(){
   describe("when schema is set", function(){
     it ("collection GET outputs a create link", function(done){
         var module = new CRUDCollection({
-                                      list : function($, cb){ cb([{"an" : "item"}]); },
+                                      list : function($, cb){ cb(null, [{"an" : "item"}]); },
                                       create : function($, obj){ },
                                       schema : { troof : true}
                                     });
@@ -49,13 +49,39 @@ describe("CRUDCollection", function(){
         module.handler.GET($);
     });
   });
+  describe("collection.GET", function(){
+    it ("creates self links in all items", function(done){
+      var module = new CRUDCollection({
+                                    list : function($, cb){ cb(null, { sometest : {"here" : "goes"}}); }
+                                   });
+      var $ = { 
+        app : {
+          autoLink : true
+        },
+        jsonCollection : function(items){
+          items.should.eql({ sometest: { here: 'goes' } });
+          return {
+            linkEach : function(rel, cb){
+              rel.should.equal('self');
+              return {
+                send : function(){
+                  done();
+                }
+              };
+            }
+          };
+        }
+      };
+      module.handler.GET($);
+    });
+  });
   describe("wildcard.DELETE", function(){
     it ("doesn't exist if options has no destroy()", function(){
       // the router will 405 a wildcard PUT if the handler doesn't
-      // implement .PUT()
+      // implement .DELETE()
       var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); }
-                                    // missing update : function($, id, obj){ ... }
+                                    // missing destroy : function($, id, obj){ ... }
                                    });
 
       should.not.exist(module.wildcard.DELETE);
