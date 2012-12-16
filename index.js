@@ -8,7 +8,7 @@ exports.JsonResponder = require(dir + 'JsonResponder');
 exports.StatusManager = require(dir + 'StatusManager');
 exports.HyperJson = require(dir + 'HyperJson');
 exports.HyperJsonCollection = require(dir + 'HyperJsonCollection');
-exports.JsonModule = require(dir + 'JsonModule');
+exports.CRUDCollection = require(dir + 'CRUDCollection');
 
 exports.AuthenticateContextHelper = require(helperDir + 'Authenticate');
 exports.BasicAuthenticateContextHelper = require(helperDir + 'BasicAuthenticate');

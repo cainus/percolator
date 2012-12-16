@@ -1,10 +1,10 @@
-var JsonModule = require('../index').JsonModule;
+var CRUDCollection = require('../index').CRUDCollection;
 var should = require('should');
 
-describe("JsonModule", function(){
+describe("CRUDCollection", function(){
   it ("throws an exception if there's no list() or collectionGET() passed in the options param", function(){
     try {
-      var module = new JsonModule({});
+      var module = new CRUDCollection({});
       should.fail("expected exception was not raised");
     } catch(ex){
       ex.should.equal("the options parameter should have a list() or collectionGET() function.");
@@ -13,7 +13,7 @@ describe("JsonModule", function(){
   });
   describe("when schema is set", function(){
     it ("collection GET outputs a create link", function(done){
-        var module = new JsonModule({
+        var module = new CRUDCollection({
                                       list : function($, cb){ cb([{"an" : "item"}]); },
                                       create : function($, obj){ },
                                       schema : { troof : true}
@@ -53,7 +53,7 @@ describe("JsonModule", function(){
     it ("doesn't exist if options has no destroy()", function(){
       // the router will 405 a wildcard PUT if the handler doesn't
       // implement .PUT()
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); }
                                     // missing update : function($, id, obj){ ... }
                                    });
@@ -61,7 +61,7 @@ describe("JsonModule", function(){
       should.not.exist(module.wildcard.DELETE);
     });
     it ("calls options.destroy()", function(done){
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                     destroy : function($, id, cb){ 
                                       id.should.equal('1234');
@@ -79,7 +79,7 @@ describe("JsonModule", function(){
     });
     it ("calls options.destroy() and its callback if specified", function(done){
       var headWritten = false;
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                     destroy : function($, id, cb){ 
                                       id.should.equal('1234');
@@ -113,7 +113,7 @@ describe("JsonModule", function(){
     it ("doesn't exist if options has no update() or upsert()", function(){
       // the router will 405 a wildcard PUT if the handler doesn't
       // implement .PUT()
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); }
                                     // missing update : function($, id, obj){ ... }
                                    });
@@ -123,7 +123,7 @@ describe("JsonModule", function(){
       var schema = {
         "name" : "name"
       };
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     schema : schema,
                                     list : function($, cb){ cb([]); },
                                     upsert : function($, id, obj){ 
@@ -153,7 +153,7 @@ describe("JsonModule", function(){
       var schema = {
         "name" : "name"
       };
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     schema : schema,
                                     list : function($, cb){ cb([]); },
                                     upsert : function($, id, obj, cb){ 
@@ -194,7 +194,7 @@ describe("JsonModule", function(){
       module.wildcard.PUT($);
     });
     it ("calls options.update()", function(done){
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                      update : function($, id, obj){ 
                                        id.should.equal('1234');
@@ -222,7 +222,7 @@ describe("JsonModule", function(){
     it ("doesn't call options.update() if fetch() fails with some error", function(done){
       var headerSet = false;
       var headWritten = false;
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                     update : function($, id, obj, cb){ 
                                       should.fail('update should not be called');
@@ -250,7 +250,7 @@ describe("JsonModule", function(){
     it ("doesn't call options.update() if fetch() doesn't find the uri", function(done){
       var headerSet = false;
       var headWritten = false;
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                     update : function($, id, obj, cb){ 
                                       should.fail('update should not be called');
@@ -282,7 +282,7 @@ describe("JsonModule", function(){
     it ("calls options.update() and its callback if specified", function(done){
       var headerSet = false;
       var headWritten = false;
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                     update : function($, id, obj, cb){ 
                                       id.should.equal('1234');
@@ -325,7 +325,7 @@ describe("JsonModule", function(){
   });
   describe("handler.GET", function(){
     it("is defined when collectionGET is defined", function(done){
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     collectionGET : function($){ done(); }
                                     // missing fetch and memberGET
                                   });
@@ -337,7 +337,7 @@ describe("JsonModule", function(){
   });
   describe("wildcard.GET", function(){
     it ("doesn't exist if there's no fetch() or memberGET", function(){
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); }
                                     // missing fetch and memberGET
                                   });
@@ -346,7 +346,7 @@ describe("JsonModule", function(){
 
     });
     it ("does not output an update link if there's no update()", function(done){
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                     fetch : function($, id, cb){
                                                 id.should.equal(1234);
@@ -379,7 +379,7 @@ describe("JsonModule", function(){
 
     });
     it ("outputs a representation of a resource when fetch is defined", function(done){
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                     fetch : function($, id, cb){ 
                                                 id.should.equal(1234);
@@ -404,7 +404,7 @@ describe("JsonModule", function(){
 
     });
     it ("outputs without an update link if update() is not defined", function(done){
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                     fetch : function($, id, cb){
                                                 id.should.equal(1234);
@@ -438,7 +438,7 @@ describe("JsonModule", function(){
 
     it ("outputs with an update link if update() is defined", function(done){
       var createdUpdateLink = false;
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                     fetch : function($, id, cb){
                                                 id.should.equal(1234);
@@ -479,7 +479,7 @@ describe("JsonModule", function(){
     });
     it ("outputs with a delete link if destroy() is defined", function(done){
       var createdDeleteLink = false;
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                     fetch : function($, id, cb){
                                                 id.should.equal(1234);
@@ -515,7 +515,7 @@ describe("JsonModule", function(){
 
     });
     it ("is defined when memberGET is defined", function(done){
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                     memberGET : function($){ 
                                       done();
@@ -533,7 +533,7 @@ describe("JsonModule", function(){
     it ("doesn't exist if options has no create()", function(){
       // the router will 405 a collection POST if the handler doesn't 
       // implement .POST()
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); }
                                     // missing create : function($, obj){ ... }
                                   });
@@ -541,7 +541,7 @@ describe("JsonModule", function(){
       should.not.exist(module.handler.POST);
     });
     it ("calls options.create()", function(done){
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                      create : function($, obj){ 
                                        obj.should.eql({age:37});
@@ -557,7 +557,7 @@ describe("JsonModule", function(){
       module.handler.POST($);
     });
     it ("calls options.create() and its callback if specified", function(done){
-      var module = new JsonModule({
+      var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
                                     create : function($, obj, cb){ 
                                       obj.should.eql({age:37});

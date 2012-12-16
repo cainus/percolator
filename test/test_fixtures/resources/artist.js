@@ -1,7 +1,7 @@
-var JsonModule = require('../../../index').JsonModule;
+var CRUDCollection = require('../../../index').CRUDCollection;
 _ = require('underscore');
 
-module.exports = new JsonModule({
+module.exports = new CRUDCollection({
 
   schema : {
     description : "A musical artist",
