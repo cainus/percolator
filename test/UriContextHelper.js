@@ -156,11 +156,28 @@ describe('UriContextHelper', function(){
       u.absolute('input').should.equal('protocol://host.com/input');
     });
   });
+  describe('#queryMerge', function(){
+    it ("merges a query object into the current querystring", function(){
+      var router = { };
+      var u = new UriContextHelper(router, '/?asdf=1234&abcde=fghij#qwer');
+      u.queryMerge({test:'spa ce',asdf:4567,abcde:null}).should.equal('http://localhost/?asdf=4567&test=spa%20ce');
+    });
+  });
   describe('#child', function(){
     it ("returns the given string as a sub path of self", function(){
       var router = { };
       var u = new UriContextHelper(router, '[path]');
       u.child('asdf').should.equal('http://localhost/[path]/asdf');
+    });
+    it ("strips querystrings if applicable", function(){
+      var router = { };
+      var u = new UriContextHelper(router, 'http://localhost/tyui/tyui?qwer=qwer');
+      u.child('asdf').should.equal('http://localhost/tyui/tyui/asdf');
+    });
+    it ("strips hash bookmarks if applicable", function(){
+      var router = { };
+      var u = new UriContextHelper(router, '/asdf/asdf/#qwer');
+      u.child('asdf').should.equal('http://localhost/asdf/asdf/asdf');
     });
 
   });
