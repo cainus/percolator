@@ -6,8 +6,6 @@ var Percolator = require('../index').Percolator;
 
 /*
 TODO : 
-   can schema be re-used for validations?
-   create a badass collection object
    tarantula - finds undocumented rels, unhittable endpoints, api errors, valid urls
    viewer like jsonviewer
    api time-cost report
