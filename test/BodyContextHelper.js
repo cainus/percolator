@@ -12,12 +12,16 @@ describe("BodyContextHelper", function(){
     });
   });
   it ("sets the error param when there's an error", function(done){
+    var resumeWasCalled = false;
     var fakeReq = {
       on : function(type, cb){
         switch(type){
           case 'error' : return cb('some error');
           case 'data' : return cb("a bunch of fake data");
         }
+      },
+      resume : function(){
+        resumeWasCalled = true;
       }
     };
     var handler = {};
@@ -25,24 +29,31 @@ describe("BodyContextHelper", function(){
     bch($, handler, function(){
       $.onBody(function(err, body){
         err.should.equal('some error');
+        resumeWasCalled.should.equal(true);
         done();
       });
     });
   });
   it ("sets a body param when successful", function(done){
+    var resumeWasCalled = false;
     var fakeReq = {
       on : function(type, cb){
         switch(type){
           case 'data' : return cb("a bunch of fake data");
           case 'end' : return cb();
         }
+      },
+      resume : function(){
+        resumeWasCalled = true;
       }
+
     };
     var handler = {};
     var $ = { req : fakeReq };
     bch($, handler, function(){
       $.onBody(function(err, body){
         body.should.equal("a bunch of fake data");
+        resumeWasCalled.should.equal(true);
         done();
       });
     });
