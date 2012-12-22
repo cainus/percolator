@@ -26,16 +26,12 @@ describe("JsonBodyContextHelper", function(){
     });
   });
   it ("sets the error param when there's an error", function(done){
-    var resumeWasCalled = false;
     var fakeReq = {
       on : function(type, cb){
         switch(type){
           case 'error' : return cb('some error');
           case 'data' : return cb('{"asdf":"asdf"}');
         }
-      },
-      resume : function(){
-        resumeWasCalled = true;
       }
     };
     var handler = {};
@@ -43,22 +39,17 @@ describe("JsonBodyContextHelper", function(){
     jbch($, handler, function(){
       $.onJson(function(err, obj){
         err.should.equal('some error');
-        resumeWasCalled.should.equal(true);
         done();
       });
     });
   });
   it ("sets an obj param when successful", function(done){
-    var resumeWasCalled = false;
     var fakeReq = {
       on : function(type, cb){
         switch(type){
           case 'data' : return cb('{"asdf":"asdf"}');
           case 'end' : return cb();
         }
-      },
-      resume : function(){
-        resumeWasCalled = true;
       }
     };
     var handler = {};
@@ -66,22 +57,17 @@ describe("JsonBodyContextHelper", function(){
     jbch($, handler, function(){
       $.onJson(function(err, obj){
         obj.should.eql({asdf:"asdf"});
-        resumeWasCalled.should.equal(true);
         done();
       });
     });
   });
   it ("responds with an error if json doesn't parse", function(done){
-    var resumeWasCalled = false;
     var fakeReq = {
       on : function(type, cb){
         switch(type){
           case 'data' : return cb('{"age":37,}');
           case 'end' : return cb();
         }
-      },
-      resume : function(){
-        resumeWasCalled = true;
       }
     };
     var handler = {};
@@ -90,7 +76,6 @@ describe("JsonBodyContextHelper", function(){
                 badRequest : function(message, detail){
                   message.should.equal('invalid json.');
                   detail.should.equal('{"age":37,}');
-                  resumeWasCalled.should.equal(true);
                   done();
                 }
               }
@@ -151,7 +136,6 @@ describe("JsonBodyContextHelper", function(){
     });
   });
   it ("throws errors when input doesn't match schema", function(done){
-    var resumeWasCalled = false;
     var schema = {
              "properties": {
                 "age": {
@@ -169,9 +153,6 @@ describe("JsonBodyContextHelper", function(){
                         // mistakenly send age as a string
           case 'end' : return cb();
         }
-      },
-      resume : function(){
-        resumeWasCalled = true;
       }
     };
     var handler = {};
@@ -186,7 +167,6 @@ describe("JsonBodyContextHelper", function(){
                   // attribute: 'type',
                   // message: 'Instance is not a required type',
                   // details: [ 'number' ] } ]
-                  resumeWasCalled.should.equal(true);
                   done();
                 }
               }
