@@ -2,6 +2,19 @@ var CRUDCollection = require('../index').CRUDCollection;
 var should = require('should');
 
 describe("CRUDCollection", function(){
+    it ("sets fetch on wildcard if fetch is defined", function(){
+      var headerSet = false;
+      var headWritten = false;
+      var module = new CRUDCollection({
+                                    list : function($, cb){ 
+                                      cb([]); 
+                                    },
+                                    fetch : function($, cb){
+                                      console.log("something happened");
+                                    }
+                                  });
+      should.exist(module.wildcard.fetch);
+    });
   it ("throws an exception if there's no list() or collectionGET() passed in the options param", function(){
     try {
       var module = new CRUDCollection({});
@@ -245,66 +258,6 @@ describe("CRUDCollection", function(){
       };
       module.wildcard.PUT($);
     });
-    it ("doesn't call options.update() if fetch() fails with some error", function(done){
-      var headerSet = false;
-      var headWritten = false;
-      var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
-                                    update : function($, id, obj, cb){ 
-                                      should.fail('update should not be called');
-                                    },
-                                    fetch : function($, id, cb){
-                                      id.should.equal('1234');
-                                      cb("some error!");
-                                    }
-                                  });
-      var $ = {
-                uri : {
-                  pathEnd : function(){
-                    return '1234';
-                  }
-                },
-                status : {
-                  internalServerError : function(err){
-                    err.should.equal('some error!');
-                    done();
-                  }
-                }
-              };
-      module.wildcard.PUT($);
-    });
-    it ("doesn't call options.update() if fetch() doesn't find the uri", function(done){
-      var headerSet = false;
-      var headWritten = false;
-      var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
-                                    update : function($, id, obj, cb){ 
-                                      should.fail('update should not be called');
-                                    },
-                                    fetch : function($, id, cb){
-                                      id.should.equal('1234');
-                                      cb(true);  // returning strict true
-                                                 // means "not found"
-                                    }
-                                  });
-      var $ = {
-                req : {
-                  url : 'http://someurl'
-                },
-                uri : {
-                  pathEnd : function(){
-                    return '1234';
-                  }
-                },
-                status : {
-                  notFound : function(url){
-                    url.should.equal('http://someurl');
-                    done();
-                  }
-                }
-              };
-      module.wildcard.PUT($);
-    });
     it ("calls options.update() and its callback if specified", function(done){
       var headerSet = false;
       var headWritten = false;
@@ -374,8 +327,7 @@ describe("CRUDCollection", function(){
     it ("does not output an update link if there's no update()", function(done){
       var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
-                                    fetch : function($, id, cb){
-                                                id.should.equal(1234);
+                                    fetch : function($, cb){
                                                 cb(null, {"some":"obj"});
                                             },
                                     updateSchema : {
@@ -384,6 +336,7 @@ describe("CRUDCollection", function(){
                                   });
 
       var $ = {
+        fetched : {"some":"obj"},
         uri : {
           self : function(){return 'http://self';},
           pathEnd : function(){  return 1234; }
@@ -407,13 +360,13 @@ describe("CRUDCollection", function(){
     it ("outputs a representation of a resource when fetch is defined", function(done){
       var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
-                                    fetch : function($, id, cb){ 
-                                                id.should.equal(1234);
+                                    fetch : function($, cb){ 
                                                 cb(null, {"some":"obj"});
                                             }
                                   });
 
       var $ = {
+        fetched : {"some":"obj"},
         uri : {
           pathEnd : function(){  return 1234; }
         },
@@ -432,8 +385,7 @@ describe("CRUDCollection", function(){
     it ("outputs without an update link if update() is not defined", function(done){
       var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
-                                    fetch : function($, id, cb){
-                                                id.should.equal(1234);
+                                    fetch : function($, cb){
                                                 cb(null, {"some":"obj"});
                                             },
                                     updateSchema : {
@@ -442,6 +394,7 @@ describe("CRUDCollection", function(){
                                   });
 
       var $ = {
+        fetched : {"some":"obj"},
         uri : {
           self : function(){return 'http://self';},
           pathEnd : function(){  return 1234; }
@@ -461,13 +414,11 @@ describe("CRUDCollection", function(){
       module.wildcard.GET($);
 
     });
-
     it ("outputs with an update link if update() is defined", function(done){
       var createdUpdateLink = false;
       var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
-                                    fetch : function($, id, cb){
-                                                id.should.equal(1234);
+                                    fetch : function($, cb){
                                                 cb(null, {"some":"obj"});
                                             },
                                     update : function(){},
@@ -477,6 +428,7 @@ describe("CRUDCollection", function(){
                                   });
 
       var $ = {
+        fetched : {"some":"obj"},
         app : {
           autoLink : true
         },
@@ -507,13 +459,13 @@ describe("CRUDCollection", function(){
       var createdDeleteLink = false;
       var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
-                                    fetch : function($, id, cb){
-                                                id.should.equal(1234);
+                                    fetch : function($, cb){
                                                 cb(null, {"some":"obj"});
                                             },
                                     destroy : function(){}
                                   });
       var $ = {
+        fetched : {"some":"obj"},
         app : {
           autoLink : true
         },
