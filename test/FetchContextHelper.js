@@ -3,7 +3,7 @@ var fch = require('../index').FetchContextHelper;
 
 describe("FetchContextHelper", function(done){
   it ("does nothing if the context has no fetch method", function(done){
-    var $ = {};
+    var $ = { req : { method : "PUT" }};
     var handler = {};
     fch($, handler, function(err){
       should.not.exist(err);
@@ -13,7 +13,7 @@ describe("FetchContextHelper", function(done){
   });
   it ("runs the object's fetch method if it has one", function(done){
     var handler = { fetch : function(context, cb){ done(); }};
-    var $ = {};
+    var $ = { req : { method : "PUT" }};
     fch($, handler, function(err, fetch){
 
     });
@@ -24,10 +24,25 @@ describe("FetchContextHelper", function(done){
                         cb(null, '1234');  // we fetched 1234
                       }
             };
-    var $ = {};
+    var $ = { req : { method : "PUT" }};
     fch($, handler, function(err){
       should.not.exist(err);
       $.fetched.should.equal('1234');
+      done();
+    });
+  });
+  it ("does nothing if the method is PUT AND handler.fetchOnPUT is false", function(done){
+    var inputUrl = '';
+    var handler = {
+      fetchOnPUT : false,
+      fetch : function(context, cb){
+        should.fail("should not actually fetch!!");
+      }
+    };
+    var $ = { req : { method : "PUT" }};
+    fch($, handler, function(err){
+      should.not.exist(err);
+      should.not.exist($.fetched);
       done();
     });
   });
@@ -47,7 +62,8 @@ describe("FetchContextHelper", function(done){
                 }
               },
               req : {
-                url : '5678'
+                url : '5678',
+                method : 'GET'
               }
             };
     fch($, handler, function(){
@@ -62,6 +78,9 @@ describe("FetchContextHelper", function(done){
                       }
     };
     var $ = {
+              req : {
+                method : "PUT" 
+              },
               status : {
                 internalServerError : function(detail){ 
                   should.not.exist($.fetched);

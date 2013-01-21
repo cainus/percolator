@@ -184,6 +184,7 @@ describe("CRUDCollection", function(){
           cb(null, {"age":37});
         }
       };
+      module.wildcard.fetchOnPUT.should.equal(false);
       module.wildcard.PUT($);
     });
     it ("calls options.upsert() with its callback if it exists", function(done){
@@ -256,6 +257,7 @@ describe("CRUDCollection", function(){
           cb(null, {"age":37});
         }
       };
+      module.wildcard.fetchOnPUT.should.equal(true);
       module.wildcard.PUT($);
     });
     it ("calls options.update() and its callback if specified", function(done){
