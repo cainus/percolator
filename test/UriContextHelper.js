@@ -156,6 +156,23 @@ describe('UriContextHelper', function(){
       u.absolute('input').should.equal('protocol://host.com/input');
     });
   });
+  describe('#queryClear', function(){
+    it ("removes the query string from a url that has one", function(){
+      var router = { };
+      var u = new UriContextHelper(router, '/?asdf=1234&abcde=fghij#qwer');
+      u.queryClear().should.equal('http://localhost/');
+    });
+    it ("does nothing to urls without query strings", function(){
+      var router = { };
+      var u = new UriContextHelper(router, '/?asdf=1234&abcde=fghij#qwer');
+      u.queryClear().should.equal('http://localhost/');
+    });
+    it ("removes the query string from a given url", function(){
+      var router = { };
+      var u = new UriContextHelper(router, '/?asdf=1234&abcde=fghij#qwer');
+      u.queryClear('/also/a/test/?this=will&not=work').should.equal('http://localhost/also/a/test/');
+    });
+  });
   describe('#queryMerge', function(){
     it ("merges a query object into the current querystring", function(){
       var router = { };

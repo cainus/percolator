@@ -36,7 +36,8 @@ describe("CRUDCollection", function(){
             autoLink : true
           },
           uri : {
-            self : function(){ return 'http://self'; }
+            self : function(){ return 'http://self.com/coll'; },
+            queryClear : function(){ return 'http://self.com/coll'; }
           },
 
           jsonCollection : function(){
@@ -45,7 +46,45 @@ describe("CRUDCollection", function(){
                 return {
                   link : function(rel, href, opts){
                     rel.should.equal('create');
-                    href.should.equal('http://self');
+                    href.should.equal('http://self.com/coll');
+                    opts.should.eql({method : 'POST',
+                                     schema : { troof : true}});
+                    return {
+                      send : function(){
+                        done();
+                      }
+                    };
+                  }
+                };
+              }
+            };
+          }
+        };
+        module.handler.GET($);
+    });
+    it ("collection GET outputs a create link with no query string even if self has one", 
+      function(done){
+        var module = new CRUDCollection({
+                                      list : function($, cb){ cb(null, [{"an" : "item"}]); },
+                                      create : function($, obj){ },
+                                      schema : { troof : true}
+                                    });
+        var $ = {
+          app : {
+            autoLink : true
+          },
+          uri : {
+            self : function(){ return 'http://self.com/coll?asdf=asdf'; },
+            queryClear : function(){ return 'http://self.com/coll'; }
+          },
+
+          jsonCollection : function(){
+            return {
+              linkEach : function(rel, cb){
+                return {
+                  link : function(rel, href, opts){
+                    rel.should.equal('create');
+                    href.should.equal('http://self.com/coll');
                     opts.should.eql({method : 'POST',
                                      schema : { troof : true}});
                     return {
