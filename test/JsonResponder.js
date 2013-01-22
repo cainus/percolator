@@ -50,6 +50,24 @@ describe("JsonResponder", function(){
       fakeRes.ended.should.equal(true);
     });
   });
+  describe("#noContent", function(){
+    it ("sets the status to 204", function(){
+      var fakeRes = new FakeResponse();
+      var responder = new JsonResponder({}, fakeRes);
+      responder.noContent();
+      fakeRes.status.should.equal(204);
+      fakeRes.ended.should.equal(true);
+    });
+  });
+  describe("#resetContent", function(){
+    it ("sets the status to 205", function(){
+      var fakeRes = new FakeResponse();
+      var responder = new JsonResponder({}, fakeRes);
+      responder.resetContent();
+      fakeRes.status.should.equal(205);
+      fakeRes.ended.should.equal(true);
+    });
+  });
   describe("#movedPermanently", function(){
     it ("sets the Location header and sets the status to 301", function(){
       var fakeRes = new FakeResponse();
