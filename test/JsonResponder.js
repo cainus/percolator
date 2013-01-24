@@ -20,6 +20,48 @@ var FakeResponse = function(){
 
 describe("JsonResponder", function(){
 
+  describe("#internalServerError", function(){
+    it ("sets the status to 500 when the detail is a simple object", function(done){
+      var fakeRes = new FakeResponse();
+      var responder = new JsonResponder({}, fakeRes);
+      var expected = {type : 500,
+                      message : 'Internal Server Error',
+                      detail : {}};
+      responder.on('error', function(data){
+        data.type.should.equal(expected.type);
+        data.message.should.equal(expected.message);
+        data.detail.should.equal(expected.detail);
+        done();
+      });
+      responder.internalServerError(expected.detail);
+      fakeRes.status.should.equal(expected.type);
+      fakeRes.ended.should.equal(true);
+      fakeRes.headers['Content-Type'].should.equal("application/json");
+      var response = JSON.parse(fakeRes.body);
+      response.error.should.eql(expected);
+    });
+    it ("sets the status to 500 when the detail is a 'circular' object", function(done){
+      var fakeRes = new FakeResponse();
+      var responder = new JsonResponder({}, fakeRes);
+      var circular = {};
+      circular.circular = circular;  // this is circular, in case that's not obvious
+      var expected = {type : 500,
+                      message : 'Internal Server Error',
+                      detail : '{ circular: [Circular] }'};
+      responder.on('error', function(data){
+        data.type.should.equal(expected.type);
+        data.message.should.equal(expected.message);
+        data.detail.should.equal(expected.detail);
+        done();
+      });
+      responder.internalServerError(circular);
+      fakeRes.status.should.equal(expected.type);
+      fakeRes.ended.should.equal(true);
+      fakeRes.headers['Content-Type'].should.equal("application/json");
+      var response = JSON.parse(fakeRes.body);
+      response.error.should.eql(expected);
+    });
+  });
   describe("#badRequest", function(){
     it ("sets the status to 400", function(done){
       var fakeRes = new FakeResponse();
