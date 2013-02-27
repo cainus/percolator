@@ -4,10 +4,11 @@ exports.handler = {
 
   GET : function($){
     $.json({})
-        .link('artists', $.uri.child('artist'))
-        .link('many', $.uri.child('many'))
-        .link('qstring', $.uri.child('qstring'))
-        .link('restricted', $.uri.child('restricted'))
+        .link('artists', $.req.uri.child('artist'))
+        .link('many', $.req.uri.child('many'))
+        .link('qstring', $.req.uri.child('qstring'))
+        .link('restricted', $.req.uri.child('restricted'))
+        .link('browser', $.req.uri.child('browser'))
         .send();
   }
 
