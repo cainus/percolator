@@ -584,10 +584,12 @@ describe("CRUDCollection", function(){
                                     }
                                   });
       var $ = {
-        status : {
-          created : function(url){
-            url.should.equal('self');
-            done();
+        res : {
+          status : {
+            created : function(url){
+              url.should.equal('self');
+              done();
+            }
           }
         },
         uri : {

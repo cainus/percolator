@@ -39,10 +39,12 @@ describe("AuthenticateContextHelper", function(done){
                       }
     };
     var $ = {
-              status : {
-                unauthenticated : function(){ 
-                  should.not.exist($.authenticated);
-                  done();
+              res : {
+                status : {
+                  unauthenticated : function(){ 
+                    should.not.exist($.authenticated);
+                    done();
+                  }
                 }
               }
             };
@@ -58,11 +60,13 @@ describe("AuthenticateContextHelper", function(done){
                       }
     };
     var $ = {
-              status : {
-                internalServerError : function(detail){ 
-                  should.not.exist($.authenticated);
-                  detail.should.eql({some : 'error'});
-                  done();
+              res : {
+                status : {
+                  internalServerError : function(detail){ 
+                    should.not.exist($.authenticated);
+                    detail.should.eql({some : 'error'});
+                    done();
+                  }
                 }
               }
             };

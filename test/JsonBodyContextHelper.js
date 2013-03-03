@@ -72,12 +72,14 @@ describe("JsonBodyContextHelper", function(){
     };
     var handler = {};
     var $ = { req : fakeReq,
+              res : {
               status : {
                 badRequest : function(message, detail){
                   message.should.equal('invalid json.');
                   detail.should.equal('{"age":37,}');
                   done();
                 }
+              }
               }
              };
     jbch($, handler, function(){
@@ -114,21 +116,23 @@ describe("JsonBodyContextHelper", function(){
     };
     var handler = {};
     var $ = { req : fakeReq,
-              status : {
-                badRequest : function(message, detail){
-                  message.should.equal('json failed schema validation.');
-                  detail[0].message.should.equal('Additional properties are not allowed');
-                  // detail looks like this:
-                  // [ { uri: 'urn:uuid:167293d9-3c95-493d-826e-1bfd4146a8b9#',
-                  // schemaUri: 'urn:uuid:b7e07efd-fd80-4370-8206-9162f4c39cc9#',
-                  // attribute: 'additionalProperties',
-                  // message: 'Additional properties are not allowed',
-                  // details: false } ]
-                  resumeWasCalled = true;
-                  done();
-                }
-              }
-             };
+      res : {
+        status : {
+          badRequest : function(message, detail){
+            message.should.equal('json failed schema validation.');
+            detail[0].message.should.equal('Additional properties are not allowed');
+            // detail looks like this:
+            // [ { uri: 'urn:uuid:167293d9-3c95-493d-826e-1bfd4146a8b9#',
+            // schemaUri: 'urn:uuid:b7e07efd-fd80-4370-8206-9162f4c39cc9#',
+            // attribute: 'additionalProperties',
+            // message: 'Additional properties are not allowed',
+            // details: false } ]
+            resumeWasCalled = true;
+            done();
+          }
+        }
+      }
+    };
     jbch($, handler, function(){
       $.onJson(schema, function(err, obj){
         should.fail('should not get here');
@@ -157,20 +161,22 @@ describe("JsonBodyContextHelper", function(){
     };
     var handler = {};
     var $ = { req : fakeReq,
-              status : {
-                badRequest : function(message, detail){
-                  message.should.equal('json failed schema validation.');
-                  detail[0].details[0].should.equal('number');
-                  // detail looks like this:
-                  // [ { uri: 'urn:uuid:67ef53a9-1b09-48b1-b97d-fae313e4ee39#/age',
-                  // schemaUri: 'urn:uuid:51edca59-120a-4486-a961-0ee2aa5c276b#/properties/age',
-                  // attribute: 'type',
-                  // message: 'Instance is not a required type',
-                  // details: [ 'number' ] } ]
-                  done();
-                }
-              }
-             };
+      res : {
+        status : {
+          badRequest : function(message, detail){
+            message.should.equal('json failed schema validation.');
+            detail[0].details[0].should.equal('number');
+            // detail looks like this:
+            // [ { uri: 'urn:uuid:67ef53a9-1b09-48b1-b97d-fae313e4ee39#/age',
+            // schemaUri: 'urn:uuid:51edca59-120a-4486-a961-0ee2aa5c276b#/properties/age',
+            // attribute: 'type',
+            // message: 'Instance is not a required type',
+            // details: [ 'number' ] } ]
+            done();
+          }
+        }
+      }
+    };
     jbch($, handler, function(){
       $.onJson(schema, function(err, obj){
         should.fail('should not get here');

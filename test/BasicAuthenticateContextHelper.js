@@ -62,13 +62,13 @@ describe("AuthenticateContextHelper", function(done){
                   name.should.equal('WWW-Authenticate');
                   value.should.equal('Basic');
                   schemeHeaderSet = true;
-                }
-              },
-              status : {
-                unauthenticated : function(){ 
-                  should.not.exist($.authenticated);
-                  schemeHeaderSet.should.equal(true);
-                  done();
+                },
+                status : {
+                  unauthenticated : function(){ 
+                    should.not.exist($.authenticated);
+                    schemeHeaderSet.should.equal(true);
+                    done();
+                  }
                 }
               },
               req : {
@@ -99,13 +99,13 @@ describe("AuthenticateContextHelper", function(done){
               res : {
                 setHeader : function(name, value){
                   schemeHeaderSet = true;
-                }
-              },
-              status : {
-                unauthenticated : function(){ 
-                  should.not.exist($.authenticated);
-                  schemeHeaderSet.should.equal(true);
-                  done();
+                },
+                status : {
+                  unauthenticated : function(){ 
+                    should.not.exist($.authenticated);
+                    schemeHeaderSet.should.equal(true);
+                    done();
+                  }
                 }
               }
             };
@@ -128,13 +128,13 @@ describe("AuthenticateContextHelper", function(done){
               res : {
                 setHeader : function(name, value){
                   schemeHeaderSet = true;
-                }
-              },
-              status : {
-                unauthenticated : function(){ 
-                  should.not.exist($.authenticated);
-                  schemeHeaderSet.should.equal(true);
-                  done();
+                },
+                status : {
+                  unauthenticated : function(){ 
+                    should.not.exist($.authenticated);
+                    schemeHeaderSet.should.equal(true);
+                    done();
+                  }
                 }
               }
             };
@@ -157,13 +157,13 @@ describe("AuthenticateContextHelper", function(done){
               res : {
                 setHeader : function(name, value){
                   schemeHeaderSet = true;
-                }
-              },
-              status : {
-                internalServerError : function(detail){ 
-                  should.not.exist($.authenticated);
-                  detail.should.eql({some : 'error'});
-                  done();
+                },
+                status : {
+                  internalServerError : function(detail){ 
+                    should.not.exist($.authenticated);
+                    detail.should.eql({some : 'error'});
+                    done();
+                  }
                 }
               }
             };

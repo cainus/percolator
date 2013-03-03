@@ -54,11 +54,13 @@ describe("FetchContextHelper", function(done){
                       }
     };
     var $ = {
-              status : {
-                notFound : function(url){ 
-                  should.not.exist($.fetched);
-                  url.should.equal('5678');
-                  done();
+              res : {
+                status : {
+                  notFound : function(url){ 
+                    should.not.exist($.fetched);
+                    url.should.equal('5678');
+                    done();
+                  }
                 }
               },
               req : {
@@ -81,11 +83,13 @@ describe("FetchContextHelper", function(done){
               req : {
                 method : "PUT" 
               },
-              status : {
-                internalServerError : function(detail){ 
-                  should.not.exist($.fetched);
-                  detail.should.eql({some : 'error'});
-                  done();
+              res : {
+                status : {
+                  internalServerError : function(detail){ 
+                    should.not.exist($.fetched);
+                    detail.should.eql({some : 'error'});
+                    done();
+                  }
                 }
               }
             };
