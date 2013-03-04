@@ -356,7 +356,7 @@ describe('Percolator', function(){
                                   },
 
                                   POST : function($){
-                                    $.onBody(function(err, body){
+                                    $.req.onBody(function(err, body){
                                       body.should.equal('wakka wakka wakka');
                                       $.res.end("Hello World!");
                                     });

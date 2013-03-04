@@ -4,10 +4,10 @@ var bch = require('../index').BodyContextHelper;
 
 describe("BodyContextHelper", function(){
   it ("sets onBody on the object", function(done){
-    var $ = { };
+    var $ = { req : {}};
     var handler = {};
     bch($, handler, function(){
-      (typeof $.onBody).should.equal('function');
+      (typeof $.req.onBody).should.equal('function');
       done();
     });
   });
@@ -23,7 +23,7 @@ describe("BodyContextHelper", function(){
     var handler = {};
     var $ = { req : fakeReq };
     bch($, handler, function(){
-      $.onBody(function(err, body){
+      $.req.onBody(function(err, body){
         err.should.equal('some error');
         done();
       });
@@ -42,7 +42,7 @@ describe("BodyContextHelper", function(){
     var handler = {};
     var $ = { req : fakeReq };
     bch($, handler, function(){
-      $.onBody(function(err, body){
+      $.req.onBody(function(err, body){
         body.should.equal("a bunch of fake data");
         done();
       });
