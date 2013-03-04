@@ -210,8 +210,8 @@ describe('Percolator', function(){
     var that = this;
     this.server = new Percolator({port : 3000});
     this.server.route('/', {  GET : function($){
-                                             should.exist($.app);
-                                             $.app.port.should.equal(3000);
+                                             should.exist($.req.app);
+                                             $.req.app.port.should.equal(3000);
                                              $.res.end("Hello World!");
                                            }});
     this.server.listen(function(err){

@@ -32,8 +32,10 @@ describe("CRUDCollection", function(){
                                       schema : { troof : true}
                                     });
         var $ = {
-          app : {
-            autoLink : true
+          req : {
+            app : {
+              autoLink : true
+            }
           },
           uri : {
             self : function(){ return 'http://self.com/coll'; },
@@ -70,8 +72,10 @@ describe("CRUDCollection", function(){
                                       schema : { troof : true}
                                     });
         var $ = {
-          app : {
-            autoLink : true
+          req : {
+            app : {
+              autoLink : true
+            }
           },
           uri : {
             self : function(){ return 'http://self.com/coll?asdf=asdf'; },
@@ -107,8 +111,10 @@ describe("CRUDCollection", function(){
                                     list : function($, cb){ cb(null, { sometest : {"here" : "goes"}}); }
                                    });
       var $ = { 
-        app : {
-          autoLink : true
+        req : {
+          app : {
+            autoLink : true
+          }
         },
         jsonCollection : function(items){
           items.should.eql({ sometest: { here: 'goes' } });
@@ -470,8 +476,10 @@ describe("CRUDCollection", function(){
 
       var $ = {
         fetched : {"some":"obj"},
-        app : {
-          autoLink : true
+        req : {
+          app : {
+            autoLink : true
+          }
         },
         uri : {
           self : function(){return 'http://self';},
@@ -507,8 +515,10 @@ describe("CRUDCollection", function(){
                                   });
       var $ = {
         fetched : {"some":"obj"},
-        app : {
-          autoLink : true
+        req : {
+          app : {
+            autoLink : true
+          }
         },
         uri : {
           self : function(){return 'http://self';},
