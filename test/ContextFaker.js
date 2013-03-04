@@ -18,10 +18,10 @@ describe("ContextFaker", function(){
       done();
     });
   });
-  it ("can fake a call to $.uri.parent()", function(done){
+  it ("can fake a call to $.req.uri.parent()", function(done){
     var resource = {
       GET : function($){
-        $.json({"parentLink" : $.uri.parent()}).send();
+        $.json({"parentLink" : $.req.uri.parent()}).send();
       }
     };
     var faker = new ContextFaker("GET")
@@ -29,7 +29,7 @@ describe("ContextFaker", function(){
     faker.route( resource, function(actual){
       actual.statusCode.should.equal(200);
       JSON.parse(actual.body).should.eql(
-        {"parentLink" : 'http://localhost/'}
+        {"parentLink" : 'http://localhost'}
       );
       done();
     });

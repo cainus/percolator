@@ -39,7 +39,7 @@ module.exports = new CRUDCollection({
   },
 
   fetch : function($, cb){
-    var id = $.uri.pathEnd();
+    var id = $.req.uri.child();
     var row = $.req.app.artists[id];
     console.log("row was: ", row);
     if (!!row){

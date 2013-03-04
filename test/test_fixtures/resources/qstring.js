@@ -1,7 +1,7 @@
 exports.handler = {
 
   GET : function($){
-    $.res.end(JSON.stringify($.uri.query()));
+    $.res.end(JSON.stringify($.req.uri.query()));
   }
 
 

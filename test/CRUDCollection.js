@@ -1,5 +1,6 @@
 var CRUDCollection = require('../index').CRUDCollection;
 var should = require('should');
+var urlgrey = require('urlgrey');
 
 describe("CRUDCollection", function(){
     it ("sets fetch on wildcard if fetch is defined", function(){
@@ -33,22 +34,18 @@ describe("CRUDCollection", function(){
                                     });
         var $ = {
           req : {
+            uri : urlgrey('http://self.com/coll'),
             app : {
               autoLink : true
             }
           },
-          uri : {
-            self : function(){ return 'http://self.com/coll'; },
-            queryClear : function(){ return 'http://self.com/coll'; }
-          },
-
           jsonCollection : function(){
             return {
               linkEach : function(rel, cb){
                 return {
                   link : function(rel, href, opts){
                     rel.should.equal('create');
-                    href.should.equal('http://self.com/coll');
+                    href.toString().should.equal('http://self.com/coll');
                     opts.should.eql({method : 'POST',
                                      schema : { troof : true}});
                     return {
@@ -75,20 +72,16 @@ describe("CRUDCollection", function(){
           req : {
             app : {
               autoLink : true
-            }
+            },
+            uri : urlgrey('http://self.com/coll?asdf=asdf')
           },
-          uri : {
-            self : function(){ return 'http://self.com/coll?asdf=asdf'; },
-            queryClear : function(){ return 'http://self.com/coll'; }
-          },
-
           jsonCollection : function(){
             return {
               linkEach : function(rel, cb){
                 return {
                   link : function(rel, href, opts){
                     rel.should.equal('create');
-                    href.should.equal('http://self.com/coll');
+                    href.toString().should.equal('http://self.com/coll');
                     opts.should.eql({method : 'POST',
                                      schema : { troof : true}});
                     return {
@@ -153,10 +146,8 @@ describe("CRUDCollection", function(){
                                     }
                                   });
       var $ = {
-        uri : {
-          pathEnd : function(){
-            return '1234';
-          }
+        req : {
+          uri : urlgrey('http://self.com/coll/1234')
         }
       };
       module.wildcard.DELETE($);
@@ -171,6 +162,9 @@ describe("CRUDCollection", function(){
                                     }
                                   });
       var $ = {
+        req : {
+          uri : urlgrey('http://self.com/coll/1234')
+        },
         res : {
           writeHead : function(code){
             headWritten = true;
@@ -179,11 +173,6 @@ describe("CRUDCollection", function(){
           end : function(){
             headWritten.should.equal(true);
             done();
-          }
-        },
-        uri : {
-          pathEnd : function(){
-            return '1234';
           }
         },
         onBody : function(cb){
@@ -216,13 +205,8 @@ describe("CRUDCollection", function(){
                                     }
                                   });
       var $ = {
-        uri : {
-          self : function(){
-            return 'http://collection/1234';
-          },
-          pathEnd : function(){
-            return '1234';
-          }
+        req : {
+          uri : urlgrey('http://self.com/coll/1234')
         },
         onJson : function(schema, cb){
           schema.should.eql(schema);
@@ -247,19 +231,14 @@ describe("CRUDCollection", function(){
                                     }
                                   });
       var $ = {
-        uri : {
-          self : function(){
-            return 'http://collection/1234';
-          },
-          pathEnd : function(){
-            return '1234';
-          }
+        req : {
+          uri : urlgrey('http://self.com/coll/1234')
         },
         res : {
           setHeader : function(name, value){
             headerSet = true;
             name.should.equal('Location');
-            value.should.equal('http://collection/1234');
+            value.toString().should.equal('http://self.com/coll/1234');
           },
           writeHead : function(code){
             headWritten = true;
@@ -288,14 +267,8 @@ describe("CRUDCollection", function(){
                                      }
                                   });
       var $ = {
-        uri : {
-          self : function(){
-            return 'http://collection/1234';
-          },
-          pathEnd : function(){
-            return '1234';
-          }
-
+        req : {
+          uri : urlgrey('http://self.com/coll/1234')
         },
         onJson : function(schema, cb){
           // TODO: verify schema
@@ -317,11 +290,14 @@ describe("CRUDCollection", function(){
                                     }
                                   });
       var $ = {
+                req : {
+                  uri : urlgrey('http://self.com/coll/1234')
+                },
                 res : {
                   setHeader : function(name, value){
                     headerSet = true;
                     name.should.equal('Location');
-                    value.should.equal('http://collection/1234');
+                    value.toString().should.equal('http://self.com/coll/1234');
                   },
                   writeHead : function(code){
                     headWritten = true;
@@ -331,14 +307,6 @@ describe("CRUDCollection", function(){
                     headerSet.should.equal(true);
                     headWritten.should.equal(true);
                     done();
-                  }
-                },
-                uri : {
-                  self : function(){
-                    return 'http://collection/1234';
-                  },
-                  pathEnd : function(){
-                    return '1234';
                   }
                 },
                 onJson : function(schema, cb){
@@ -384,9 +352,8 @@ describe("CRUDCollection", function(){
 
       var $ = {
         fetched : {"some":"obj"},
-        uri : {
-          self : function(){return 'http://self';},
-          pathEnd : function(){  return 1234; }
+        req : {
+          uri : urlgrey('http://self.com/coll/1234')
         },
         json : function(obj){
           obj.should.eql({'some':'obj'});
@@ -414,8 +381,8 @@ describe("CRUDCollection", function(){
 
       var $ = {
         fetched : {"some":"obj"},
-        uri : {
-          pathEnd : function(){  return 1234; }
+        req : {
+          uri : urlgrey('http://self.com/coll/1234')
         },
         json : function(obj){
           obj.should.eql({'some':'obj'});
@@ -442,9 +409,8 @@ describe("CRUDCollection", function(){
 
       var $ = {
         fetched : {"some":"obj"},
-        uri : {
-          self : function(){return 'http://self';},
-          pathEnd : function(){  return 1234; }
+        req : {
+          uri : urlgrey('http://self/1234')
         },
         json : function(obj){
           obj.should.eql({'some':'obj'});
@@ -479,11 +445,8 @@ describe("CRUDCollection", function(){
         req : {
           app : {
             autoLink : true
-          }
-        },
-        uri : {
-          self : function(){return 'http://self';},
-          pathEnd : function(){  return 1234; }
+          },
+          uri : urlgrey('http://self/1234')
         },
         json : function(obj){
           obj.should.eql({'some':'obj'});
@@ -495,7 +458,7 @@ describe("CRUDCollection", function(){
             link : function(rel, href, opts){
               createdUpdateLink = true;
               rel.should.equal("update");
-              href.should.equal("http://self");
+              href.toString().should.equal("http://self/1234");
               opts.should.eql({method : 'PUT', schema : { name : "somename"}});
             }
           };
@@ -518,11 +481,8 @@ describe("CRUDCollection", function(){
         req : {
           app : {
             autoLink : true
-          }
-        },
-        uri : {
-          self : function(){return 'http://self';},
-          pathEnd : function(){  return 1234; }
+          },
+          uri : urlgrey('http://self/1234')
         },
         json : function(obj){
           obj.should.eql({'some':'obj'});
@@ -534,7 +494,7 @@ describe("CRUDCollection", function(){
             link : function(rel, href, opts){
               createdDeleteLink = true;
               rel.should.equal("delete");
-              href.should.equal("http://self");
+              href.toString().should.equal("http://self/1234");
               opts.should.eql({method : 'DELETE'});
             }
           };
@@ -594,17 +554,15 @@ describe("CRUDCollection", function(){
                                     }
                                   });
       var $ = {
+        req : {
+          uri : urlgrey('http://self/1234')
+        },
         res : {
           status : {
             created : function(url){
-              url.should.equal('self');
+              url.toString().should.equal('http://self/1234');
               done();
             }
-          }
-        },
-        uri : {
-          self : function(){
-            return 'self';
           }
         },
         onJson : function(schema, cb){
