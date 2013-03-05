@@ -4,23 +4,23 @@ var jbch = require('../index').JsonBodyContextHelper;
 // TODO test bad schema, successful schema, json parse error
 describe("JsonBodyContextHelper", function(){
   it ("sets onJson on the object", function(done){
-    var $ = { };
+    var $ = { req : {} };
     var handler = {};
     jbch($, handler, function(){
-      (typeof $.onJson).should.equal('function');
+      (typeof $.req.onJson).should.equal('function');
       done();
     });
   });
   it ("throws an error when called with 2+ params", function(done){
     var handler = {};
-    var $ = { };
+    var $ = { req : {} };
     jbch($, handler, function(){
       try {
-        $.onJson({}, {}, function(err, obj){
+        $.req.onJson({}, {}, function(err, obj){
           err.should.equal('some error');
         });
       } catch(ex){
-        ex.should.equal('$.onJson() was called with the wrong number of properties.');
+        ex.should.equal('$.req.onJson() was called with the wrong number of properties.');
         done();
       }
     });
@@ -37,7 +37,7 @@ describe("JsonBodyContextHelper", function(){
     var handler = {};
     var $ = { req : fakeReq };
     jbch($, handler, function(){
-      $.onJson(function(err, obj){
+      $.req.onJson(function(err, obj){
         err.should.equal('some error');
         done();
       });
@@ -55,7 +55,7 @@ describe("JsonBodyContextHelper", function(){
     var handler = {};
     var $ = { req : fakeReq };
     jbch($, handler, function(){
-      $.onJson(function(err, obj){
+      $.req.onJson(function(err, obj){
         obj.should.eql({asdf:"asdf"});
         done();
       });
@@ -83,7 +83,7 @@ describe("JsonBodyContextHelper", function(){
               }
              };
     jbch($, handler, function(){
-      $.onJson(function(err, obj){
+      $.req.onJson(function(err, obj){
         should.fail('should not get here');
       });
     });
@@ -134,7 +134,7 @@ describe("JsonBodyContextHelper", function(){
       }
     };
     jbch($, handler, function(){
-      $.onJson(schema, function(err, obj){
+      $.req.onJson(schema, function(err, obj){
         should.fail('should not get here');
       });
     });
@@ -178,7 +178,7 @@ describe("JsonBodyContextHelper", function(){
       }
     };
     jbch($, handler, function(){
-      $.onJson(schema, function(err, obj){
+      $.req.onJson(schema, function(err, obj){
         should.fail('should not get here');
       });
     });

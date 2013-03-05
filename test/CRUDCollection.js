@@ -206,11 +206,11 @@ describe("CRUDCollection", function(){
                                   });
       var $ = {
         req : {
-          uri : urlgrey('http://self.com/coll/1234')
-        },
-        onJson : function(schema, cb){
-          schema.should.eql(schema);
-          cb(null, {"age":37});
+          uri : urlgrey('http://self.com/coll/1234'),
+          onJson : function(schema, cb){
+            schema.should.eql(schema);
+            cb(null, {"age":37});
+          }
         }
       };
       module.wildcard.fetchOnPUT.should.equal(false);
@@ -232,7 +232,11 @@ describe("CRUDCollection", function(){
                                   });
       var $ = {
         req : {
-          uri : urlgrey('http://self.com/coll/1234')
+          uri : urlgrey('http://self.com/coll/1234'),
+          onJson : function(schema, cb){
+            schema.should.eql(schema);
+            cb(null, {"age":37});
+          }
         },
         res : {
           setHeader : function(name, value){
@@ -249,10 +253,6 @@ describe("CRUDCollection", function(){
             headWritten.should.equal(true);
             done();
           }
-        },
-        onJson : function(schema, cb){
-          schema.should.eql(schema);
-          cb(null, {"age":37});
         }
       };
       module.wildcard.PUT($);
@@ -268,11 +268,11 @@ describe("CRUDCollection", function(){
                                   });
       var $ = {
         req : {
-          uri : urlgrey('http://self.com/coll/1234')
-        },
-        onJson : function(schema, cb){
-          // TODO: verify schema
-          cb(null, {"age":37});
+          uri : urlgrey('http://self.com/coll/1234'),
+          onJson : function(schema, cb){
+            // TODO: verify schema
+            cb(null, {"age":37});
+          }
         }
       };
       module.wildcard.fetchOnPUT.should.equal(true);
@@ -291,7 +291,11 @@ describe("CRUDCollection", function(){
                                   });
       var $ = {
                 req : {
-                  uri : urlgrey('http://self.com/coll/1234')
+                  uri : urlgrey('http://self.com/coll/1234'),
+                  onJson : function(schema, cb){
+                    //TODO verify schema
+                    cb(null, {"age":37});
+                  }
                 },
                 res : {
                   setHeader : function(name, value){
@@ -308,12 +312,7 @@ describe("CRUDCollection", function(){
                     headWritten.should.equal(true);
                     done();
                   }
-                },
-                onJson : function(schema, cb){
-                  //TODO verify schema
-                  cb(null, {"age":37});
-                }
-              };
+                }              };
       module.wildcard.PUT($);
     });
   });
@@ -538,9 +537,11 @@ describe("CRUDCollection", function(){
                                      }
                                   });
       var $ = {
-        onJson : function(schema, cb){
-          //TODO: verify schema
-          cb(null, {"age":37});
+        req : {
+          onJson : function(schema, cb){
+            //TODO: verify schema
+            cb(null, {"age":37});
+          }
         }
       };
       module.handler.POST($);
@@ -555,7 +556,11 @@ describe("CRUDCollection", function(){
                                   });
       var $ = {
         req : {
-          uri : urlgrey('http://self/1234')
+          uri : urlgrey('http://self/1234'),
+          onJson : function(schema, cb){
+            //TODO: verify schema
+            cb(null, {"age":37});
+          }
         },
         res : {
           status : {
@@ -564,10 +569,6 @@ describe("CRUDCollection", function(){
               done();
             }
           }
-        },
-        onJson : function(schema, cb){
-          //TODO: verify schema
-          cb(null, {"age":37});
         }
       };
       module.handler.POST($);
