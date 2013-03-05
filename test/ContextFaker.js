@@ -121,7 +121,7 @@ describe("ContextFaker", function(){
         cb(null, {found : true});
       },
       GET : function($){
-        $.fetched.found.should.equal(true);
+        $.req.fetched.found.should.equal(true);
         $.res.end("YES");
       }
     };

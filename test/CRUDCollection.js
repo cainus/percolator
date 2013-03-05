@@ -350,9 +350,9 @@ describe("CRUDCollection", function(){
                                   });
 
       var $ = {
-        fetched : {"some":"obj"},
         req : {
-          uri : urlgrey('http://self.com/coll/1234')
+          uri : urlgrey('http://self.com/coll/1234'),
+          fetched : {"some":"obj"}
         },
         json : function(obj){
           obj.should.eql({'some':'obj'});
@@ -379,9 +379,9 @@ describe("CRUDCollection", function(){
                                   });
 
       var $ = {
-        fetched : {"some":"obj"},
         req : {
-          uri : urlgrey('http://self.com/coll/1234')
+          uri : urlgrey('http://self.com/coll/1234'),
+          fetched : {"some":"obj"}
         },
         json : function(obj){
           obj.should.eql({'some':'obj'});
@@ -407,9 +407,9 @@ describe("CRUDCollection", function(){
                                   });
 
       var $ = {
-        fetched : {"some":"obj"},
         req : {
-          uri : urlgrey('http://self/1234')
+          uri : urlgrey('http://self/1234'),
+          fetched : {"some":"obj"}
         },
         json : function(obj){
           obj.should.eql({'some':'obj'});
@@ -440,11 +440,11 @@ describe("CRUDCollection", function(){
                                   });
 
       var $ = {
-        fetched : {"some":"obj"},
         req : {
           app : {
             autoLink : true
           },
+          fetched : {"some":"obj"},
           uri : urlgrey('http://self/1234')
         },
         json : function(obj){
@@ -476,11 +476,11 @@ describe("CRUDCollection", function(){
                                     destroy : function(){}
                                   });
       var $ = {
-        fetched : {"some":"obj"},
         req : {
           app : {
             autoLink : true
           },
+          fetched : {"some":"obj"},
           uri : urlgrey('http://self/1234')
         },
         json : function(obj){

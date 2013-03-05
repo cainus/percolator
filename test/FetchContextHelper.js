@@ -7,7 +7,7 @@ describe("FetchContextHelper", function(done){
     var handler = {};
     fch($, handler, function(err){
       should.not.exist(err);
-      should.not.exist($.fetched);
+      should.not.exist($.req.fetched);
       done();
     });
   });
@@ -27,7 +27,7 @@ describe("FetchContextHelper", function(done){
     var $ = { req : { method : "PUT" }};
     fch($, handler, function(err){
       should.not.exist(err);
-      $.fetched.should.equal('1234');
+      $.req.fetched.should.equal('1234');
       done();
     });
   });
@@ -42,7 +42,7 @@ describe("FetchContextHelper", function(done){
     var $ = { req : { method : "PUT" }};
     fch($, handler, function(err){
       should.not.exist(err);
-      should.not.exist($.fetched);
+      should.not.exist($.req.fetched);
       done();
     });
   });
@@ -57,7 +57,7 @@ describe("FetchContextHelper", function(done){
               res : {
                 status : {
                   notFound : function(url){ 
-                    should.not.exist($.fetched);
+                    should.not.exist($.req.fetched);
                     url.should.equal('5678');
                     done();
                   }
@@ -86,7 +86,7 @@ describe("FetchContextHelper", function(done){
               res : {
                 status : {
                   internalServerError : function(detail){ 
-                    should.not.exist($.fetched);
+                    should.not.exist($.req.fetched);
                     detail.should.eql({some : 'error'});
                     done();
                   }
