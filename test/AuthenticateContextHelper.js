@@ -3,11 +3,11 @@ var fch = require('../index').AuthenticateContextHelper;
 
 describe("AuthenticateContextHelper", function(done){
   it ("does nothing if the context has no authenticate method", function(done){
-    var $ = {};
+    var $ = { req : {}};
     var handler = {};
     fch($, handler, function(err){
       should.not.exist(err);
-      should.not.exist($.authenticated);
+      should.not.exist($.req.authenticated);
       done();
     });
   });
@@ -19,7 +19,9 @@ describe("AuthenticateContextHelper", function(done){
     });
   });
   it ("sets authenticated on the object", function(done){
-    var $ = {};
+    var $ = {
+              req : {}
+    };
     var handler  = {
               authenticate : function(context, cb){
                         cb(null, '1234');  // we got 1234
@@ -27,7 +29,7 @@ describe("AuthenticateContextHelper", function(done){
             };
     fch($, handler, function(err){
       should.not.exist(err);
-      $.authenticated.should.equal('1234');
+      $.req.authenticated.should.equal('1234');
       done();
     });
   });
@@ -39,10 +41,11 @@ describe("AuthenticateContextHelper", function(done){
                       }
     };
     var $ = {
+              req : {},
               res : {
                 status : {
                   unauthenticated : function(){ 
-                    should.not.exist($.authenticated);
+                    should.not.exist($.req.authenticated);
                     done();
                   }
                 }
@@ -60,10 +63,11 @@ describe("AuthenticateContextHelper", function(done){
                       }
     };
     var $ = {
+              req : {},
               res : {
                 status : {
                   internalServerError : function(detail){ 
-                    should.not.exist($.authenticated);
+                    should.not.exist($.req.authenticated);
                     detail.should.eql({some : 'error'});
                     done();
                   }

@@ -2,13 +2,13 @@ var should = require('should');
 var bach = require('../index').BasicAuthenticateContextHelper;
 
 // TODO authenticate still needs the context
-describe("AuthenticateContextHelper", function(done){
+describe("BasicAuthenticateContextHelper", function(done){
   it ("does nothing if the context has no basicAuthenticate method", function(done){
-    var $ = {};
+    var $ = { req : {}};
     var handler = {};
     bach($, handler, function(err){
       should.not.exist(err);
-      should.not.exist($.authenticated);
+      should.not.exist($.req.authenticated);
       done();
     });
   });
@@ -48,7 +48,7 @@ describe("AuthenticateContextHelper", function(done){
             };
     bach($, handler, function(err){
       should.not.exist(err);
-      $.authenticated.should.equal('1234');
+      $.req.authenticated.should.equal('1234');
       done();
     });
   });
@@ -65,7 +65,7 @@ describe("AuthenticateContextHelper", function(done){
                 },
                 status : {
                   unauthenticated : function(){ 
-                    should.not.exist($.authenticated);
+                    should.not.exist($.req.authenticated);
                     schemeHeaderSet.should.equal(true);
                     done();
                   }
@@ -102,7 +102,7 @@ describe("AuthenticateContextHelper", function(done){
                 },
                 status : {
                   unauthenticated : function(){ 
-                    should.not.exist($.authenticated);
+                    should.not.exist($.req.authenticated);
                     schemeHeaderSet.should.equal(true);
                     done();
                   }
@@ -131,7 +131,7 @@ describe("AuthenticateContextHelper", function(done){
                 },
                 status : {
                   unauthenticated : function(){ 
-                    should.not.exist($.authenticated);
+                    should.not.exist($.req.authenticated);
                     schemeHeaderSet.should.equal(true);
                     done();
                   }
@@ -160,7 +160,7 @@ describe("AuthenticateContextHelper", function(done){
                 },
                 status : {
                   internalServerError : function(detail){ 
-                    should.not.exist($.authenticated);
+                    should.not.exist($.req.authenticated);
                     detail.should.eql({some : 'error'});
                     done();
                   }
