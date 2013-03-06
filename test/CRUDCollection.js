@@ -354,17 +354,19 @@ describe("CRUDCollection", function(){
           uri : urlgrey('http://self.com/coll/1234'),
           fetched : {"some":"obj"}
         },
-        json : function(obj){
-          obj.should.eql({'some':'obj'});
-          return {
-            send : function(thing){
-              done();
-            },
-            link : function(rel, href, opts){
-              console.log(arguments);
-              should.fail("there should be no additional calls to link() because there's not update() method.");
-            }
-          };
+        res : {
+          object : function(obj){
+            obj.should.eql({'some':'obj'});
+            return {
+              send : function(thing){
+                done();
+              },
+              link : function(rel, href, opts){
+                console.log(arguments);
+                should.fail("there should be no additional calls to link() because there's not update() method.");
+              }
+            };
+          }
         }
       };
       module.wildcard.GET($);
@@ -383,13 +385,15 @@ describe("CRUDCollection", function(){
           uri : urlgrey('http://self.com/coll/1234'),
           fetched : {"some":"obj"}
         },
-        json : function(obj){
-          obj.should.eql({'some':'obj'});
-          return {
-            send : function(thing){
-              done();
-            }
-          };
+        res : {
+          object : function(obj){
+            obj.should.eql({'some':'obj'});
+            return {
+              send : function(thing){
+                done();
+              }
+            };
+          }
         }
       };
       module.wildcard.GET($);
@@ -411,16 +415,18 @@ describe("CRUDCollection", function(){
           uri : urlgrey('http://self/1234'),
           fetched : {"some":"obj"}
         },
-        json : function(obj){
-          obj.should.eql({'some':'obj'});
-          return {
-            send : function(thing){
-              done();
-            },
-            link : function(rel, href, opts){
-              should.fail("no link should be added!");
-            }
-          };
+        res : {
+          object : function(obj){
+            obj.should.eql({'some':'obj'});
+            return {
+              send : function(thing){
+                done();
+              },
+              link : function(rel, href, opts){
+                should.fail("no link should be added!");
+              }
+            };
+          }
         }
       };
       module.wildcard.GET($);
@@ -447,20 +453,22 @@ describe("CRUDCollection", function(){
           fetched : {"some":"obj"},
           uri : urlgrey('http://self/1234')
         },
-        json : function(obj){
-          obj.should.eql({'some':'obj'});
-          return {
-            send : function(thing){
-              createdUpdateLink.should.equal(true);
-              done();
-            },
-            link : function(rel, href, opts){
-              createdUpdateLink = true;
-              rel.should.equal("update");
-              href.toString().should.equal("http://self/1234");
-              opts.should.eql({method : 'PUT', schema : { name : "somename"}});
-            }
-          };
+        res : {
+          object : function(obj){
+            obj.should.eql({'some':'obj'});
+            return {
+              send : function(thing){
+                createdUpdateLink.should.equal(true);
+                done();
+              },
+              link : function(rel, href, opts){
+                createdUpdateLink = true;
+                rel.should.equal("update");
+                href.toString().should.equal("http://self/1234");
+                opts.should.eql({method : 'PUT', schema : { name : "somename"}});
+              }
+            };
+          }
         }
       };
       module.wildcard.GET($);
@@ -483,20 +491,22 @@ describe("CRUDCollection", function(){
           fetched : {"some":"obj"},
           uri : urlgrey('http://self/1234')
         },
-        json : function(obj){
-          obj.should.eql({'some':'obj'});
-          return {
-            send : function(thing){
-              createdDeleteLink.should.equal(true);
-              done();
-            },
-            link : function(rel, href, opts){
-              createdDeleteLink = true;
-              rel.should.equal("delete");
-              href.toString().should.equal("http://self/1234");
-              opts.should.eql({method : 'DELETE'});
-            }
-          };
+        res : {
+          object : function(obj){
+            obj.should.eql({'some':'obj'});
+            return {
+              send : function(thing){
+                createdDeleteLink.should.equal(true);
+                done();
+              },
+              link : function(rel, href, opts){
+                createdDeleteLink = true;
+                rel.should.equal("delete");
+                href.toString().should.equal("http://self/1234");
+                opts.should.eql({method : 'DELETE'});
+              }
+            };
+          }
         }
       };
       module.wildcard.GET($);

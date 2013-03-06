@@ -10,7 +10,7 @@ exports.handler = {
   },
 
   GET : function(req, res){
-    res.end("Access granted!");
+    res.object({accessGranted:true}).send();
   }
 
 };

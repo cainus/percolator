@@ -5,7 +5,7 @@ describe("ContextFaker", function(){
   it ("fakes a 200 response", function(done){
     var resource = {
       GET : function($){
-        $.json({"this" : "is", "a" : "test"}).send();
+        $.res.object({"this" : "is", "a" : "test"}).send();
       }
     };
     var faker = new ContextFaker("GET")
@@ -21,7 +21,7 @@ describe("ContextFaker", function(){
   it ("can fake a call to $.req.uri.parent()", function(done){
     var resource = {
       GET : function($){
-        $.json({"parentLink" : $.req.uri.parent()}).send();
+        $.res.object({"parentLink" : $.req.uri.parent()}).send();
       }
     };
     var faker = new ContextFaker("GET")
@@ -38,7 +38,7 @@ describe("ContextFaker", function(){
     var resource = {
       GET : function($){
         setTimeout(function(){
-          $.json({"this" : "is", "a" : "test"}).send();
+          $.res.object({"this" : "is", "a" : "test"}).send();
         }, 20);
       }
     };
@@ -62,7 +62,7 @@ describe("ContextFaker", function(){
         $.req.on('end', function(data){
           body += data;
           body.should.eql('{"incoming":"test"}');
-          $.json({ok : true}).send();
+          $.res.object({ok : true}).send();
         });
       }
     };
@@ -81,7 +81,7 @@ describe("ContextFaker", function(){
     var resource = {
       GET : function($){
         $.req.headers.test.should.equal('header');
-        $.json({"this" : "is", "a" : "test"}).send();
+        $.res.object({"this" : "is", "a" : "test"}).send();
       }
     };
     var faker = new ContextFaker("GET")
@@ -100,7 +100,7 @@ describe("ContextFaker", function(){
       GET : function($){
         $.req.headers.test.should.equal('header');
         $.req.headers.test2.should.equal('header2');
-        $.json({"this" : "is", "a" : "test"}).send();
+        $.res.object({"this" : "is", "a" : "test"}).send();
       }
     };
     var faker = new ContextFaker("GET")

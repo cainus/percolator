@@ -2,7 +2,7 @@ var Percolator = require('./index').Percolator;
 
 var server = new Percolator();
 server.route('/', function($){
-                  $.json({hello : "world!"})
+                  $.res.object({hello : "world!"})
                    .send();
                   });
 server.listen(function(err){
