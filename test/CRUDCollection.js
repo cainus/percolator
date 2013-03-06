@@ -39,24 +39,26 @@ describe("CRUDCollection", function(){
               autoLink : true
             }
           },
-          jsonCollection : function(){
-            return {
-              linkEach : function(rel, cb){
+          res : {
+            collection : function(){
                 return {
-                  link : function(rel, href, opts){
-                    rel.should.equal('create');
-                    href.toString().should.equal('http://self.com/coll');
-                    opts.should.eql({method : 'POST',
-                                     schema : { troof : true}});
+                  linkEach : function(rel, cb){
                     return {
-                      send : function(){
-                        done();
+                      link : function(rel, href, opts){
+                        rel.should.equal('create');
+                        href.toString().should.equal('http://self.com/coll');
+                        opts.should.eql({method : 'POST',
+                                         schema : { troof : true}});
+                        return {
+                          send : function(){
+                            done();
+                          }
+                        };
                       }
                     };
                   }
-                };
-              }
-            };
+              };
+            }
           }
         };
         module.handler.GET($);
@@ -75,24 +77,26 @@ describe("CRUDCollection", function(){
             },
             uri : urlgrey('http://self.com/coll?asdf=asdf')
           },
-          jsonCollection : function(){
-            return {
-              linkEach : function(rel, cb){
-                return {
-                  link : function(rel, href, opts){
-                    rel.should.equal('create');
-                    href.toString().should.equal('http://self.com/coll');
-                    opts.should.eql({method : 'POST',
-                                     schema : { troof : true}});
-                    return {
-                      send : function(){
-                        done();
-                      }
-                    };
-                  }
-                };
-              }
-            };
+          res : {
+            collection : function(){
+              return {
+                linkEach : function(rel, cb){
+                  return {
+                    link : function(rel, href, opts){
+                      rel.should.equal('create');
+                      href.toString().should.equal('http://self.com/coll');
+                      opts.should.eql({method : 'POST',
+                                       schema : { troof : true}});
+                      return {
+                        send : function(){
+                          done();
+                        }
+                      };
+                    }
+                  };
+                }
+              };
+            }
           }
         };
         module.handler.GET($);
@@ -109,18 +113,20 @@ describe("CRUDCollection", function(){
             autoLink : true
           }
         },
-        jsonCollection : function(items){
-          items.should.eql({ sometest: { here: 'goes' } });
-          return {
-            linkEach : function(rel, cb){
-              rel.should.equal('self');
-              return {
-                send : function(){
-                  done();
-                }
-              };
-            }
-          };
+        res : {
+          collection : function(items){
+            items.should.eql({ sometest: { here: 'goes' } });
+            return {
+              linkEach : function(rel, cb){
+                rel.should.equal('self');
+                return {
+                  send : function(){
+                    done();
+                  }
+                };
+              }
+            };
+          }
         }
       };
       module.handler.GET($);

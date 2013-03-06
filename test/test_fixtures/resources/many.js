@@ -1,6 +1,6 @@
 exports.handler = {
   GET : function($){
-    $.jsonCollection([{"hello" : "collectors", "links" : $.req.uri.child('1234')}])
+    $.res.collection([{"hello" : "collectors", "links" : $.req.uri.child('1234')}])
       .send();
   }
 };
