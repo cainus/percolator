@@ -27,6 +27,10 @@ app.artists = {
   2 : {"name" : "Joe Strummer", created : new Date()}
 };
 
+
+app.teas = [{name : "Earl Grey"}, {name : "Orange Pekoe"}, {name : "Lemon Zinger"}, {name : "English Breakfast"}];
+app.teas = _.map(app.teas, function(tea){ tea.created = new Date(); return tea; });
+
 var server = new Percolator(app);
 server.onRequest(function(handler, context, cb){
   console.log(' <-- ', context.req.method, ' ', context.req.url);
