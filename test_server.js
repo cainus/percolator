@@ -1,6 +1,6 @@
 var _ = require('underscore');
 var Percolator = require('./index').Percolator;
-var BasicAuthenticateContextHelper = require('./index').BasicAuthenticateContextHelper;
+var BasicAuthenticateHelper = require('./index').BasicAuthenticateHelper;
 
 // TODO collections proof-of-concept - POST, PUT, DELETE
 // TODO make status man do conneg
@@ -36,7 +36,7 @@ server.onRequest(function(handler, context, cb){
   console.log(' <-- ', context.req.method, ' ', context.req.url);
   // TODO context helpers take params in a different order than onRequest provides them?
   // this is confusing
-  BasicAuthenticateContextHelper(context, handler, function(){
+  BasicAuthenticateHelper(context.req, context.res, handler, function(){
     cb(context);
   });
 });

@@ -10,8 +10,8 @@ exports.HyperJson = require(dir + 'HyperJson');
 exports.HyperJsonCollection = require(dir + 'HyperJsonCollection');
 exports.CRUDCollection = require(dir + 'CRUDCollection');
 
-exports.AuthenticateContextHelper = require(helperDir + 'Authenticate');
-exports.BasicAuthenticateContextHelper = require(helperDir + 'BasicAuthenticate');
+exports.AuthenticateHelper = require(helperDir + 'Authenticate');
+exports.BasicAuthenticateHelper = require(helperDir + 'BasicAuthenticate');
 exports.JsonContextHelper = require(helperDir + 'Json');
 exports.onBodyHelper = require(helperDir + 'onBody');
 exports.JsonBodyContextHelper = require(helperDir + 'JsonBody');

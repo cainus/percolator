@@ -1,7 +1,7 @@
 
 exports.handler = {
 
-  basicAuthenticate : function(login, pass, $, cb){
+  basicAuthenticate : function(login, pass, req, res, cb){
     if (login === "login" && pass === "password"){
       cb(null, true);
     } else {
