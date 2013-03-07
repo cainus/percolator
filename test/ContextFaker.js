@@ -117,7 +117,7 @@ describe("ContextFaker", function(){
   });
   it ("fakes a 200 request to a module that implements fetch()", function(done){
     var resource = {
-      fetch : function($, cb){
+      fetch : function(req, res, cb){
         cb(null, {found : true});
       },
       GET : function($){
@@ -135,7 +135,7 @@ describe("ContextFaker", function(){
   });
   it ("fakes a 404 request to a module that implements fetch()", function(done){
     var resource = {
-      fetch : function($, cb){
+      fetch : function(req, res, cb){
         cb(true);
       },
       GET : function($){
@@ -157,7 +157,7 @@ describe("ContextFaker", function(){
   });
   it ("fakes a 500 request to a module that implements fetch()", function(done){
     var resource = {
-      fetch : function($, cb){
+      fetch : function(req, res, cb){
         cb("something weird happened");
       },
       GET : function($){

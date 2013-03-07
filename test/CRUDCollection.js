@@ -10,7 +10,7 @@ describe("CRUDCollection", function(){
                                     list : function($, cb){ 
                                       cb([]); 
                                     },
-                                    fetch : function($, cb){
+                                    fetch : function(req, res, cb){
                                       console.log("something happened");
                                     }
                                   });
@@ -347,7 +347,7 @@ describe("CRUDCollection", function(){
     it ("does not output an update link if there's no update()", function(done){
       var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
-                                    fetch : function($, cb){
+                                    fetch : function(req, res, cb){
                                                 cb(null, {"some":"obj"});
                                             },
                                     updateSchema : {
@@ -381,7 +381,7 @@ describe("CRUDCollection", function(){
     it ("outputs a representation of a resource when fetch is defined", function(done){
       var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
-                                    fetch : function($, cb){ 
+                                    fetch : function(req, res, cb){ 
                                                 cb(null, {"some":"obj"});
                                             }
                                   });
@@ -408,7 +408,7 @@ describe("CRUDCollection", function(){
     it ("outputs without an update link if update() is not defined", function(done){
       var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
-                                    fetch : function($, cb){
+                                    fetch : function(req, res, cb){
                                                 cb(null, {"some":"obj"});
                                             },
                                     updateSchema : {
@@ -442,7 +442,7 @@ describe("CRUDCollection", function(){
       var createdUpdateLink = false;
       var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
-                                    fetch : function($, cb){
+                                    fetch : function(req, res, cb){
                                                 cb(null, {"some":"obj"});
                                             },
                                     update : function(){},
@@ -484,7 +484,7 @@ describe("CRUDCollection", function(){
       var createdDeleteLink = false;
       var module = new CRUDCollection({
                                     list : function($, cb){ cb([]); },
-                                    fetch : function($, cb){
+                                    fetch : function(req, res, cb){
                                                 cb(null, {"some":"obj"});
                                             },
                                     destroy : function(){}

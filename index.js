@@ -15,6 +15,6 @@ exports.BasicAuthenticateContextHelper = require(helperDir + 'BasicAuthenticate'
 exports.JsonContextHelper = require(helperDir + 'Json');
 exports.onBodyHelper = require(helperDir + 'onBody');
 exports.JsonBodyContextHelper = require(helperDir + 'JsonBody');
-exports.FetchContextHelper = require(helperDir + 'Fetch');
+exports.FetchHelper = require(helperDir + 'Fetch');
 exports.ContextFaker = require(dir + 'ContextFaker');
 exports.Percolator = require(dir + 'Percolator');
