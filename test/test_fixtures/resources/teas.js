@@ -15,26 +15,26 @@ module.exports = new CRUDCollection({
     }
   },
 
-  create : function($, obj, cb){
+  create : function(req, res, obj, cb){
     console.log('creating: ', obj);
     obj.created = new Date();
-    $.req.app.teas.push(obj);
+    req.app.teas.push(obj);
     cb();
   },
 
-  update : function($, id, obj, cb){
+  update : function(req, res, id, obj, cb){
     console.log('updating: ', id, obj);
-    $.req.app.teas[id] = obj;
+    req.app.teas[id] = obj;
     cb();
   },
 
-  destroy : function($, id, cb){
-    delete $.req.app.teas[id];
+  destroy : function(req, res, id, cb){
+    delete req.app.teas[id];
     cb();
   },
 
-  list : function($, cb){
-    cb(null, $.req.app.teas, 'name');
+  list : function(req, res, cb){
+    cb(null, req.app.teas, 'name');
   },
 
   fetch : function(req, res, cb){

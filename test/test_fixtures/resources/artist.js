@@ -15,27 +15,27 @@ module.exports = new CRUDCollection({
     }
   },
 
-  create : function($, obj, cb){
+  create : function(req, res, obj, cb){
     console.log('creating: ', obj);
     obj.created = new Date();
-    var newKey = parseInt(_.max(_.keys($.req.app.artists)), 10) + 1;
-    $.req.app.artists[newKey] = obj;
+    var newKey = parseInt(_.max(_.keys(req.app.artists)), 10) + 1;
+    req.app.artists[newKey] = obj;
     cb();
   },
 
-  update : function($, id, obj, cb){
+  update : function(req, res, id, obj, cb){
     console.log('updating: ', id, obj);
-    $.req.app.artists[id] = obj;
+    req.app.artists[id] = obj;
     cb();
   },
 
-  destroy : function($, id, cb){
-    delete $.req.app.artists[id];
+  destroy : function(req, res, id, cb){
+    delete req.app.artists[id];
     cb();
   },
 
-  list : function($, cb){
-    cb(null, $.req.app.artists);
+  list : function(req, res, cb){
+    cb(null, req.app.artists);
   },
 
   fetch : function(req, res, cb){

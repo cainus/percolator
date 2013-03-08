@@ -7,7 +7,7 @@ describe("CRUDCollection", function(){
       var headerSet = false;
       var headWritten = false;
       var module = new CRUDCollection({
-                                    list : function($, cb){ 
+                                    list : function(req, res, cb){ 
                                       cb([]); 
                                     },
                                     fetch : function(req, res, cb){
@@ -28,18 +28,17 @@ describe("CRUDCollection", function(){
   describe("when schema is set", function(){
     it ("collection GET outputs a create link", function(done){
         var module = new CRUDCollection({
-                                      list : function($, cb){ cb(null, [{"an" : "item"}]); },
-                                      create : function($, obj){ },
+                                      list : function(req, res, cb){ cb(null, [{"an" : "item"}]); },
+                                      create : function(req, res, obj){ },
                                       schema : { troof : true}
                                     });
-        var $ = {
-          req : {
+        var req = {
             uri : urlgrey('http://self.com/coll'),
             app : {
               autoLink : true
             }
-          },
-          res : {
+          };
+        var res = {
             collection : function(){
                 return {
                   linkEach : function(rel, cb){
@@ -59,25 +58,23 @@ describe("CRUDCollection", function(){
                   }
               };
             }
-          }
         };
-        module.handler.GET($);
+        module.handler.GET(req, res);
     });
     it ("collection GET outputs a create link with no query string even if self has one", 
       function(done){
         var module = new CRUDCollection({
-                                      list : function($, cb){ cb(null, [{"an" : "item"}]); },
-                                      create : function($, obj){ },
+                                      list : function(req, res, cb){ cb(null, [{"an" : "item"}]); },
+                                      create : function(req, res, obj){ },
                                       schema : { troof : true}
                                     });
-        var $ = {
-          req : {
+        var req = {
             app : {
               autoLink : true
             },
             uri : urlgrey('http://self.com/coll?asdf=asdf')
-          },
-          res : {
+          };
+        var res = {
             collection : function(){
               return {
                 linkEach : function(rel, cb){
@@ -97,23 +94,21 @@ describe("CRUDCollection", function(){
                 }
               };
             }
-          }
         };
-        module.handler.GET($);
+        module.handler.GET(req, res);
     });
   });
   describe("collection.GET", function(){
     it ("creates self links in all items", function(done){
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb(null, { sometest : {"here" : "goes"}}); }
+                                    list : function(req, res, cb){ cb(null, { sometest : {"here" : "goes"}}); }
                                    });
-      var $ = { 
-        req : {
+      var req = {
           app : {
             autoLink : true
           }
-        },
-        res : {
+        };
+      var res = {
           collection : function(items){
             items.should.eql({ sometest: { here: 'goes' } });
             return {
@@ -127,9 +122,8 @@ describe("CRUDCollection", function(){
               }
             };
           }
-        }
       };
-      module.handler.GET($);
+      module.handler.GET(req, res);
     });
   });
   describe("wildcard.DELETE", function(){
@@ -137,41 +131,36 @@ describe("CRUDCollection", function(){
       // the router will 405 a wildcard PUT if the handler doesn't
       // implement .DELETE()
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); }
-                                    // missing destroy : function($, id, obj){ ... }
+                                    list : function(req, res, cb){ cb([]); }
+                                    // missing destroy : function(req, res, id, obj){ ... }
                                    });
 
       should.not.exist(module.wildcard.DELETE);
     });
     it ("calls options.destroy()", function(done){
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
-                                    destroy : function($, id, cb){ 
+                                    list : function(req, res, cb){ cb([]); },
+                                    destroy : function(req, res, id, cb){ 
                                       id.should.equal('1234');
                                       done();
                                     }
                                   });
-      var $ = {
-        req : {
+      var req = {
           uri : urlgrey('http://self.com/coll/1234')
-        }
       };
-      module.wildcard.DELETE($);
+      var res = {};
+      module.wildcard.DELETE(req, res);
     });
     it ("calls options.destroy() and its callback if specified", function(done){
       var headWritten = false;
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
-                                    destroy : function($, id, cb){ 
+                                    list : function(req, res, cb){ cb([]); },
+                                    destroy : function(req, res, id, cb){ 
                                       id.should.equal('1234');
                                       return cb();
                                     }
                                   });
-      var $ = {
-        req : {
-          uri : urlgrey('http://self.com/coll/1234')
-        },
-        res : {
+      var res = {
           writeHead : function(code){
             headWritten = true;
             code.should.equal(204);
@@ -180,12 +169,14 @@ describe("CRUDCollection", function(){
             headWritten.should.equal(true);
             done();
           }
-        },
+      };
+      var req = {
+        uri : urlgrey('http://self.com/coll/1234'),
         onBody : function(cb){
           cb(null, '{"age":37}');
         }
       };
-      module.wildcard.DELETE($);
+      module.wildcard.DELETE(req, res);
     });
   });
   describe("wildcard.PUT", function(){
@@ -193,8 +184,8 @@ describe("CRUDCollection", function(){
       // the router will 405 a wildcard PUT if the handler doesn't
       // implement .PUT()
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); }
-                                    // missing update : function($, id, obj){ ... }
+                                    list : function(req, res, cb){ cb([]); }
+                                    // missing update : function(req, res, id, obj){ ... }
                                    });
       should.not.exist(module.wildcard.PUT);
     });
@@ -204,23 +195,22 @@ describe("CRUDCollection", function(){
       };
       var module = new CRUDCollection({
                                     schema : schema,
-                                    list : function($, cb){ cb([]); },
-                                    upsert : function($, id, obj){ 
+                                    list : function(req, res, cb){ cb([]); },
+                                    upsert : function(req, res, id, obj){ 
                                       obj.should.eql({age:37});
                                       done();
                                     }
                                   });
-      var $ = {
-        req : {
+      var req = {
           uri : urlgrey('http://self.com/coll/1234'),
           onJson : function(schema, cb){
             schema.should.eql(schema);
             cb(null, {"age":37});
           }
-        }
       };
+      var res = {};
       module.wildcard.fetchOnPUT.should.equal(false);
-      module.wildcard.PUT($);
+      module.wildcard.PUT(req, res);
     });
     it ("calls options.upsert() with its callback if it exists", function(done){
       var headerSet = false;
@@ -230,21 +220,20 @@ describe("CRUDCollection", function(){
       };
       var module = new CRUDCollection({
                                     schema : schema,
-                                    list : function($, cb){ cb([]); },
-                                    upsert : function($, id, obj, cb){ 
+                                    list : function(req, res, cb){ cb([]); },
+                                    upsert : function(req, res, id, obj, cb){ 
                                       obj.should.eql({age:37});
                                       cb();
                                     }
                                   });
-      var $ = {
-        req : {
+      var req = {
           uri : urlgrey('http://self.com/coll/1234'),
           onJson : function(schema, cb){
             schema.should.eql(schema);
             cb(null, {"age":37});
           }
-        },
-        res : {
+      };
+      var res = {
           setHeader : function(name, value){
             headerSet = true;
             name.should.equal('Location');
@@ -259,51 +248,48 @@ describe("CRUDCollection", function(){
             headWritten.should.equal(true);
             done();
           }
-        }
       };
-      module.wildcard.PUT($);
+      module.wildcard.PUT(req, res);
     });
     it ("calls options.update()", function(done){
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
-                                     update : function($, id, obj){ 
+                                    list : function(req, res, cb){ cb([]); },
+                                     update : function(req, res, id, obj){ 
                                        id.should.equal('1234');
                                        obj.should.eql({age:37});
                                        done();
                                      }
                                   });
-      var $ = {
-        req : {
+      var req = {
           uri : urlgrey('http://self.com/coll/1234'),
           onJson : function(schema, cb){
             // TODO: verify schema
             cb(null, {"age":37});
           }
-        }
       };
+      var res = {};
       module.wildcard.fetchOnPUT.should.equal(true);
-      module.wildcard.PUT($);
+      module.wildcard.PUT(req, res);
     });
     it ("calls options.update() and its callback if specified", function(done){
       var headerSet = false;
       var headWritten = false;
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
-                                    update : function($, id, obj, cb){ 
+                                    list : function(req, res, cb){ cb([]); },
+                                    update : function(req, res, id, obj, cb){ 
                                       id.should.equal('1234');
                                       obj.should.eql({age:37});
                                       return cb();
                                     }
                                   });
-      var $ = {
-                req : {
+      var req = {
                   uri : urlgrey('http://self.com/coll/1234'),
                   onJson : function(schema, cb){
                     //TODO verify schema
                     cb(null, {"age":37});
                   }
-                },
-                res : {
+                };
+      var res = {
                   setHeader : function(name, value){
                     headerSet = true;
                     name.should.equal('Location');
@@ -318,26 +304,27 @@ describe("CRUDCollection", function(){
                     headWritten.should.equal(true);
                     done();
                   }
-                }              };
-      module.wildcard.PUT($);
+      };
+      module.wildcard.PUT(req, res);
     });
   });
   describe("handler.GET", function(){
     it("is defined when collectionGET is defined", function(done){
       var module = new CRUDCollection({
-                                    collectionGET : function($){ done(); }
+                                    collectionGET : function(req, res){ done(); }
                                     // missing fetch and memberGET
                                   });
 
       should.exist(module.handler.GET);
-      var $ = {};
-      module.handler.GET($);
+      var req = {};
+      var res = {};
+      module.handler.GET(req, res);
     });
   });
   describe("wildcard.GET", function(){
     it ("doesn't exist if there's no fetch() or memberGET", function(){
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); }
+                                    list : function(req, res, cb){ cb([]); }
                                     // missing fetch and memberGET
                                   });
 
@@ -346,7 +333,7 @@ describe("CRUDCollection", function(){
     });
     it ("does not output an update link if there's no update()", function(done){
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
+                                    list : function(req, res, cb){ cb([]); },
                                     fetch : function(req, res, cb){
                                                 cb(null, {"some":"obj"});
                                             },
@@ -355,12 +342,11 @@ describe("CRUDCollection", function(){
                                     }
                                   });
 
-      var $ = {
-        req : {
+      var req = {
           uri : urlgrey('http://self.com/coll/1234'),
           fetched : {"some":"obj"}
-        },
-        res : {
+      };
+      var res = {
           object : function(obj){
             obj.should.eql({'some':'obj'});
             return {
@@ -373,25 +359,23 @@ describe("CRUDCollection", function(){
               }
             };
           }
-        }
       };
-      module.wildcard.GET($);
+      module.wildcard.GET(req, res);
 
     });
     it ("outputs a representation of a resource when fetch is defined", function(done){
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
+                                    list : function(req, res, cb){ cb([]); },
                                     fetch : function(req, res, cb){ 
                                                 cb(null, {"some":"obj"});
                                             }
                                   });
 
-      var $ = {
-        req : {
+      var req = {
           uri : urlgrey('http://self.com/coll/1234'),
           fetched : {"some":"obj"}
-        },
-        res : {
+      };
+      var res = {
           object : function(obj){
             obj.should.eql({'some':'obj'});
             return {
@@ -400,14 +384,13 @@ describe("CRUDCollection", function(){
               }
             };
           }
-        }
       };
-      module.wildcard.GET($);
+      module.wildcard.GET(req, res);
 
     });
     it ("outputs without an update link if update() is not defined", function(done){
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
+                                    list : function(req, res, cb){ cb([]); },
                                     fetch : function(req, res, cb){
                                                 cb(null, {"some":"obj"});
                                             },
@@ -416,12 +399,11 @@ describe("CRUDCollection", function(){
                                     }
                                   });
 
-      var $ = {
-        req : {
+      var req = {
           uri : urlgrey('http://self/1234'),
           fetched : {"some":"obj"}
-        },
-        res : {
+      };
+      var res = {
           object : function(obj){
             obj.should.eql({'some':'obj'});
             return {
@@ -433,15 +415,14 @@ describe("CRUDCollection", function(){
               }
             };
           }
-        }
       };
-      module.wildcard.GET($);
+      module.wildcard.GET(req, res);
 
     });
     it ("outputs with an update link if update() is defined", function(done){
       var createdUpdateLink = false;
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
+                                    list : function(req, res, cb){ cb([]); },
                                     fetch : function(req, res, cb){
                                                 cb(null, {"some":"obj"});
                                             },
@@ -451,15 +432,14 @@ describe("CRUDCollection", function(){
                                     }
                                   });
 
-      var $ = {
-        req : {
+      var req = {
           app : {
             autoLink : true
           },
           fetched : {"some":"obj"},
           uri : urlgrey('http://self/1234')
-        },
-        res : {
+        };
+      var res = {
           object : function(obj){
             obj.should.eql({'some':'obj'});
             return {
@@ -475,29 +455,27 @@ describe("CRUDCollection", function(){
               }
             };
           }
-        }
       };
-      module.wildcard.GET($);
+      module.wildcard.GET(req, res);
 
     });
     it ("outputs with a delete link if destroy() is defined", function(done){
       var createdDeleteLink = false;
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
+                                    list : function(req, res, cb){ cb([]); },
                                     fetch : function(req, res, cb){
                                                 cb(null, {"some":"obj"});
                                             },
                                     destroy : function(){}
                                   });
-      var $ = {
-        req : {
+      var req = {
           app : {
             autoLink : true
           },
           fetched : {"some":"obj"},
           uri : urlgrey('http://self/1234')
-        },
-        res : {
+      };
+      var res = {
           object : function(obj){
             obj.should.eql({'some':'obj'});
             return {
@@ -513,22 +491,21 @@ describe("CRUDCollection", function(){
               }
             };
           }
-        }
       };
-      module.wildcard.GET($);
+      module.wildcard.GET(req, res);
 
     });
     it ("is defined when memberGET is defined", function(done){
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
-                                    memberGET : function($){ 
+                                    list : function(req, res, cb){ cb([]); },
+                                    memberGET : function(req, res){ 
                                       done();
                                     }
                                   });
 
-      var $ = {
-      };
-      module.wildcard.GET($);
+      var req = { };
+      var res = { };
+      module.wildcard.GET(req, res);
 
     });
 
@@ -538,56 +515,53 @@ describe("CRUDCollection", function(){
       // the router will 405 a collection POST if the handler doesn't 
       // implement .POST()
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); }
-                                    // missing create : function($, obj){ ... }
+                                    list : function(req, res, cb){ cb([]); }
+                                    // missing create : function(req, res, obj){ ... }
                                   });
 
       should.not.exist(module.handler.POST);
     });
     it ("calls options.create()", function(done){
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
-                                     create : function($, obj){ 
+                                    list : function(req, res, cb){ cb([]); },
+                                     create : function(req, res, obj){ 
                                        obj.should.eql({age:37});
                                        done();
                                      }
                                   });
-      var $ = {
-        req : {
+      var req = {
           onJson : function(schema, cb){
             //TODO: verify schema
             cb(null, {"age":37});
           }
-        }
       };
-      module.handler.POST($);
+      var res = {};
+      module.handler.POST(req, res);
     });
     it ("calls options.create() and its callback if specified", function(done){
       var module = new CRUDCollection({
-                                    list : function($, cb){ cb([]); },
-                                    create : function($, obj, cb){ 
+                                    list : function(req, res, cb){ cb([]); },
+                                    create : function(req, res, obj, cb){ 
                                       obj.should.eql({age:37});
                                       return cb();
                                     }
                                   });
-      var $ = {
-        req : {
+      var req = {
           uri : urlgrey('http://self/1234'),
           onJson : function(schema, cb){
             //TODO: verify schema
             cb(null, {"age":37});
           }
-        },
-        res : {
+      };
+      var res = {
           status : {
             created : function(url){
               url.toString().should.equal('http://self/1234');
               done();
             }
           }
-        }
       };
-      module.handler.POST($);
+      module.handler.POST(req, res);
     });
   });
 });
