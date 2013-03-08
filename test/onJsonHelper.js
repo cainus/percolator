@@ -1,32 +1,35 @@
 var should = require('should');
-var jbch = require('../index').JsonBodyContextHelper;
+var jbch = require('../index').onJsonHelper;
 
 // TODO test bad schema, successful schema, json parse error
-describe("JsonBodyContextHelper", function(){
+describe("onJsonHelper", function(){
   it ("sets onJson on the object", function(done){
-    var $ = { req : {} };
+    var req = {};
+    var res = {};
     var handler = {};
-    jbch($, handler, function(){
-      (typeof $.req.onJson).should.equal('function');
+    jbch(req, res, handler, function(){
+      (typeof req.onJson).should.equal('function');
       done();
     });
   });
   it ("throws an error when called with 2+ params", function(done){
     var handler = {};
-    var $ = { req : {} };
-    jbch($, handler, function(){
+    var req = {};
+    var res = {};
+    jbch(req, res, handler, function(){
       try {
-        $.req.onJson({}, {}, function(err, obj){
+        req.onJson({}, {}, function(err, obj){
           err.should.equal('some error');
         });
       } catch(ex){
-        ex.should.equal('$.req.onJson() was called with the wrong number of properties.');
+        ex.should.equal('req.onJson() was called with the wrong number of properties.');
         done();
       }
     });
   });
   it ("sets the error param when there's an error", function(done){
-    var fakeReq = {
+    var res = {};
+    var req = {
       on : function(type, cb){
         switch(type){
           case 'error' : return cb('some error');
@@ -35,16 +38,16 @@ describe("JsonBodyContextHelper", function(){
       }
     };
     var handler = {};
-    var $ = { req : fakeReq };
-    jbch($, handler, function(){
-      $.req.onJson(function(err, obj){
+    jbch(req, res, handler, function(){
+      req.onJson(function(err, obj){
         err.should.equal('some error');
         done();
       });
     });
   });
   it ("sets an obj param when successful", function(done){
-    var fakeReq = {
+    var res = {};
+    var req = {
       on : function(type, cb){
         switch(type){
           case 'data' : return cb('{"asdf":"asdf"}');
@@ -53,16 +56,15 @@ describe("JsonBodyContextHelper", function(){
       }
     };
     var handler = {};
-    var $ = { req : fakeReq };
-    jbch($, handler, function(){
-      $.req.onJson(function(err, obj){
+    jbch(req, res, handler, function(){
+      req.onJson(function(err, obj){
         obj.should.eql({asdf:"asdf"});
         done();
       });
     });
   });
   it ("responds with an error if json doesn't parse", function(done){
-    var fakeReq = {
+    var req = {
       on : function(type, cb){
         switch(type){
           case 'data' : return cb('{"age":37,}');
@@ -71,8 +73,7 @@ describe("JsonBodyContextHelper", function(){
       }
     };
     var handler = {};
-    var $ = { req : fakeReq,
-              res : {
+    var res = {
               status : {
                 badRequest : function(message, detail){
                   message.should.equal('invalid json.');
@@ -80,10 +81,9 @@ describe("JsonBodyContextHelper", function(){
                   done();
                 }
               }
-              }
              };
-    jbch($, handler, function(){
-      $.req.onJson(function(err, obj){
+    jbch(req, res, handler, function(){
+      req.onJson(function(err, obj){
         should.fail('should not get here');
       });
     });
@@ -101,7 +101,7 @@ describe("JsonBodyContextHelper", function(){
               },
               "additionalProperties" : false
             };
-    var fakeReq = {
+    var req = {
       on : function(type, cb){
         switch(type){
           case 'data' : return cb('{"age":37, "name":"GDizzle", "wrong" : "wrong"}');
@@ -115,8 +115,7 @@ describe("JsonBodyContextHelper", function(){
       }
     };
     var handler = {};
-    var $ = { req : fakeReq,
-      res : {
+    var res = {
         status : {
           badRequest : function(message, detail){
             message.should.equal('json failed schema validation.');
@@ -131,10 +130,9 @@ describe("JsonBodyContextHelper", function(){
             done();
           }
         }
-      }
     };
-    jbch($, handler, function(){
-      $.req.onJson(schema, function(err, obj){
+    jbch(req, res, handler, function(){
+      req.onJson(schema, function(err, obj){
         should.fail('should not get here');
       });
     });
@@ -150,7 +148,7 @@ describe("JsonBodyContextHelper", function(){
                 }
               }
             };
-    var fakeReq = {
+    var req = {
       on : function(type, cb){
         switch(type){
           case 'data' : return cb('{"age":"37", "name":"GDizzle"}');
@@ -160,8 +158,7 @@ describe("JsonBodyContextHelper", function(){
       }
     };
     var handler = {};
-    var $ = { req : fakeReq,
-      res : {
+    var res = {
         status : {
           badRequest : function(message, detail){
             message.should.equal('json failed schema validation.');
@@ -175,10 +172,9 @@ describe("JsonBodyContextHelper", function(){
             done();
           }
         }
-      }
     };
-    jbch($, handler, function(){
-      $.req.onJson(schema, function(err, obj){
+    jbch(req, res, handler, function(){
+      req.onJson(schema, function(err, obj){
         should.fail('should not get here');
       });
     });

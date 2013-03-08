@@ -37,9 +37,9 @@ module.exports = new CRUDCollection({
     cb(null, $.req.app.teas, 'name');
   },
 
-  fetch : function($, cb){
-    var id = $.req.uri.child();
-    var row = $.req.app.teas[id];
+  fetch : function(req, res, cb){
+    var id = req.uri.child();
+    var row = req.app.teas[id];
     console.log("row was: ", row);
     if (!!row){
       cb(null, row);
