@@ -128,12 +128,12 @@ describe('Percolator', function(){
     var that = this;
     var url = "http://localhost:3000/";
     this.server = new Percolator({port : 3000});
-    this.server.route('/', {  GET : function($){
-                                             $.res.end("Hello World! " + $.decorated);
+    this.server.route('/', {  GET : function(req, res){
+                                             res.end("Hello World! " + req.decorated);
                                            }});
     this.server.onRequest(function(handler, context, cb){
       context.req.url.should.equal('/');
-      context.decorated = true;
+      context.req.decorated = true;
       cb(context);
     });
     this.server.listen(function(err){
@@ -233,9 +233,9 @@ describe('Percolator', function(){
   it ("adds a router reference to every context", function(done){
     var that = this;
     this.server = new Percolator({port : 3000});
-    this.server.route('/', {  GET : function($){
-                                             should.exist($.router);
-                                             $.res.end("Hello World!");
+    this.server.route('/', {  GET : function(req, res){
+                                             should.exist(req.router);
+                                             res.end("Hello World!");
                                            }});
     this.server.listen(function(err){
       if (err) {
@@ -383,14 +383,14 @@ describe('Percolator', function(){
     it ("parsed body gets added to the context", function(done){
       var that = this;
       this.server = new Percolator({port : this.port, parseBody : true});
-      this.server.route('/', {  GET : function($){
-                                    $.res.end("Hello World!");
+      this.server.route('/', {  GET : function(req, res){
+                                    res.end("Hello World!");
                                   },
 
-                                  PUT : function($){
-                                    $.body.thisisa.should.equal('TEST');
-                                    $.rawBody.should.equal('{"thisisa":"TEST"}');
-                                    $.res.end("Hello World!");
+                                  PUT : function(req, res){
+                                    req.body.thisisa.should.equal('TEST');
+                                    req.rawBody.should.equal('{"thisisa":"TEST"}');
+                                    res.end("Hello World!");
                                   }});
       this.server.listen(function(err){
         if (err) {
