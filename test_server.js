@@ -46,8 +46,8 @@ server.routeDirectory(resourceDir, app.resourcePath, function(err){
   console.log("routed resources in " + resourceDir);
 
   server.route('/inside', 
-                      { GET : function($){ 
-                                $.res.end("muahahah!"); 
+                      { GET : function(req, res){ 
+                                res.end("muahahah!"); 
                               }
                       });
 
