@@ -12,7 +12,7 @@ exports.CRUDCollection = require(dir + 'CRUDCollection');
 
 exports.AuthenticateHelper = require(helperDir + 'Authenticate');
 exports.BasicAuthenticateHelper = require(helperDir + 'BasicAuthenticate');
-exports.JsonContextHelper = require(helperDir + 'Json');
+exports.ObjectHelper = require(helperDir + 'Object');
 exports.onBodyHelper = require(helperDir + 'onBody');
 exports.JsonBodyContextHelper = require(helperDir + 'JsonBody');
 exports.FetchHelper = require(helperDir + 'Fetch');
