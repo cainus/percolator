@@ -29,13 +29,14 @@ app.teas = _.map(app.teas, function(tea){ tea.created = new Date(); return tea; 
 
 var server = new Percolator(app);
 server.before(function(req, res, handler, cb){
+  req.started = new Date();
   BasicAuthenticateHelper(req, res, handler, function(){
     cb(req, res);
   });
 });
 
 server.after(function(req, res, handler){
-  console.log(' <-- ', req.method, ' ', req.url);
+  console.log(' <-- ', req.method, ' ', req.url, (new Date() - req.started) + ' ms');
 });
 
 var resourceDir = __dirname + '/test/test_fixtures/resources';
