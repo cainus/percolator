@@ -29,12 +29,13 @@ app.teas = _.map(app.teas, function(tea){ tea.created = new Date(); return tea; 
 
 var server = new Percolator(app);
 server.before(function(req, res, handler, cb){
-  console.log(' <-- ', req.method, ' ', req.url);
-  // TODO helpers take params in a different order than onRequest provides them?
-  // this is confusing
   BasicAuthenticateHelper(req, res, handler, function(){
     cb(req, res);
   });
+});
+
+server.after(function(req, res, handler){
+  console.log(' <-- ', req.method, ' ', req.url);
 });
 
 var resourceDir = __dirname + '/test/test_fixtures/resources';

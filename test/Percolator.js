@@ -149,6 +149,31 @@ describe('Percolator', function(){
     });
   });
 
+  it ("exposes an after hook for executing logic after requests", function(done){
+    var that = this;
+    var responded = false;
+    var url = "http://localhost:3000/";
+    this.server = new Percolator({port : 3000});
+    this.server.route('/', {  GET : function(req, res){
+                                             res.end("Hello World!");
+                                           }});
+    this.server.after(function(req, res, handler){
+      req.url.should.equal('/');
+      done();
+    });
+    this.server.listen(function(err){
+      if (err) {
+        throw err;
+      }
+      hottap(url).request("GET",
+                               function(err, response){
+                                 responded = true;
+                                 response.status.should.equal(200);
+                                 response.body.should.equal("Hello World!");
+                               });
+    });
+  });
+
   it ("can respond to simple requests", function(done){
     var that = this;
     this.server = new Percolator({port : 3000});
