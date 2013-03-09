@@ -4,8 +4,8 @@ var ContextFaker = require('../index').ContextFaker;
 describe("ContextFaker", function(){
   it ("fakes a 200 response", function(done){
     var resource = {
-      GET : function($){
-        $.res.object({"this" : "is", "a" : "test"}).send();
+      GET : function(req, res){
+        res.object({"this" : "is", "a" : "test"}).send();
       }
     };
     var faker = new ContextFaker("GET")
@@ -18,10 +18,10 @@ describe("ContextFaker", function(){
       done();
     });
   });
-  it ("can fake a call to $.req.uri.parent()", function(done){
+  it ("can fake a call to req.uri.parent()", function(done){
     var resource = {
-      GET : function($){
-        $.res.object({"parentLink" : $.req.uri.parent()}).send();
+      GET : function(req, res){
+        res.object({"parentLink" : req.uri.parent()}).send();
       }
     };
     var faker = new ContextFaker("GET")
@@ -36,9 +36,9 @@ describe("ContextFaker", function(){
   });
   it ("fakes a 200 response with an asynch call", function(done){
     var resource = {
-      GET : function($){
+      GET : function(req, res){
         setTimeout(function(){
-          $.res.object({"this" : "is", "a" : "test"}).send();
+          res.object({"this" : "is", "a" : "test"}).send();
         }, 20);
       }
     };
@@ -54,15 +54,15 @@ describe("ContextFaker", function(){
   });
   it ("fakes a json POST", function(done){
     var resource = {
-      GET : function($){
+      GET : function(req, res){
         var body = '';
-        $.req.on('data', function(data){
+        req.on('data', function(data){
           body += data;
         });
-        $.req.on('end', function(data){
+        req.on('end', function(data){
           body += data;
           body.should.eql('{"incoming":"test"}');
-          $.res.object({ok : true}).send();
+          res.object({ok : true}).send();
         });
       }
     };
@@ -79,9 +79,9 @@ describe("ContextFaker", function(){
   });
   it ("fakes header setting", function(done){
     var resource = {
-      GET : function($){
-        $.req.headers.test.should.equal('header');
-        $.res.object({"this" : "is", "a" : "test"}).send();
+      GET : function(req, res){
+        req.headers.test.should.equal('header');
+        res.object({"this" : "is", "a" : "test"}).send();
       }
     };
     var faker = new ContextFaker("GET")
@@ -97,10 +97,10 @@ describe("ContextFaker", function(){
   });
   it ("fakes headers setting", function(done){
     var resource = {
-      GET : function($){
-        $.req.headers.test.should.equal('header');
-        $.req.headers.test2.should.equal('header2');
-        $.res.object({"this" : "is", "a" : "test"}).send();
+      GET : function(req, res){
+        req.headers.test.should.equal('header');
+        req.headers.test2.should.equal('header2');
+        res.object({"this" : "is", "a" : "test"}).send();
       }
     };
     var faker = new ContextFaker("GET")
@@ -120,9 +120,9 @@ describe("ContextFaker", function(){
       fetch : function(req, res, cb){
         cb(null, {found : true});
       },
-      GET : function($){
-        $.req.fetched.found.should.equal(true);
-        $.res.end("YES");
+      GET : function(req, res){
+        req.fetched.found.should.equal(true);
+        res.end("YES");
       }
     };
     var faker = new ContextFaker("GET")
@@ -138,7 +138,7 @@ describe("ContextFaker", function(){
       fetch : function(req, res, cb){
         cb(true);
       },
-      GET : function($){
+      GET : function(req, res){
         should.fail("should not get here");
       }
     };
@@ -160,7 +160,7 @@ describe("ContextFaker", function(){
       fetch : function(req, res, cb){
         cb("something weird happened");
       },
-      GET : function($){
+      GET : function(req, res){
         should.fail("should not get here");
       }
     };
