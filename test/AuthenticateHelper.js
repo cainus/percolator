@@ -2,7 +2,7 @@ var should = require('should');
 var fch = require('../index').AuthenticateHelper;
 
 describe("AuthenticateHelper", function(done){
-  it ("does nothing if the context has no authenticate method", function(done){
+  it ("does nothing if the handler has no authenticate method", function(done){
     var req = {};
     var res = {};
     var handler = {};

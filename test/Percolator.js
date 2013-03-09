@@ -131,10 +131,10 @@ describe('Percolator', function(){
     this.server.route('/', {  GET : function(req, res){
                                              res.end("Hello World! " + req.decorated);
                                            }});
-    this.server.onRequest(function(handler, context, cb){
-      context.req.url.should.equal('/');
-      context.req.decorated = true;
-      cb(context);
+    this.server.onRequest(function(handler, req, res, cb){
+      req.url.should.equal('/');
+      req.decorated = true;
+      cb(req, res);
     });
     this.server.listen(function(err){
       if (err) {
@@ -206,7 +206,7 @@ describe('Percolator', function(){
       }
     });
   });
-  it ("passes options on to the context's 'app' namespace", function(done){
+  it ("passes options on to the req's 'app' namespace", function(done){
     var that = this;
     this.server = new Percolator({port : 3000});
     this.server.route('/', {  GET : function($){
@@ -230,7 +230,7 @@ describe('Percolator', function(){
     });
   });
 
-  it ("adds a router reference to every context", function(done){
+  it ("adds a router reference to every req", function(done){
     var that = this;
     this.server = new Percolator({port : 3000});
     this.server.route('/', {  GET : function(req, res){
@@ -348,7 +348,7 @@ describe('Percolator', function(){
 
   
   describe('when managing a text/plain body', function(){
-    it ("parsed body gets added to the context", function(done){
+    it ("parsed body gets added to the req", function(done){
       var that = this;
       this.server = new Percolator({port : this.port});
       this.server.route('/', {  GET : function($){
@@ -380,7 +380,7 @@ describe('Percolator', function(){
     });
   });
   describe('when managing a json body', function(){
-    it ("parsed body gets added to the context", function(done){
+    it ("parsed body gets added to the req", function(done){
       var that = this;
       this.server = new Percolator({port : this.port, parseBody : true});
       this.server.route('/', {  GET : function(req, res){

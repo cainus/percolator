@@ -1,9 +1,8 @@
 var should = require('should');
 var bach = require('../index').BasicAuthenticateHelper;
 
-// TODO authenticate still needs the context
-describe("BasicAuthenticateContextHelper", function(done){
-  it ("does nothing if the context has no basicAuthenticate method", function(done){
+describe("BasicAuthenticateHelper", function(done){
+  it ("does nothing if the handler has no basicAuthenticate method", function(done){
     var req = {};
     var res = {};
     var handler = {};

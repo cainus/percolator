@@ -2,7 +2,7 @@ var should = require('should');
 var fch = require('../index').FetchHelper;
 
 describe("FetchHelper", function(done){
-  it ("does nothing if the context has no fetch method", function(done){
+  it ("does nothing if the handler has no fetch method", function(done){
     var req = { method : "PUT" };
     var res = {};
     var handler = {};
@@ -13,7 +13,7 @@ describe("FetchHelper", function(done){
     });
   });
   it ("runs the object's fetch method if it has one", function(done){
-    var handler = { fetch : function(context, cb){ done(); }};
+    var handler = { fetch : function(req, res, cb){ done(); }};
     var req = { method : "PUT" };
     var res = {};
     fch(req, res, handler, function(err, fetch){

@@ -32,12 +32,12 @@ app.teas = [{name : "Earl Grey"}, {name : "Orange Pekoe"}, {name : "Lemon Zinger
 app.teas = _.map(app.teas, function(tea){ tea.created = new Date(); return tea; });
 
 var server = new Percolator(app);
-server.onRequest(function(handler, context, cb){
-  console.log(' <-- ', context.req.method, ' ', context.req.url);
-  // TODO context helpers take params in a different order than onRequest provides them?
+server.onRequest(function(handler, req, res, cb){
+  console.log(' <-- ', req.method, ' ', req.url);
+  // TODO helpers take params in a different order than onRequest provides them?
   // this is confusing
-  BasicAuthenticateHelper(context.req, context.res, handler, function(){
-    cb(context);
+  BasicAuthenticateHelper(req, res, handler, function(){
+    cb(req, res);
   });
 });
 
