@@ -2,16 +2,12 @@ var _ = require('underscore');
 var Percolator = require('./index').Percolator;
 var BasicAuthenticateHelper = require('./index').BasicAuthenticateHelper;
 
-// TODO collections proof-of-concept - POST, PUT, DELETE
 // TODO make status man do conneg
 // TODO producers of app/json should respond to requests for app/blah+json
 // TODO get a specific mediatype in there
 // TODO don't use in/out for mediatype handlers
 // == low priority ==
 // TODO better error output when there's an error in mediaTypes, resources, etc.
-// TODO how to put content-type in links
-// TODO form post for create
-// TODO better errors when you try to getUrl an unknown route
 // TODO better way to see all routes
 
 
@@ -32,7 +28,7 @@ app.teas = [{name : "Earl Grey"}, {name : "Orange Pekoe"}, {name : "Lemon Zinger
 app.teas = _.map(app.teas, function(tea){ tea.created = new Date(); return tea; });
 
 var server = new Percolator(app);
-server.onRequest(function(handler, req, res, cb){
+server.before(function(req, res, handler, cb){
   console.log(' <-- ', req.method, ' ', req.url);
   // TODO helpers take params in a different order than onRequest provides them?
   // this is confusing

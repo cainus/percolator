@@ -124,14 +124,14 @@ describe('Percolator', function(){
     });
   });
 
-  it ("exposes an onRequest hook for additionally handling requests", function(done){
+  it ("exposes a before hook for executing logic before requests", function(done){
     var that = this;
     var url = "http://localhost:3000/";
     this.server = new Percolator({port : 3000});
     this.server.route('/', {  GET : function(req, res){
                                              res.end("Hello World! " + req.decorated);
                                            }});
-    this.server.onRequest(function(handler, req, res, cb){
+    this.server.before(function(req, res, handler, cb){
       req.url.should.equal('/');
       req.decorated = true;
       cb(req, res);
