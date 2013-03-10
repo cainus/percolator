@@ -120,9 +120,6 @@ Have all the intended features (yet!)
 Have support for non-json media-types, beyond what core node request/response objects provide.
   </li>
   <li>
-Augment node.js's core request/response objects in any way whatsoever.
-  </li>
-  <li>
   Stay unopinionated.  It's impossible to do so much automatically without making some 
   decisions about how things should be done.
   </li>
@@ -134,8 +131,8 @@ If you have a server.js with the following content...
 <pre class="sh_javascript">
 var Percolator = require('Percolator').Percolator;
 var server = new Percolator();
-server.route('/', function($){
-        $.json({hello : "world!"})
+server.route('/', function(req, res){
+        res.object({hello : "world!"})
              .send();
           });
 server.listen(function(err){
@@ -181,19 +178,13 @@ The interesting parts of this example are probably all in the routing and reques
 take a second look at that:
 </p>
 <pre class="sh_javascript">
-server.route('/', function($){
-            $.json({hello : "world!"})
+server.route('/', function(req, res){
+            res.object({hello : "world!"})
              .send();
           });
 </pre>
 <p>
 server.route() takes a route, in this case the root route '/', and associates a handler to it for when a request comes in for '/'. If the handler is just a function, as is the case here, then it will only handle GET requests.
-</p>
-<p>
-In general, the only parameter that handler functions need to take is a single 'context' parameter that I just name $ for brevity, but you can name it whatever you want. The context parameter comes with a number of useful methods and objects, but we just use the json() "context helper" to specify and then send() our object as json.
-</p>
-<p>
-The context parameter also has the plain node.js request and response objects on it, so you're still free to access those as usual. They'd be available in the handler function here as $.req and $.res and they are completely unaltered and should act exactly as shown in the node.js documentation.
 </p>
 <p>
 This just scratches the surface though. Other examples will show more advanced features.

@@ -105,6 +105,7 @@
             <a href="#server-route">route</a>&nbsp;
             <a href="#server-listen">listen</a>&nbsp;
             <a href="#server-before">before</a>&nbsp;
+            <a href="#server-after">after</a>&nbsp;
           </p>
           <li class="nav-header" ><a href="#handler">The Handler Object</a></li>
           <li class="nav-sub-header"><a href="#handler-GET">GET</a></li>
@@ -114,11 +115,40 @@
           <li class="nav-sub-header"><a href="#handler-fetch">fetch</a></li>
           <li class="nav-sub-header"><a href="#handler-authenticate">authenticate</a></li>
           <li class="nav-sub-header"><a href="#handler-basicAuthenticate">basicAuthenticate</a></li>
-          <li class="nav-header" ><a href="#context">The Context Object ($)</a></li>
-          <li class="nav-sub-header"><a href="#context-req">$.req</a></li>
-          <li class="nav-sub-header"><a href="#context-res">$.res</a></li>
-          <li class="nav-sub-header"><a href="#req-app">req.app</a></li>
-          <li class="nav-sub-header"><a href="#res-status">res.status</a></li>
+          <li class="nav-header"><a href="#req-uri">req.uri</a></li>
+          <p class="nav-sub-header">
+             <a href="#req-uri-child">child</a> &nbsp;
+             <a href="#req-uri-decode">decode</a> &nbsp;
+             <a href="#req-uri-encode">encode</a> &nbsp;
+             <a href="#req-uri-hash">hash</a> &nbsp;
+             <a href="#req-uri-hostname">hostname</a> &nbsp;
+             <a href="#req-uri-parent">parent</a> &nbsp;
+             <a href="#req-uri-password">password</a> &nbsp;
+             <a href="#req-uri-path">path</a> &nbsp;
+             <a href="#req-uri-port">port</a> &nbsp;
+             <a href="#req-uri-protocol">protocol</a> &nbsp;
+             <a href="#req-uri-query">query</a> &nbsp;
+             <a href="#req-uri-querystring">queryString</a> &nbsp;
+             <a href="#req-uri-toJson">toJson</a> &nbsp;
+             <a href="#req-uri-toString">toString</a> &nbsp;
+             <a href="#req-uri-username">username</a> &nbsp;
+          </p>
+          <li class="nav-header" ><a href="#req-onJson">req.onJson</a></li>
+          <li class="nav-header" ><a href="#req-onBody">req.onBody</a></li>
+          <li class="nav-header" ><a href="#res-object">res.object</a></li>
+          <p class="nav-sub-header">
+             <a href="#res-object-toString">toString</a> &nbsp;
+             <a href="#res-object-toObject">toObject</a> &nbsp;
+             <a href="#res-object-property">property</a> &nbsp;
+             <a href="#res-object-link">link</a> &nbsp;
+             <a href="#res-object-send">send</a> &nbsp;
+          </p>
+          <li class="nav-header" ><a href="#res-collection">res.collection</a></li>
+          <p class="nav-sub-header">
+             <a href="#res-collection-each">each</a> &nbsp;
+             <a href="#res-collection-linkEach">linkEach</a> &nbsp;
+          </p>
+          <li class="nav-header"><a href="#res-status">res.status</a></li>
           <p class="nav-sub-header">
             <a href="#res-status-created">created</a>&nbsp;
             <a href="#res-status-accepted">accepted</a>&nbsp;
@@ -147,40 +177,6 @@
             <a href="#res-status-serviceUnavailable">serviceUnavailable</a>&nbsp;
             <a href="#res-status-gatewayTimeout">gatewayTimeout</a>
           </p>
-          <li class="nav-sub-header"><a href="#req-uri">$.uri</a></li>
-          <p class="nav-sub-header">
-             <a href="#context-uri-absolute">absolute</a> &nbsp;
-             <a href="#context-uri-child">child</a> &nbsp;
-             <a href="#context-uri-get">get</a> &nbsp;
-             <a href="#context-uri-param">param</a> &nbsp;
-             <a href="#context-uri-params">params</a> &nbsp;
-             <a href="#context-uri-parent">parent</a> &nbsp;
-             <a href="#context-uri-parse">parse</a> &nbsp;
-             <a href="#context-uri-pathEnd">pathEnd</a> &nbsp;
-             <a href="#context-uri-pathJoin">pathJoin</a> &nbsp;
-             <a href="#context-uri-query">query</a> &nbsp;
-             <a href="#context-uri-queryClear">queryClear</a> &nbsp;
-             <a href="#context-uri-queryMerge">queryMerge</a> &nbsp;
-             <a href="#context-uri-querystring">queryString</a> &nbsp;
-             <a href="#context-uri-self">self</a> &nbsp;
-             <a href="#context-uri-urlDecode">urlDecode</a> &nbsp;
-             <a href="#context-uri-urlEncode">urlEncode  </a> &nbsp;
-          </p>
-          <li class="nav-sub-header" ><a href="#res-object">res.object</a></li>
-          <p class="nav-sub-header">
-             <a href="#res-object-toString">toString</a> &nbsp;
-             <a href="#res-object-toObject">toObject</a> &nbsp;
-             <a href="#res-object-property">property</a> &nbsp;
-             <a href="#res-object-link">link</a> &nbsp;
-             <a href="#res-object-send">send</a> &nbsp;
-          </p>
-          <li class="nav-sub-header" ><a href="#res-collection">res.collection</a></li>
-          <p class="nav-sub-header">
-             <a href="#res-collection-each">each</a> &nbsp;
-             <a href="#res-collection-linkEach">linkEach</a> &nbsp;
-          </p>
-          <li class="nav-sub-header" ><a href="#req-onJson">req.onJson</a></li>
-          <li class="nav-sub-header" ><a href="#req-onBody">req.onBody</a></li>
           <li class="nav-header" ><a href="#crudCollection">CRUDCollection</a></li>
 
           <p class="nav-sub-header">
@@ -305,7 +301,7 @@ This is called the <strong>app</strong> object.
 </p>
 <p>
 
-Anything you put in the app object will be available to all your HTTP handlers, so it's 
+Anything you put in the app object will be available to all your HTTP handlers as req.app, so it's 
 great for shared configuration, database objects, etc.
 </p>
 
@@ -320,7 +316,9 @@ great for shared configuration, database objects, etc.
 <strong>autoLink</strong> - A boolean that indicates whether or not to automatically add some links to your json payloads for you.  This value is optional, and the default is 'true', meaning that hyperlinks will be added automatically to your json payloads.<br>
 <strong>port</strong> - the http port.  A low port like 80 will not work unless you run the app with root privileges.  </p>
 <strong>parseBody</strong> - A boolean that indicates whether or not to automatically wait for the entire body to stream in before
-calling an HTTP method handler.  If set to true, the body will be available as req.rawBody or parsed as json to an object available as req.body .</p>
+calling an HTTP method handler.  If set to true, the body will be available as req.rawBody or parsed as json to an object available as req.body .  The default for this is false,
+because the <a href="#req-onBody">req.onBody</a> and <a href="#req-onJson">req.onJson</a> functions allow you to access the same data on a case-by-case basis.  It's recommended that you try those first.
+</p>
 
 <p>You're obviously going to want to limit the number of app object variables that you add beyond the necessary ones, but
 certain types of objects might make sense in that shared space.</p>
@@ -416,8 +414,8 @@ The <strong>handler</strong> is the resource object that is routed to the reques
 the router.  It will contain the functions meant to handle the different HTTP methods.
 </p>
 <p>
-The <strong>cb</strong> parameter is a callback that will be called to 'return' the 
-req and res objects.  The req and res objects should be its only parameters.
+The <strong>cb</strong> parameter is a callback that will be called to signal that pre-processing
+is complete.
 </p>
 
 <p>
@@ -426,9 +424,38 @@ Here's an example:
 
 <pre class="sh_javascript">
 server.before(function(req, res, handler, cb){
-  // print the request method and url for every request.
+  // print the request method and url before every request.
   console.log(' <-- ', req.method, ' ', req.url);
-  cb(req, res);
+  cb();
+});
+</pre>
+</section>
+<section id="server-after">
+<h5>after(cb)</h5>
+<p>
+The after() method takes a callback as its only parameter.  The callback is called after a
+response is ended.
+</p>
+
+<p>
+The callback takes req, res, and handler parameters.  
+</p>
+<p>
+The <strong>req and res</strong> parameters are the standard node request and response objects.  
+If you want to augment them for some reason, for all requests, this is a great place to do it.
+</p>
+<p>
+The <strong>handler</strong> is the resource object that is routed to the request url in 
+the router.  It will contain the functions meant to handle the different HTTP methods.
+</p>
+<p>
+Here's an example:
+</p>
+
+<pre class="sh_javascript">
+server.after(function(req, res, handler){
+  // print the request method and url after every request.
+  console.log(' <-- ', req.method, ' ', req.url);
 });
 </pre>
 </section>
@@ -446,27 +473,27 @@ method will result in an automatic 405 (method not allowed) response.</p>
 <h5>GET(req, res)</h5>
 <p>
 Implementing this method on a handler object will allow it to respond to GET requests.  The only 
-parameter is a <a href="#context">context object</a>.  Any return value will be ignored.
+parameters are the standard request and response objects from node.  Any return value will be ignored.
 </p>
 <section id="handler-POST"></section>
 <h5>POST(req, res)</h5>
 <p>
 Implementing this method on a handler object will allow it to respond to POST requests.  The only 
-parameter is a <a href="#context">context object</a>.  Any return value will be ignored.
+parameters are the standard request and response objects from node.  Any return value will be ignored.
 </p>
 
 <section id="handler-DELETE"></section>
 <h5>DELETE(req, res)</h5>
 <p>
 Implementing this method on a handler object will allow it to respond to DELETE requests.  The only 
-parameter is a <a href="#context">context object</a>.  Any return value will be ignored.
+parameters are the standard request and response objects from node. Any return value will be ignored.
 </p>
 
 <section id="handler-PUT"></section>
 <h5>PUT(req, res)</h5>
 <p>
 Implementing this method on a handler object will allow it to respond to PUT requests.  The only 
-parameter is a <a href="#context">context object</a>.  Any return value will be ignored.
+parameters are the standard request and response objects from node.  Any return value will be ignored.
 </p>
 
 <section id="handler-authenticate"></section>
@@ -478,8 +505,8 @@ If you implement authenticate(), it will automatically return 401 responses for
 unauthenticated access while permitting authenticated access as normal.
 
 
-<p>The authenticate() function has two required parameters: the <a href="#context">context object</a>
-, and cb.</p>
+<p>The authenticate() function has three required parameters: the standard req and res parameters
+, and a callback (cb).</p>
 
 <p>The <strong>cb</strong> argument is a callback that takes two parameters.  The
 first parameter is an error object if any error occurred.  If the error object
@@ -487,7 +514,7 @@ is strictly <strong>true</strong>, then the response will be a 401.  If the erro
 object is non-strict-true but still truthy, then the response will be a 500 (internal 
 server error). The second parameter should be an object that represents the 
 logged in user.  It will automatically
-by added to the context object as req.authenticated in any member resource
+by added to the req object as req.authenticated in any member resource
 methods that you implement.
 </p>
 <pre class="sh_javascript">
@@ -515,9 +542,8 @@ on the resource.  If you implement basicAuthenticate(), it will automatically re
 unauthenticated access while permitting authenticated access as normal.
 
 
-<p>The basicAuthenticate() function has four required parameters: the basic http auth username, 
-the basic http auth password, the <a href="#context">context object</a>
-, and a callback, cb.</p>
+<p>The basicAuthenticate() function has five required parameters: the basic http auth username, 
+the basic http auth password, the standard node req and res objects, and a callback, cb.</p>
 
 <p>The <strong>cb</strong> argument is a callback that takes two parameters.  The
 first parameter is an error object if any error occurred.  If the error object
@@ -555,8 +581,8 @@ handler methods are even run.  In the event of a 404, a call to <a href="#res-st
 </a> will be made automatically.
 </p>
 
-<p>The fetch() function has two required parameters: the <a href="#context">context object</a>
-, and cb.</p>
+<p>The fetch() function has three required parameters: the standard node req and res objects, 
+and a callback (cb).</p>
 
 <p>The <strong>cb</strong> argument is a callback that takes two parameters.  The
 first parameter is an error object if any error occurred.  The
@@ -580,7 +606,7 @@ resource would otherwise cause a 404.
 <pre class="sh_javascript">
 var module = new CRUDCollection({
   fetch : function(req, res, cb){
-    // get some item from your data source, probably based on req.uri.pathEnd()
+    // get some item from your data source, probably based on req.uri.child()
     cb(null, theObject);
   }
 });
@@ -591,23 +617,6 @@ var module = new CRUDCollection({
 
 
 </section>
-<section id="context">
-<h3>The Context Object ($)</h3>
-The "Hello World" example should be pretty straightforward, except it has a strange dollar sign ($) in it.  
-This is the context object.  The context object is basically just a holder for all the things your request 
-handler will care about.  You can name it whatever you want really, but '$' is a nice short name that you're
-unlikely to have a clash with in a server-side environment.  It has a number of interesting properties:
-<section id="context-req"></section>
-<h5>$.req</h5>
-This is the unaltered <a href="http://nodejs.org/api/http.html#http_class_http_serverrequest">request object</a> from the node.js standard library.
-<section id="context-res"></section>
-<h5>$.res</h5>
-This is the unaltered <a href="http://nodejs.org/api/http.html#http_class_http_serverrequest">response object</a> from the node.js standard library.
-
-<section id="req-app"></section>
-<h5>req.app</h5>
-This is the app object that you passed in the constructor to Percolator.
-
 <section id="res-status">
 </section>
 <h5>res.status</h5>
@@ -992,278 +1001,322 @@ res.status.badGateway([detail])
 
 
 <section id="req-uri">
-<h5>$.uri</h5>
+<h5>req.uri</h5>
 <p>
-Each method you define has access to a 'uri' module that understands the context of each particular request that it's used in. The module makes a number of convenient methods available for dealing with uri's and generally making the parsing of uri's simpler and the creation of new uri's simple. Here are example usages:
+Each method you define has access to a 'uri' object instantiated from the uri of the current
+request. The uri object has a chainable/fluent interface that makes a number of methods 
+available for for querying different aspects the current uri, and even modifying it to create
+new uris.  
+</p>
+<p>
+Most methods are named after different parts of the uri and allow you to read that part from 
+the current uri if you don't pass any parameters, or they allow you to generate a new uri with
+a change to that part in the current uri if you do pass a parameter.
+</p>
+
+<p>
+For the examples below, we'll use the following uri: 
+<pre>https://user:pass@subdomain.asdf.com/path/kid?asdf=1234#frag</pre>
+</p>
+
+
+Here are example usages:
 </p>
 
 <h6> General Usage: </h6>
 
 <pre class="sh_javascript">
 server.route('/', {  GET : function(req, res){
-                              res.object({self : $.uri.self()}).send();
+                              res.object({self : req.uri}).send();
                                 // --> {"self" : "http://example.com/currentUrl"}
                             }});
 </pre>
 <h6>Api specifics:</h6>
-<section id="context-uri-absolute">
+<section id="req-uri-child">
 <dl>
   <dt>
-    $.uri.absolute(path)
+    req.uri.child([lastPart])
   </dt>
   <dd>
-    Takes a relative path and returns an absolute path using the hostname header.
+    Setter/getter for the last part of a path:
     <pre class="sh_javascript">
-$.uri.absolute("/somepath");
-// returns "http://hostname.com/somepath" </pre>
+      req.uri.child(); // returns "kid" 
+      req.uri.child("grandkid"); // returns a new uri object with the uri 
+                                 // https://user:pass@subdomain.asdf.com/path/kid/grandkid?asdf=1234#frag
+   </pre>
+   see also: <a href='#req-uri-parent'>req.uri.parent()</a>, 
+    <a href='#req-uri-path'>req.uri.path()</a>.
   </dd>
 </dl>
 </section>
 
-<section id="context-uri-child">
+<section id="req-uri-decode">
 <dl>
   <dt>
-$.uri.child(suffix);
+    req.uri.decode(encodedString);
   </dt>
   <dd>
-Returns the current url with the given suffix added to the path as the last 
-"folder".  For example, if the current URI is http://localhost/artist/1234/, then...
+   Returns the decoded version of the input string using node's standard 
+<a href='http://nodejs.org/api/querystring.html#querystring_querystring_unescape'>querystring.unescape()</a>.
     <pre class="sh_javascript">
-$.uri.child('song');
-// ... would return http://localhost/artist/1234/song
+      req.uri.decode('this%20is%20a%20test');  // returns "this is a test"
+    </pre>
+   see also: <a href='#req-uri-encode'>req.uri.encode()</a>.
+  </dd>
+</dl>
+</section>
+
+<section id="req-uri-encode">
+<dl>
+  <dt>
+    req.uri.encode(unencodedString);
+  </dt>
+  <dd>
+   Returns the encoded version of the input string using node's standard 
+<a href='http://nodejs.org/api/querystring.html#querystring_querystring_escape'>querystring.escape()</a>.
+    <pre class="sh_javascript">
+      req.uri.encode('this is a test'); // returns 'this%20is%20a%20test'
+    </pre>
+   see also: <a href='#req-uri-decode'>req.uri.decode()</a>.
+  </dd>
+</dl>
+</section>
+
+<section id="req-uri-hash">
+<dl>
+  <dt>
+    req.uri.hash([newHash])
+  </dt>
+  <dd>
+    Setter/getter for the url fragment/anchor/hash of a path.
+    <pre class="sh_javascript">
+      req.uri.hash(); // returns 'frag'
+      req.uri.hash("blah"); // returns a new uri object with the uri
+                            // https://user:pass@subdomain.asdf.com/path/kid/?asdf=1234#blah
 </pre>
   </dd>
 </dl>
 </section>
 
-<section id="context-uri-get">
+<section id="req-uri-hostname">
 <dl>
   <dt>
-$.uri.get(path [, variableHash]);
+req.uri.hostname([newHostname])
   </dt>
   <dd>
-Gets a url by path. An optional hash may be passed of variables to fill in necessary path variables.
+    Setter/getter for the url hostname.
     <pre class="sh_javascript">
-$.uri.get('/artist/:artist', {artist : 1234});
-// could return something like:  'http://hostname.com/artist/1234' if such a route exists.
+      req.uri.hostname(); // returns 'subdomain.asdf.com'
+      req.uri.hostname("geocities.com"); // returns a new uri object with the uri
+                            // https://user:pass@geocities.com/path/kid/?asdf=1234#frag
 </pre>
   </dd>
 </dl>
 </section>
 
-<section id="context-uri-param">
+<section id="req-uri-parent">
 <dl>
   <dt>
-$.uri.param(name)
+    req.uri.parent();
   </dt>
   <dd>
-Retrieves the specified param value by the input param name from the object returned by $.uri.params() (see above).
-For example, if the URI is http://localhost/artist/1234/song/5678, then...
+    Get the parent URI of the current URI. (This property is read-only).
     <pre class="sh_javascript">
-$.uri.param("song");
-// ... will return 5678
+      req.uri.parent();  // returns a new uri object with the uri
+                         // https://user:pass@subdomain.asdf.com/path/?asdf=1234#frag
 </pre>
-  </dd>
-</dl>
-</section>
-
-<section id="context-uri-params">
-<dl>
-  <dt>
-$.uri.params()
-  </dt>
-  <dd>
-returns an object containing the name/value pairs of variables extracted from the uri's "path" (NOT including querystring). An optional uri may be passed in, but the default is to use the current request's uri.
-
-For example, if the URI is http://localhost/artist/1234/song/5678, then...
-    <pre class="sh_javascript">
-$.uri.params()
-// ... will return:
-{ artist : 1234, song : 5678 }
-</pre>
-  </dd>
-</dl>
-</section>
-
-<section id="context-uri-parent">
-<dl>
-  <dt>
-$.uri.parent();
-  </dt>
-  <dd>
-Get the parent URI of the current URI. An optional URI may be passed in to get its' parent's URI instead.
-    <pre class="sh_javascript">
-$.uri.parent("http://asdf.com/asdf");
-// returns "http://asdf.com/"
-</pre>
+   see also: <a href='#req-uri-child'>req.uri.child()</a>, 
+    <a href='#req-uri-path'>req.uri.path()</a>.
   </dd>
 </dl>
 </section>
 
 
-<section id="context-uri-parse">
+<section id="req-uri-password">
 <dl>
   <dt>
-$.uri.parse([url]);
+    req.uri.password([newPassword]);
   </dt>
   <dd>
-Returns the result of <a href="http://nodejs.org/docs/v0.9.0/api/url.html#url_url_parse_urlstr_parsequerystring_slashesdenotehost">node's url.parse</a> for the current URI. An optional URI can be passed to use that one instead.
+    Setter/getter for the password portion of the url.
     <pre class="sh_javascript">
-$.uri.parse();
-//returns:
-{ href : 'http://somehostname.com:8080/artist/1234/song?genre=hiphop', 
-  protocol : 'http', 
-  host : 'somehostname.com:8080', 
-  hostname : 'somehostname.com', 
-  port : 8080,
-  pathname : '/artist1234',
-  search : '?genre=hiphop'}
+      req.uri.password(); // returns 'pass'
+      req.uri.password("newpass"); // returns a new uri object with the uri
+                            // https://user:newpass@subdomain.asdf.com/path/kid/?asdf=1234#frag
+</pre>
+   see also: <a href='#req-uri-username'>req.uri.username()</a>, 
+  </dd>
+</dl>
+</section>
+
+<section id="req-uri-path">
+<dl>
+  <dt>
+    req.uri.path([mixed]);
+  </dt>
+  <dd>
+    Setter/getter for the path portion of the url.
+    <pre class="sh_javascript">
+      req.uri.path(); // returns '/path/kid'
+      req.uri.path("newpath"); // returns a new uri object with the uri
+                               // https://user:newpass@subdomain.asdf.com/newpath
+
+      // ALSO, req.uri.path() can take arrays of strings as input as well:
+      req.uri.path(['qwer', '/asdf'], 'qwer/1234/', '/1234/'); 
+                      // this returns a new uri object with the uri
+                      // https://user:newpass@subdomain.asdf.com/qwer/asdf/qwer/1234/1234
+    </pre>
+    <p>
+    Note: changing the path will remove the querystring and hash, since they
+    rarely make sense on a new path.
+    </p>
+   see also: <a href='#req-uri-child'>req.uri.child()</a>, 
+    <a href='#req-uri-parent'>req.uri.parent()</a>.
+  </dd>
+</dl>
+</section>
+
+<section id="req-uri-port">
+<dl>
+  <dt>
+    req.uri.port([newPort]);
+  </dt>
+  <dd>
+    Setter/getter for the port portion of the url.
+    <pre class="sh_javascript">
+      req.uri.port(); // returns 80
+      req.uri.port(8080); // returns a new uri object with the uri
+                          // https://user:pass@subdomain.asdf.com:8080/path/kid/?asdf=1234#frag
+</pre>
+  </dd>
+</dl>
+</section>
+<section id="req-uri-protocol">
+<dl>
+  <dt>
+    req.uri.protocol([newProtocol]);
+  </dt>
+  <dd>
+    Setter/getter for the protocol portion of the url.
+    <pre class="sh_javascript">
+      req.uri.protocol(); // returns 'https'
+      req.uri.protocol("http"); // returns a new uri object with the uri
+                                // http://user:pass@subdomain.asdf.com/path/kid/?asdf=1234#frag
+    </pre>
+  </dd>
+</dl>
+</section>
+
+<section id="req-uri-query">
+<dl>
+  <dt>
+    req.uri.query([mixed]);
+  </dt>
+  <dd>
+    Setter/getter for the querystring using javascript objects.
+    <pre class="sh_javascript">
+      req.uri.query(); // returns {asdf : 1234}
+      req.uri.query(false); // returns a new uri object with the querystring-free uri
+                            // https://user:pass@subdomain.asdf.com/path/kid#frag
+      req.uri.query({spaced : 'space test'})
+                                // returns a new uri object with the input object serialized
+                                // and merged into the querystring like so:
+                                // https://user:pass@subdomain.asdf.com/path/kid/?asdf=1234&spaced=space%20test#frag
+    </pre>
+    <p>
+    NOTE: escaping and unescaping of applicable characters happens automatically. (eg " " to "%20", 
+    and vice versa)
+    </p>
+    <p>
+    NOTE: an input object will overwrite an existing querystring where they have the same names.
+    </p>
+    <p>
+    NOTE: an input object will remove an existing name-value pair where they have the same names and
+    the value in the input name-value pair is null.
+    </p>
+    <p>
+    see also: <a href='#req-uri-queryString'>req.uri.queryString()</a>, 
+    </p>
+  </dd>
+</dl>
+</section>
+
+<section id="req-uri-queryString">
+<dl>
+  <dt>
+    req.uri.queryString([newQueryString]);
+  </dt>
+  <dd>
+    Setter/getter for the querystring using a plain string representation.  This is
+    lower-level than $.req.query(), but allows complete control of the querystring.
+    <pre class="sh_javascript">
+      req.uri.queryString(); // returns asdf=1234  (notice there is no leading '?')
+      req.uri.queryString("blah"); // returns a new uri object with a new querystring
+                            // https://user:pass@subdomain.asdf.com/path/kid?blah#frag
+    </pre>
+    <p>
+    NOTE: no escaping/unescaping of applicable characters will occur.  This must be done
+    manually.
+    </p>
+    <p>
+    see also: <a href='#req-uri-query'>req.uri.query()</a>, 
+    </p>
+  </dd>
+</dl>
+</section>
+<section id="req-uri-toJson">
+<dl>
+  <dt>
+req.uri.toJson();
+  </dt>
+  <dd>
+Returns the json representation of the uri object, which is simply the uri as a string.  The output
+is exactly the same as <a href='#req-uri-toString'>req.uri.toString()</a>.  This method is read-only.
+
+    <pre class="sh_javascript">
+      req.uri.toJson(); // returns
+                        // "https://user:pass@subdomain.asdf.com/path/kid/?asdf=1234#frag"
 </pre>
   </dd>
 </dl>
 </section>
 
-<section id="context-uri-pathEnd">
+
+<section id="req-uri-toString">
 <dl>
   <dt>
-$.uri.pathEnd([url]);
+req.uri.toString();
   </dt>
   <dd>
-Returns the last "folder" in the path of the given url.  If no url is given, then the current url
-is used.
+Returns the string representation of the uri object, which is simply the uri as a string. 
+This method is read-only.
+
     <pre class="sh_javascript">
-$.uri.pathEnd('http://asdf.com/a/b/c');
-// ... would return 'c':
+      req.uri.toString(); // returns
+                        // "https://user:pass@subdomain.asdf.com/path/kid/?asdf=1234#frag"
 </pre>
   </dd>
 </dl>
 </section>
 
-<section id="context-uri-pathJoin">
+<section id="req-uri-username">
 <dl>
   <dt>
-$.uri.pathJoin(...);
+req.uri.username([newUsername])
   </dt>
   <dd>
-Takes a list of strings and arrays of strings and returns a forward-slash-delimited path of all the pieces in the order that they appear (without a trailing slash).
+    Setter/getter for the username portion of the url.
     <pre class="sh_javascript">
-$.uri.pathJoin("asdf", ["qwer", "tyui"], "1234");
-returns '/asdf/qwer/tyui/1234'
+      req.uri.username(); // returns 'user'
+      req.uri.username("newuser"); // returns a new uri object with the uri
+                            // https://newuser:pass@subdomain.asdf.com/path/kid/?asdf=1234#frag
 </pre>
+   see also: <a href='#req-uri-password'>req.uri.password()</a>, 
   </dd>
 </dl>
 </section>
 
-<section id="context-uri-query">
-<dl>
-  <dt>
-$.uri.query([url]);
-  </dt>
-  <dd>
-Get the querystring data from the current url as an object with the name/value pairs in the querystring. An alternative url can optionally be passed in.
-    <pre class="sh_javascript">
-$.uri.query('http://asdf.com/path/?this=is&a=test');
-// returns: 
-{ this:is, a:test }
-</pre>
-  </dd>
-</dl>
-</section>
-
-<section id="context-uri-queryClear">
-<dl>
-  <dt>
-$.uri.queryClear([url]);
-  </dt>
-  <dd>
-Remove the querystring from the current URL, or optionally an input URL.
-    <pre class="sh_javascript">
-$.uri.queryClear('http://localhost/asdf?this=isnot&a=test&ok=true');
-// returns: 'http://localhost/asdf'
-</pre>
-  </dd>
-</dl>
-</section>
-<section id="context-uri-queryMerge">
-<dl>
-  <dt>
-$.uri.queryMerge(queryHash, [url]);
-  </dt>
-  <dd>
-Take an input object (the 'queryHash') and optionally a url (default is the current url) and create a new url with a 
-querystring that has the name/value pairs of the input object merged into it.
-    <pre class="sh_javascript">
-$.uri.queryMerge({ this:is, ok:null }, 'http://localhost/asdf?this=isnot&a=test&ok=true');
-// returns: 'http://localhost/asdf?this=is&a=test'
-</pre>
-Notice that a null value (in the case of 'ok') removes the ok value from the querystring.<br/>
-Also notice that the value of 'this' is changed from 'isnot' to 'is' and the value of 'a' is left
-untouched because the queryHash doesn't mention it.
-  </dd>
-</dl>
-</section>
-
-
-<section id="context-uri-querystring">
-<dl>
-  <dt>
-$.uri.queryString(queryHash);
-  </dt>
-  <dd>
-Take an input object and create a querystring of the name/value pairs in the queryHash.
-    <pre class="sh_javascript">
-$.uri.queryString({ this:is, a:test });
-// returns: '?this=is&a=test'
-</pre>
-  </dd>
-</dl>
-</section>
-
-<section id="context-uri-self">
-<dl>
-  <dt>
-$.uri.self()
-  </dt>
-  <dd>
-returns the current uri (as an absolute uri).
-    <pre class="sh_javascript">
-$.uri.self();
-// returns 'http://hostname.com/thecurrentpath/'  (if that's the current url)
-</pre>
-  </dd>
-</dl>
-</section>
-
-<section id="context-uri-urlDecode">
-<dl>
-  <dt>
-$.uri.urlDecode(someEncodedStr)
-  </dt>
-  <dd>
-take a url-encoded string and return a decoded version of it.
-    <pre class="sh_javascript">
-$.uri.urlDecode("this%20is%20a%20test");
-// returns "this is a test"
-</pre>
-  </dd>
-</dl>
-</section>
-
-<section id="context-uri-urlEncode">
-<dl>
-  <dt>
-$.uri.urlEncode(somestr);
-  </dt>
-  <dd>
-take a string and return a url-encoded version of it. This method uses node's querystring module's escape().
-    <pre class="sh_javascript">
-$.uri.urlEncode("this is a test");
-// returns "this%20is%20a%20test"
-</pre>
-  </dd>
-</dl>
-</section><!-- / context-uri-urlEncode -->
-</section><!-- / context-uri -->
+</section><!-- / req-uri -->
 
 <section id="res-object">
 <h5>res.object</h5>
@@ -1656,14 +1709,14 @@ implement this, you'll need to implement memberGET() to be
 able to GET resources for individual members.
 </p>
 
-<p>The fetch() function has two required parameters: the 
-context object, and cb.</p>
+<p>The fetch() function has three required parameters: the 
+standard node req and res objects, and cb.</p>
 
 <p>The <strong>cb</strong> argument is a callback that takes two parameters.  The
 first parameter is an error object if any error occurred.  The
 second parameter should be the object that was fetched from your
 data source for the current uri.  It will automatically
-by added to the context object as req.fetched in any member resource
+by added to the req object as req.fetched in any member resource
 methods that you implement.
 </p>
 <p>
@@ -1680,7 +1733,7 @@ members as well.
 <pre class="sh_javascript">
 var module = new CRUDCollection({
   fetch : function(req, res, cb){
-    // get some item from your data source, probably based on $.uri.pathEnd()
+    // get some item from your data source, probably based on <a href="#req-uri-child">req.uri.child()</a>
     cb(null, theObject);
   }
 });
@@ -1705,7 +1758,7 @@ in the case of failures.
 </p>
 
 <p>
-The function will be passed a context object ($), the 
+The function will be passed the standard node req and res objects, the 
 unserialized json object, and a callback.  The callback takes
 no parameters and can optionally be called in the event of 
 successful creation to respond with a 201 CREATED status.  You have
@@ -1735,7 +1788,7 @@ if you supply a <strong>schema</strong> or an
 appropriate error messages automatically in the case of failures.
 </p>
 <p>
-The function will be passed a context object ($), the 'id' at the
+The function will be passed the standard node req and res objects, the 'id' at the
 end of the resource's URI, the object returned from 
 <code class="incode">fetch()</code>, and a callback.  The callback takes
 no parameters and can optionally be called in the event of 
@@ -1776,7 +1829,7 @@ if you supply a <strong>schema</strong> or both
 automatically in the case of failures.
 </p>
 <p>
-The function will be passed a context object ($), the 'id' at the
+The function will be passed the standard node req and res objects, the 'id' at the
 end of the resource's URI, the object returned from 
 <code class="incode">fetch()</code>, and a callback.  The callback takes
 no parameters and can optionally be called in the event of 
@@ -1806,7 +1859,7 @@ a 404 NOT FOUND status.
 Implement destroy() to allow resources to be removed.
 </p>
 <p>
-The function will be passed a context object ($), the 'id' at the
+The function will be passed the standard node req and res objects, the 'id' at the
 end of the resource's URI, and a callback.  The callback takes
 no parameters and can optionally be called in the event of 
 successful 'removal' to respond with a 204 to indicate a success
@@ -1985,7 +2038,7 @@ Here's an example with connect.favicon, used for serving up favicons:
 <pre class="sh_javascript">
 server.before(function(req, res, handler, cb){
   connect.favicon()(req, res, function(){
-    cb(req, res);
+    cb();
   });
 });
 </pre>

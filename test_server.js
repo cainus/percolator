@@ -31,7 +31,7 @@ var server = new Percolator(app);
 server.before(function(req, res, handler, cb){
   req.started = new Date();
   BasicAuthenticateHelper(req, res, handler, function(){
-    cb(req, res);
+    cb();
   });
 });
 

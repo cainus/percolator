@@ -110,8 +110,8 @@
 var Percolator = require('Percolator').Percolator;
 
 var server = new Percolator();
-server.route('/', {  GET : function($){
-                              $.json({message : 'Hello World!'}).send();
+server.route('/', {  GET : function(req, res){
+                              res.object({message : 'Hello World!'}).send();
                             }});
 server.listen(function(err){
   console.log('server is listening on port ', server.port);
@@ -430,6 +430,8 @@ var Percolator = require('Percolator').Percolator;
 var CRUDCollection = require('Percolator').CRUDCollection;
 var SomeDB = require('./SomeDB');
 
+var db = new SomeDB();
+
 var schema = {
   description : 
     "A notable url to be saved and optionally tagged.",
@@ -452,46 +454,46 @@ var linkCollection = new CRUDCollection({
 
   schema : schema,
 
-  create : function($, obj, cb){
-    $.app.db.insert(obj, function(err, id){
+  create : function(req, res, obj, cb){
+    db.insert(obj, function(err, id){
       if (err){
-        return $.status.internalServerError(err);
+        return res.status.internalServerError(err);
       }
       cb();
     });
   },
 
-  update : function($, id, obj, cb){
-    $.app.db.update(id, obj, function(err){
+  update : function(req, res, id, obj, cb){
+    db.update(id, obj, function(err){
       if (err){
-        return $.status.internalServerError(err);
+        return res.status.internalServerError(err);
       }
       cb();
     });
   },
 
-  destroy : function($, id, cb){
-    $.app.db.remove(id, function(err){
+  destroy : function(req, res, id, cb){
+    db.remove(id, function(err){
       if (err){
-        return $.status.internalServerError(err);
+        return res.status.internalServerError(err);
       }
       cb();
     });
   },
 
-  list : function($, cb){
-    $.app.db.find(function(err, objects){
+  list : function(res, res, cb){
+    db.find(function(err, objects){
       return cb(err, objects);
     });
   },
 
-  fetch : function($, id, cb){
-    $.app.db.findById(id, function(err, foundObject){
+  fetch : function(req, res, id, cb){
+    db.findById(id, function(err, foundObject){
       if (err){
         if (err === 'Not Found'){
           return cb(true);
         }
-        return $.status.internalServerError(err);
+        return res.status.internalServerError(err);
       }
       cb(null, foundObject);
     });
@@ -499,8 +501,7 @@ var linkCollection = new CRUDCollection({
 
 });
 
-var app = { port : 3001,
-            db : new SomeDB()};
+var app = { port : 3001 };
 var server = new Percolator(app);
 
 server.route('/links', linkCollection.handler);
