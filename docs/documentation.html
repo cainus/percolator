@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="percdocs">
+  <head>
+    <meta charset="utf-8">
+    <title>percolator.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="css/sh_acid.min.css" rel="stylesheet">
+      <!-- body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      } 
+
+      .nav-list > li > a {
+        padding: 0px 0px 0px 0px;
+        margin-left : 10px;
+      }
+
+-->
+    <style type="text/css">
+      h2 {
+        margin-top : 50px;
+      }
+      .nav-header {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        margin-top: 0px;
+        margin-bottom: 0px;
+
+      }
+      .nav-sub-header {
+        font-size: 12px;
+        margin-left : 15px;
+        margin-top: 0px;
+        margin-bottom: 0px;
+      }
+      p.nav-sub-header {
+        margin-left : 30px;
+      }
+      li.nav-header {
+        margin-top : 0px;
+        padding-top : 0px;
+        padding-bottom : 0px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-57-precomposed.png">
+    <script type="text/javascript" src="/js/sh_main.min.js"></script>
+    <script type="text/javascript" src="/js/sh_javascript.min.js"></script>
+  </head>
+
+  <body  onload="sh_highlightDocument();" >
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/"><img src="/img/headr-nav.png" /></a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="about.html">About</a></li>
+              <li class="active"><a href="documentation.html">Documentation</a></li>
+              <li><a href="examples.html">Examples</a></li>
+              <li><a href="https://github.com/cainus/percolator">Source Code</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!-- /container -->
+      </div><!-- /navbar-inner -->
+    </div><!-- /navbar -->
+    <div class="container" id="topspacer">
+
+    </div>
+
+    <div class="container">
+        <h2>
+        Documentation
+        </h2>
+        <p></p>
+        <ul class="nav nav-list">
+          <li class="nav-header"><a href="#installation">Installation</a></li>
+          <li class="nav-header" ><a href="#runningtests">Running Tests</a></li>
+          <li class="nav-header" ><a href="#helloworld">Hello World Quick Start</a></li>
+          <li class="nav-header"><a href="#server">The Percolator Server Object</a></li>
+          <p class="nav-sub-header">
+            <a href="#server-route">route</a>&nbsp;
+            <a href="#server-listen">listen</a>&nbsp;
+            <a href="#server-onrequest">onRequest</a>&nbsp;
+          </p>
+          <li class="nav-header" ><a href="#handler">The Handler Object</a></li>
+          <li class="nav-sub-header"><a href="#handler-GET">GET</a></li>
+          <li class="nav-sub-header"><a href="#handler-POST">POST</a></li>
+          <li class="nav-sub-header"><a href="#handler-DELETE">DELETE</a></li>
+          <li class="nav-sub-header"><a href="#handler-PUT">PUT</a></li>
+          <li class="nav-sub-header"><a href="#handler-fetch">fetch</a></li>
+          <li class="nav-sub-header"><a href="#handler-authenticate">authenticate</a></li>
+          <li class="nav-sub-header"><a href="#handler-basicAuthenticate">basicAuthenticate</a></li>
+          <li class="nav-header" ><a href="#context">The Context Object ($)</a></li>
+          <li class="nav-sub-header"><a href="#context-req">$.req</a></li>
+          <li class="nav-sub-header"><a href="#context-res">$.res</a></li>
+          <li class="nav-sub-header"><a href="#context-app">$.app</a></li>
+          <li class="nav-sub-header"><a href="#context-status">$.status</a></li>
+          <p class="nav-sub-header">
+            <a href="#context-status-created">created</a>&nbsp;
+            <a href="#context-status-accepted">accepted</a>&nbsp;
+            <a href="#context-status-noContent">noContent</a>&nbsp;
+            <a href="#context-status-resetContent">resetContent</a>&nbsp;
+            <a href="#context-status-movedPermanently">movedPermanently</a>&nbsp;
+            <a href="#context-status-redirect">redirect</a>&nbsp;
+            <a href="#context-status-badRequest">badRequest</a>&nbsp;
+            <a href="#context-status-unauthenticated">unauthenticated</a>&nbsp;
+            <a href="#context-status-forbidden">forbidden</a>&nbsp;
+            <a href="#context-status-notFound">notFound</a>&nbsp;
+            <a href="#context-status-methodNotAllowed">methodNotAllowed</a>&nbsp;
+            <a href="#context-status-notAcceptable">notAcceptable</a>&nbsp;
+            <a href="#context-status-conflict">conflict</a>&nbsp;
+            <a href="#context-status-gone">gone</a>&nbsp;
+            <a href="#context-status-lengthRequired">lengthRequired</a>&nbsp;
+            <a href="#context-status-preconditionFailed">preconditionFailed</a>&nbsp;
+            <a href="#context-status-requestEntityTooLarge">requestEntityTooLarge</a>&nbsp;
+            <a href="#context-status-requestUriTooLong">requestUriTooLong</a>&nbsp;
+            <a href="#context-status-unsupportedMediaType">unsupportedMediaType</a>&nbsp;
+            <a href="#context-status-unprocessableEntity">unprocessableEntity</a>&nbsp;
+            <a href="#context-status-tooManyRequests">tooManyRequests</a>&nbsp;
+            <a href="#context-status-internalServerError">internalServerError</a>&nbsp;
+            <a href="#context-status-notImplemented">notImplemented</a>&nbsp;
+            <a href="#context-status-badGateway">badGateway</a>&nbsp;
+            <a href="#context-status-serviceUnavailable">serviceUnavailable</a>&nbsp;
+            <a href="#context-status-gatewayTimeout">gatewayTimeout</a>
+          </p>
+          <li class="nav-sub-header"><a href="#context-uri">$.uri</a></li>
+          <p class="nav-sub-header">
+             <a href="#context-uri-absolute">absolute</a> &nbsp;
+             <a href="#context-uri-child">child</a> &nbsp;
+             <a href="#context-uri-get">get</a> &nbsp;
+             <a href="#context-uri-param">param</a> &nbsp;
+             <a href="#context-uri-params">params</a> &nbsp;
+             <a href="#context-uri-parent">parent</a> &nbsp;
+             <a href="#context-uri-parse">parse</a> &nbsp;
+             <a href="#context-uri-pathEnd">pathEnd</a> &nbsp;
+             <a href="#context-uri-pathJoin">pathJoin</a> &nbsp;
+             <a href="#context-uri-query">query</a> &nbsp;
+             <a href="#context-uri-queryClear">queryClear</a> &nbsp;
+             <a href="#context-uri-queryMerge">queryMerge</a> &nbsp;
+             <a href="#context-uri-querystring">queryString</a> &nbsp;
+             <a href="#context-uri-self">self</a> &nbsp;
+             <a href="#context-uri-urlDecode">urlDecode</a> &nbsp;
+             <a href="#context-uri-urlEncode">urlEncode  </a> &nbsp;
+          </p>
+          <li class="nav-sub-header" ><a href="#context-json">$.json</a></li>
+          <p class="nav-sub-header">
+             <a href="#context-json-toString">toString</a> &nbsp;
+             <a href="#context-json-toObject">toObject</a> &nbsp;
+             <a href="#context-json-property">property</a> &nbsp;
+             <a href="#context-json-link">link</a> &nbsp;
+             <a href="#context-json-send">send</a> &nbsp;
+          </p>
+          <li class="nav-sub-header" ><a href="#context-jsoncollection">$.jsonCollection</a></li>
+          <p class="nav-sub-header">
+             <a href="#context-jsoncollection-each">each</a> &nbsp;
+             <a href="#context-jsoncollection-linkEach">linkEach</a> &nbsp;
+          </p>
+          <li class="nav-sub-header" ><a href="#context-onJson">$.onJson</a></li>
+          <li class="nav-sub-header" ><a href="#context-onBody">$.onBody</a></li>
+          <li class="nav-header" ><a href="#crudCollection">CRUDCollection</a></li>
+
+          <p class="nav-sub-header">
+             <a href="#crudCollection-list">list</a> &nbsp;
+             <a href="#crudCollection-fetch">fetch</a> &nbsp;
+             <a href="#crudCollection-create">create</a> &nbsp;
+             <a href="#crudCollection-update">update</a> &nbsp;
+             <a href="#crudCollection-upsert">upsert</a> &nbsp;
+             <a href="#crudCollection-destroy">destroy</a> &nbsp;
+             <a href="#crudCollection-collectionGET">collectionGET</a> &nbsp;
+             <a href="#crudCollection-memberGET">memberGET</a> &nbsp;
+             <a href="#crudCollection-updateSchema">updateSchema</a> &nbsp;
+             <a href="#crudCollection-createSchema">createSchema</a> &nbsp;
+             <a href="#crudCollection-schema">schema</a> &nbsp;
+          </p>
+
+          <li class="nav-header" ><a href="#advancedrouting">Advanced Routing</a> </li>
+          <li class="nav-header" ><a href="#usingConnectMiddleware">Using Connect Middleware</a> </li>
+        </ul>
+      <section id="installation">
+        <h3>Installation</h3>
+        <code>npm install Percolator</code>
+      </section>
+      <section id="runningtests">
+        <h3>Running Tests</h3>
+        <code>make test</code>
+      </section>
+      <section id="helloworld">
+        <h3>Hello World Quick Start:</h3>
+
+<ul class="unstyled">
+<li> Create a <code class="incode">server.js</code> in your project directory, and copy this code below into it:</li>
+<pre class="sh_javascript">
+var Percolator = require('Percolator').Percolator;
+
+var server = new Percolator();
+server.route('/', {  GET : function($){
+                              $.json({message : 'Hello World!'}).send();
+                            }});
+server.listen(function(err){
+  console.log('server is listening on port ', server.port);
+});
+</pre>
+
+<li>
+<p>Run the server:
+<code class="incode">node server.js</code>
+</p>
+</li>
+
+<li><p>See your "Hello World" output at http://localhost:3000/ and be completely floored by the greatest 
+API of all time.  Or not.</p>
+The output json look like this:
+<pre class="sh_javascript">
+{
+  message: "Hello World!",
+  _links: {
+    self: {
+      href: "http://localhost:3000/"
+    }
+  }
+}
+</pre >
+
+You'll notice that Percolator automatically adds a link to the document itself.  This is because 
+it tries to help you create a surfable "Hypermedia" API where every endpoint is accessible from a link
+in another endpoint, and where everything that can be done with the API is described in the API
+itself.
+</li>
+</ul>
+</section>
+
+<div class="alert alert-success">
+  <h3>Why should I care about Hypermedia??!?</h3>
+  <p>
+  Because Hypermedia APIs are pretty awesome for the people using your API.
+  </p>
+  <p>
+  Developers can find their way to all your endpoints just by following the links in the json payload
+  instead of having to read a bunch of docs.  Using a browser plugin like JSONView for 
+  <a href="http://jsonview.com/">Firefox</a> or 
+  <a href="https://chrome.google.com/webstore/detail/jsonview/chklaanhfefbnpoihckbnefhakgolnmc">chrome</a> 
+  makes it so developers can just surf around your API in their browser as if your 
+  responses are regular web pages.
+  </p>
+  <p>
+  These types of APIs are machine-readable as well, so they're spider-able, and even allow automatic 
+  form generation, or automated fuzz-testing.
+  </p>
+
+  <p>
+  In other frameworks adding links everywhere can be time-consuming.  Percolator makes this either 
+  automatic or very easy though.
+
+  </p>
+  <p>
+  NOTE:  If you're worried about the size of your responses, keep in mind that 
+  with proper caching and compression (gzip), there should be little to no cost to your 
+  clients' performance or bandwidth.
+  </p>
+  <p>
+    If you're still unconvinced, you can just pass <code class="incode">autoLink : false</code> to the
+    Percolator constructor, and no links will be added automatically.
+  </p>
+</div> <!-- /alert -->
+
+<section id="server">
+<h3>The Percolator Server Object</h3>
+Any Percolator objects you create are just http servers (based on 
+<a href="https://github.com/cainus/oneone">oneone</a>) with a bunch of helpers
+for making JSON APIs more easily.
+
+<h5>The constructor</h5>
+The constructor returns a percolator server.  It can take an optional single object as 
+a parameter like so:
+
+<pre class="sh_javascript">
+var server = new Percolator({"some" : "object"});
+</pre>
+<p>
+This is called the <strong>app</strong> object.
+</p>
+<p>
+
+Anything you put in the app object will be available to all your HTTP handlers, so it's 
+great for shared configuration, database objects, etc.
+</p>
+
+<p>Additionally, the constructor recognizes a few special properties of the app object:</p>
+
+<p>
+<strong>protocol</strong> - 'http' or 'https'<br>
+<strong>resourcePath</strong> - the url path that all the resource will be routed from (eg. Setting it to '/' will serve the 
+  resources from <a href="http://yourdomain.com/">http://yourdomain.com/</a> while setting it to '/api' will serve the resources from 
+  <a href="http://yourdomain.com/api">http://yourdomain.com/api</a> .<br>
+<strong>staticDir</strong> - The directory on the filesystem from which you will serve static content (use an absolute path!).<br><strong>port</strong> - the http port.  A low port like 80 will not work unless you run the app with root privileges.  </p>
+<strong>autoLink</strong> - A boolean that indicates whether or not to automatically add some links to your json payloads for you.  This value is optional, and the default is 'true', meaning that hyperlinks will be added automatically to your json payloads.<br>
+<strong>port</strong> - the http port.  A low port like 80 will not work unless you run the app with root privileges.  </p>
+<strong>parseBody</strong> - A boolean that indicates whether or not to automatically wait for the entire body to stream in before
+calling an HTTP method handler.  If set to true, the body will be available as $.rawBody or parsed as json to an object available as $.body .</p>
+
+<p>You're obviously going to want to limit the number of app object variables that you add beyond the necessary ones, but
+certain types of objects might make sense in that shared space.</p>
+
+<section id="server-route">
+<h5>route(routeString, handler)</h5>
+<p>
+The route() method of the server takes two parameters, the route string and the resource object.
+</p>
+
+<p>
+It then sets a route using the route string that the given <a href="#handler">handler object</a> will handle when
+an incoming request matches that route.
+</p>
+
+<p>
+Route strings can be regular expressions, or 
+<a href="http://expressjs.com/api.html">express</a>/sinatra-style route strings.
+</p>
+
+<p>
+The resource object is any object that has methods on it that match HTTP methods like POST, PUT, GET, 
+DELETE, etc.  The method takes only one parameter: the context object ($).
+</p>
+
+<p>
+The Hello World example above has a resource object that implements only GET:
+</p>
+<pre class="sh_javascript">
+{
+  GET : function($){
+    $.json({message : 'Hello World!'}).send();
+  }
+}
+</pre>
+Of course, other HTTP methods (PUT, POST, DELETE, etc) can be added to this object as well to
+make this API do more.  Here it is, passed to route() with a routeString of '/', the root path:
+
+<pre class="sh_javascript">
+server.route('/', {  GET : function($){
+                              $.json({message : 'Hello World!'}).send();
+                            }});
+</pre>
+
+Here it is with a POST handler as well:
+<pre class="sh_javascript">
+server.route('/', {
+                    GET : function($){
+                              $.json({message : 'Hello World!'}).send();
+                    },
+                    POST : function($){
+                      $.onJson(function(err, obj){
+                        $.json({posted:obj}).send();
+                      });
+                    }
+});
+</pre>
+
+Note that because resource objects are just objects, you can load them from a file as modules, or create
+components that you re-use for different modules.
+</section>
+<section id="server-listen">
+<h5>listen([cb])</h5>
+Call listen() on the server to start it listening.  The default port (unless overridden by 
+the app object) is 3000.
+
+listen() takes an optional callback as well, that is called when the server is listening, or 
+when there's been an error.  The error will be the first parameter to this callback, if it exists.
+
+<pre class="sh_javascript">
+server.listen(function(err){
+  console.log('server is listening on port ', server.port);
+});
+</pre>
+</section>
+<section id="server-onrequest">
+<h5>onRequest(cb)</h5>
+<p>
+The onRequest() method takes a callback as its only parameter.  The callback is called when
+a request occurs.
+</p>
+
+<p>
+The callback takes handler, context and cb parameters.  
+</p>
+
+<p>
+The <strong>handler</strong> is the resource object that is routed to the request url in 
+the router.  It will contain the functions meant to handle the different HTTP methods.
+</p>
+<p>
+The <strong>context</strong> ($) is the context object.  If you want to augment the 
+context object for some reason, for all requests, this is a great place to do it.
+</p>
+<p>
+The <strong>cb</strong> parameter is a callback that will be called to 'return' the 
+context object.  The context object should be its only parameter.
+</p>
+
+<p>
+Here's an example:
+</p>
+
+<pre class="sh_javascript">
+server.onRequest(function(handler, $, cb){
+  // print the request method and url for every request.
+  console.log(' <-- ', $.req.method, ' ', $.req.url);
+  cb($);
+});
+</pre>
+</section>
+</section>
+<section id="handler">
+<h3>The Handler Object</h3>
+<p>The handler object is not an object in the Percolator framework, but rather is one that an application
+written on the Percolator framework should provide for each route that it defines.  It is simply the 
+object that is passed to calls to <a href="#server-route">Server.route()</a> that specifies how a route should handle requests.
+</p>
+<p>
+  It may or may not implement any of the methods listed below.  If it does not implement a particular HTTP method, requests to the handler for that
+method will result in an automatic 405 (method not allowed) response.</p>
+<section id="handler-GET"></section>
+<h5>GET($)</h5>
+<p>
+Implementing this method on a handler object will allow it to respond to GET requests.  The only 
+parameter is a <a href="#context">context object</a>.  Any return value will be ignored.
+</p>
+<section id="handler-POST"></section>
+<h5>POST($)</h5>
+<p>
+Implementing this method on a handler object will allow it to respond to POST requests.  The only 
+parameter is a <a href="#context">context object</a>.  Any return value will be ignored.
+</p>
+
+<section id="handler-DELETE"></section>
+<h5>DELETE($)</h5>
+<p>
+Implementing this method on a handler object will allow it to respond to DELETE requests.  The only 
+parameter is a <a href="#context">context object</a>.  Any return value will be ignored.
+</p>
+
+<section id="handler-PUT"></section>
+<h5>PUT($)</h5>
+<p>
+Implementing this method on a handler object will allow it to respond to PUT requests.  The only 
+parameter is a <a href="#context">context object</a>.  Any return value will be ignored.
+</p>
+
+<section id="handler-authenticate"></section>
+<h5>authenticate($, cb)</h5>
+<p>
+Implementing authenticate() is not required but is convenient if you want
+to specify a general authentication strategy for all methods on the resource.  
+If you implement authenticate(), it will automatically return 401 responses for
+unauthenticated access while permitting authenticated access as normal.
+
+
+<p>The authenticate() function has two required parameters: the <a href="#context">context object</a>
+, and cb.</p>
+
+<p>The <strong>cb</strong> argument is a callback that takes two parameters.  The
+first parameter is an error object if any error occurred.  If the error object
+is strictly <strong>true</strong>, then the response will be a 401.  If the error
+object is non-strict-true but still truthy, then the response will be a 500 (internal 
+server error). The second parameter should be an object that represents the 
+logged in user.  It will automatically
+by added to the context object as $.authenticated in any member resource
+methods that you implement.
+</p>
+<pre class="sh_javascript">
+server.route('/someProtectedPath', {
+  authenticate : function($, cb){
+    // try to get the user here, based on cookie, Authentication header, etc
+    if (cannotGetUser){
+      return cb(true);  // Percolator will 401 for you
+    }
+    cb(someError, theUser);
+    // if there wasn't some other error, theUser will be available 
+    // at $.authenticated in all methods
+  },
+  GET : function($){
+    $.json({youAre : $.authenticated}).send();
+  }
+});
+</pre>
+<section id="handler-basicAuthenticate"></section>
+<h5>basicAuthenticate(username, password, $, cb)</h5>
+<p>
+Implementing basicAuthenticate() is not required but is convenient if you want
+to use <a href="http://en.wikipedia.org/wiki/Basic_access_authentication">basic http authentication</a> 
+on the resource.  If you implement basicAuthenticate(), it will automatically return 401 responses for
+unauthenticated access while permitting authenticated access as normal.
+
+
+<p>The basicAuthenticate() function has four required parameters: the basic http auth username, 
+the basic http auth password, the <a href="#context">context object</a>
+, and a callback, cb.</p>
+
+<p>The <strong>cb</strong> argument is a callback that takes two parameters.  The
+first parameter is an error object if any error occurred.  If the error object
+is strictly <strong>true</strong>, then the response will be a 401.  If the error
+object is non-strict-true but still truthy, then the response will be a 500 (internal 
+server error). The second parameter should be an object that represents the 
+logged in user.  It will automatically
+by added to the context object as $.authenticated in any member resource
+methods that you implement.
+</p>
+<pre class="sh_javascript">
+server.route('/someProtectedPath', {
+  basicAuthenticate : function(username, password, $, cb){
+    // try to get the user here, based on cookie, Authentication header, etc
+    if (username === 'Pierre' && password === 'Collateur'){
+      return cb(null, {username : "Pierre", twitter_handle : "@Percolator"});
+      // user object will be available in $.authenticated in all methods
+    } else {
+      return cb(true);  // Percolator will 401 for you
+    }
+  },
+  GET : function($){
+    $.json({youAre : $.authenticated}).send();
+  }
+});
+</pre>
+
+<section id="handler-fetch"></section>
+<h5>fetch($, cb)</h5>
+<p>
+Implementing fetch() on a handler object is an unnecessary but sometimes useful way to specify how
+404s will be determined, so you don&apos;t need to write the same 404-handling code in all methods
+that you support.  If you implement fetch(), fetch can do the 404-ing for you, before your regular 
+handler methods are even run.  In the event of a 404, a call to <a href="#context-status-notFound">$.status.notFound()
+</a> will be made automatically.
+</p>
+
+<p>The fetch() function has two required parameters: the <a href="#context">context object</a>
+, and cb.</p>
+
+<p>The <strong>cb</strong> argument is a callback that takes two parameters.  The
+first parameter is an error object if any error occurred.  The
+second parameter should be the object that was fetched from your
+data source for the current uri.  It will automatically
+by added to the context object as $.fetched in any member resource
+methods that you implement.
+</p>
+<p>
+The fetch() function will 404 for you automatically if you
+pass strict <strong>true</strong> to the callback (<strong>
+cb</strong>) as the first parameter.
+</p>
+<p>
+A handler object can also have a boolean property by the name of &apos;fetchOnPUT&apos; that defaults to true,
+but allows you to turn fetch off for PUT, even though fetch usually applies to all methods.  This
+is useful if you use PUT for creating new resources at the given URL, because a non-existent 
+resource would otherwise cause a 404.
+</p>
+
+<pre class="sh_javascript">
+var module = new CRUDCollection({
+  fetch : function($, cb){
+    // get some item from your data source, probably based on $.uri.pathEnd()
+    cb(null, theObject);
+  }
+});
+</pre>
+</section>
+
+
+
+
+</section>
+<section id="context">
+<h3>The Context Object ($)</h3>
+The "Hello World" example should be pretty straightforward, except it has a strange dollar sign ($) in it.  
+This is the context object.  The context object is basically just a holder for all the things your request 
+handler will care about.  You can name it whatever you want really, but '$' is a nice short name that you're
+unlikely to have a clash with in a server-side environment.  It has a number of interesting properties:
+<section id="context-req"></section>
+<h5>$.req</h5>
+This is the unaltered <a href="http://nodejs.org/api/http.html#http_class_http_serverrequest">request object</a> from the node.js standard library.
+<section id="context-res"></section>
+<h5>$.res</h5>
+This is the unaltered <a href="http://nodejs.org/api/http.html#http_class_http_serverrequest">response object</a> from the node.js standard library.
+
+<section id="context-app"></section>
+<h5>$.app</h5>
+This is the app object that you passed in the constructor to Percolator.
+
+<section id="context-status">
+</section>
+<h5>$.status</h5>
+<p>
+The status module is automatically attached to your resource handler at request time. It is just a bunch of helper functions for dealing with response statuses.
+</p>
+
+<p>
+This is an important module because building great APIs requires excellent and consistent error and status reporting.
+</p>
+
+<p>
+To understand what the codes mean, please refer to <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html">http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html</a>.
+</p>
+
+<h6>Usage</h6>
+These methods generally set the HTTP status and end the response, so in general you should 
+not expect to write more to the response after these. If a response body makes sense, it 
+will generally be written automatically. For clarity, it's recommended that when you call 
+one of these functions, you call it with <code class="incode">return</code> in front of it. Here's an example:
+
+<pre class="sh_javascript">
+server.route('/', {  GET : function($){
+                              return $.status.redirect('/someOtherUrl');
+                            }});
+</pre>
+<p>
+Here are the functions that it makes available in your method handler:
+</p>
+
+<h6>Redirect scenarios</h6>
+<section id="context-status-created">
+<dl>
+  <dt>
+$.status.created(redirectUrl);
+  </dt>
+  <dd>
+This method is used for HTTP STATUS 201 scenarios when the server has just created a resource successfully so that the server can tell the client where to find it. It sets the status to 201 and sets the 'Location' header to the redirectUrl.
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-movedPermanently">
+<dl>
+  <dt>
+    $.status.movedPermanently(redirectUrl);
+  </dt>
+  <dd>
+    This method is used for HTTP STATUS 301 scenarios where a resource has been permanently moved somewhere else so the server can tell the client where to find it. It sets the status to 301 and sets the 'Location' header to the redirectUrl.
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-redirect">
+<dl>
+  <dt>
+    $.status.redirect(redirectUrl);
+  </dt>
+  <dd>
+    This is just an alias of movedPermanently()
+  </dd>
+</dl>
+</section>
+
+<h6>Success responses</h6>
+<p>
+"200 OK" statuses are the default, so you don't need to specify those explicitly.
+</p>
+<p>
+201 Created statuses are described in the redirect section above.
+</p>
+
+<section id="context-status-accepted">
+<dl>
+  <dt>
+    $.status.accepted();
+  </dt>
+  <dd>
+    Used to indicate that a response has been accepted, but not yet processed, this response will emit a "202 Accepted" status.
+  </dd>
+</dl>
+</section>
+<section id="context-status-noContent">
+<dl>
+  <dt>
+    $.status.noContent();
+  </dt>
+  <dd>
+    Used to indicate that a request was successful, but there's no body to return (for example, a successful DELETE).  This response will emit a "204 No Content" status.
+  </dd>
+</dl>
+</section>
+<section id="context-status-resetContent">
+<dl>
+  <dt>
+    $.status.resetContent();
+  </dt>
+  <dd>
+    Used to indicate that a request was sucessful so a related UI (usually a form) should clear its content.  This response will emit a "205 Reset Content" status.
+  </dd>
+</dl>
+</section>
+
+<h6>Error Scenarios</h6>
+All of the error scenarios are handled similarly and attempt to show a response body that indicates the error that occurred as well. The status code will be set on the response as well as in that response body.
+
+All of these methods additionally take a single parameter where additional detail information can be added. For example:
+
+<pre class="sh_javascript">
+server.route('/', {  GET : function($){
+                              return $.status.internalServerError('The server is on fire.');
+                            }});
+</pre>
+
+Output:<br />
+<code>
+{"type":500,"message":"Internal Server Error","detail":"The server is on fire"}
+</code>
+<h6>Error response methods:</h6>
+
+<section id="context-status-badRequest">
+<dl>
+  <dt>
+    $.status.badRequest([detail])
+  </dt>
+  <dd>
+    <code>
+    {"type":400,"message":"Bad Request"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-unauthenticated">
+<dl>
+  <dt>
+    $.status.unauthenticated([detail])
+  </dt>
+  <dd>
+    <code>
+      {"type":401,"message":"Unauthenticated"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-forbidden">
+<dl>
+  <dt>
+      $.status.forbidden([detail])
+  </dt>
+  <dd>
+    <code>
+      {"type":403,"message":"Forbidden"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-notFound">
+<dl>
+  <dt>
+      $.status.notFound([detail])
+  </dt>
+  <dd>
+    <code>
+        {"type":404,"message":"Not Found"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-methodNotAllowed">
+
+<dl>
+  <dt>
+      $.status.methodNotAllowed([detail])
+  </dt>
+  <dd>
+    <code>
+      {"type":405,"message":"Method Not Allowed"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-notAcceptable">
+<dl>
+  <dt>
+      $.status.notAcceptable([detail])
+  </dt>
+  <dd>
+    <code>
+      {"type":406,"message":"Not Acceptable"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+
+<section id="context-status-conflict">
+<dl>
+  <dt>
+      $.status.conflict([detail])
+  </dt>
+  <dd>
+    <code>
+        {"type":409,"message":"Conflict"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-gone">
+<dl>
+  <dt>
+      $.status.gone([detail])
+  </dt>
+  <dd>
+    <code>
+        {"type":410,"message":"Gone"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-lengthRequired">
+<dl>
+  <dt>
+      $.status.lengthRequired([detail])
+  </dt>
+  <dd>
+    <code>
+        {"type":411,"message":"Length Required"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-preconditionFailed">
+<dl>
+  <dt>
+      $.status.preconditionFailed([detail])
+  </dt>
+  <dd>
+    <code>
+        {"type":412,"message":"Precondition Failed"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-requestEntityTooLarge">
+<dl>
+  <dt>
+      $.status.requestEntityTooLarge([detail])
+  </dt>
+  <dd>
+    <code>
+        {"type":413,"message":"'Request Entity Too Large"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-requestUriTooLong">
+<dl>
+  <dt>
+$.status.requestUriTooLong([detail])
+  </dt>
+  <dd>
+    <code>
+{"type":414,"message":"Request URI Too Long"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-unsupportedMediaType">
+<dl>
+  <dt>
+$.status.unsupportedMediaType([detail])
+  </dt>
+  <dd>
+    <code>
+{"type":415,"message":"Unsupported Media Type"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-unprocessableEntity">
+<dl>
+  <dt>
+$.status.unprocessableEntity([detail])
+  </dt>
+  <dd>
+    <code>
+{"type":422,"message":"'Unprocessable Entity"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-tooManyRequests">
+<dl>
+  <dt>
+$.status.tooManyRequests([detail])
+  </dt>
+  <dd>
+    <code>
+{"type":429,"message":"Too Many Requests"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-internalServerError">
+<dl>
+  <dt>
+$.status.internalServerError([detail])
+  </dt>
+  <dd>
+    <code>
+{"type":500,"message":"Internal Server Error"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-notImplemented">
+<dl>
+  <dt>
+$.status.notImplemented([detail])
+  </dt>
+  <dd>
+    <code>
+{"type":501,"message":"Not Implemented"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-badGateway">
+<dl>
+  <dt>
+$.status.badGateway([detail])
+  </dt>
+  <dd>
+    <code>
+{"type":502,"message":"Bad Gateway"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-serviceUnavailable">
+<dl>
+  <dt>
+      $.status.serviceUnavailable([detail])
+  </dt>
+  <dd>
+    <code>
+        {"type":503,"message":"Service Unavailable"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+<section id="context-status-gatewayTimeout">
+<dl>
+  <dt>
+      $.status.gatewayTimeout([detail])
+  </dt>
+  <dd>
+    <code>
+        {"type":504,"message":"Gateway Timeout"}
+    </code>
+  </dd>
+</dl>
+</section>
+
+
+<section id="context-uri">
+<h5>$.uri</h5>
+<p>
+Each method you define has access to a 'uri' module that understands the context of each particular request that it's used in. The module makes a number of convenient methods available for dealing with uri's and generally making the parsing of uri's simpler and the creation of new uri's simple. Here are example usages:
+</p>
+
+<h6> General Usage: </h6>
+
+<pre class="sh_javascript">
+server.route('/', {  GET : function($){
+                              $.json({self : $.uri.self()}).send();
+                                // --> {"self" : "http://example.com/currentUrl"}
+                            }});
+</pre>
+<h6>Api specifics:</h6>
+<section id="context-uri-absolute">
+<dl>
+  <dt>
+    $.uri.absolute(path)
+  </dt>
+  <dd>
+    Takes a relative path and returns an absolute path using the hostname header.
+    <pre class="sh_javascript">
+$.uri.absolute("/somepath");
+// returns "http://hostname.com/somepath" </pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-uri-child">
+<dl>
+  <dt>
+$.uri.child(suffix);
+  </dt>
+  <dd>
+Returns the current url with the given suffix added to the path as the last 
+"folder".  For example, if the current URI is http://localhost/artist/1234/, then...
+    <pre class="sh_javascript">
+$.uri.child('song');
+// ... would return http://localhost/artist/1234/song
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-uri-get">
+<dl>
+  <dt>
+$.uri.get(path [, variableHash]);
+  </dt>
+  <dd>
+Gets a url by path. An optional hash may be passed of variables to fill in necessary path variables.
+    <pre class="sh_javascript">
+$.uri.get('/artist/:artist', {artist : 1234});
+// could return something like:  'http://hostname.com/artist/1234' if such a route exists.
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-uri-param">
+<dl>
+  <dt>
+$.uri.param(name)
+  </dt>
+  <dd>
+Retrieves the specified param value by the input param name from the object returned by $.uri.params() (see above).
+For example, if the URI is http://localhost/artist/1234/song/5678, then...
+    <pre class="sh_javascript">
+$.uri.param("song");
+// ... will return 5678
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-uri-params">
+<dl>
+  <dt>
+$.uri.params()
+  </dt>
+  <dd>
+returns an object containing the name/value pairs of variables extracted from the uri's "path" (NOT including querystring). An optional uri may be passed in, but the default is to use the current request's uri.
+
+For example, if the URI is http://localhost/artist/1234/song/5678, then...
+    <pre class="sh_javascript">
+$.uri.params()
+// ... will return:
+{ artist : 1234, song : 5678 }
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-uri-parent">
+<dl>
+  <dt>
+$.uri.parent();
+  </dt>
+  <dd>
+Get the parent URI of the current URI. An optional URI may be passed in to get its' parent's URI instead.
+    <pre class="sh_javascript">
+$.uri.parent("http://asdf.com/asdf");
+// returns "http://asdf.com/"
+</pre>
+  </dd>
+</dl>
+</section>
+
+
+<section id="context-uri-parse">
+<dl>
+  <dt>
+$.uri.parse([url]);
+  </dt>
+  <dd>
+Returns the result of <a href="http://nodejs.org/docs/v0.9.0/api/url.html#url_url_parse_urlstr_parsequerystring_slashesdenotehost">node's url.parse</a> for the current URI. An optional URI can be passed to use that one instead.
+    <pre class="sh_javascript">
+$.uri.parse();
+//returns:
+{ href : 'http://somehostname.com:8080/artist/1234/song?genre=hiphop', 
+  protocol : 'http', 
+  host : 'somehostname.com:8080', 
+  hostname : 'somehostname.com', 
+  port : 8080,
+  pathname : '/artist1234',
+  search : '?genre=hiphop'}
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-uri-pathEnd">
+<dl>
+  <dt>
+$.uri.pathEnd([url]);
+  </dt>
+  <dd>
+Returns the last "folder" in the path of the given url.  If no url is given, then the current url
+is used.
+    <pre class="sh_javascript">
+$.uri.pathEnd('http://asdf.com/a/b/c');
+// ... would return 'c':
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-uri-pathJoin">
+<dl>
+  <dt>
+$.uri.pathJoin(...);
+  </dt>
+  <dd>
+Takes a list of strings and arrays of strings and returns a forward-slash-delimited path of all the pieces in the order that they appear (without a trailing slash).
+    <pre class="sh_javascript">
+$.uri.pathJoin("asdf", ["qwer", "tyui"], "1234");
+returns '/asdf/qwer/tyui/1234'
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-uri-query">
+<dl>
+  <dt>
+$.uri.query([url]);
+  </dt>
+  <dd>
+Get the querystring data from the current url as an object with the name/value pairs in the querystring. An alternative url can optionally be passed in.
+    <pre class="sh_javascript">
+$.uri.query('http://asdf.com/path/?this=is&a=test');
+// returns: 
+{ this:is, a:test }
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-uri-queryClear">
+<dl>
+  <dt>
+$.uri.queryClear([url]);
+  </dt>
+  <dd>
+Remove the querystring from the current URL, or optionally an input URL.
+    <pre class="sh_javascript">
+$.uri.queryClear('http://localhost/asdf?this=isnot&a=test&ok=true');
+// returns: 'http://localhost/asdf'
+</pre>
+  </dd>
+</dl>
+</section>
+<section id="context-uri-queryMerge">
+<dl>
+  <dt>
+$.uri.queryMerge(queryHash, [url]);
+  </dt>
+  <dd>
+Take an input object (the 'queryHash') and optionally a url (default is the current url) and create a new url with a 
+querystring that has the name/value pairs of the input object merged into it.
+    <pre class="sh_javascript">
+$.uri.queryMerge({ this:is, ok:null }, 'http://localhost/asdf?this=isnot&a=test&ok=true');
+// returns: 'http://localhost/asdf?this=is&a=test'
+</pre>
+Notice that a null value (in the case of 'ok') removes the ok value from the querystring.<br/>
+Also notice that the value of 'this' is changed from 'isnot' to 'is' and the value of 'a' is left
+untouched because the queryHash doesn't mention it.
+  </dd>
+</dl>
+</section>
+
+
+<section id="context-uri-querystring">
+<dl>
+  <dt>
+$.uri.queryString(queryHash);
+  </dt>
+  <dd>
+Take an input object and create a querystring of the name/value pairs in the queryHash.
+    <pre class="sh_javascript">
+$.uri.queryString({ this:is, a:test });
+// returns: '?this=is&a=test'
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-uri-self">
+<dl>
+  <dt>
+$.uri.self()
+  </dt>
+  <dd>
+returns the current uri (as an absolute uri).
+    <pre class="sh_javascript">
+$.uri.self();
+// returns 'http://hostname.com/thecurrentpath/'  (if that's the current url)
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-uri-urlDecode">
+<dl>
+  <dt>
+$.uri.urlDecode(someEncodedStr)
+  </dt>
+  <dd>
+take a url-encoded string and return a decoded version of it.
+    <pre class="sh_javascript">
+$.uri.urlDecode("this%20is%20a%20test");
+// returns "this is a test"
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-uri-urlEncode">
+<dl>
+  <dt>
+$.uri.urlEncode(somestr);
+  </dt>
+  <dd>
+take a string and return a url-encoded version of it. This method uses node's querystring module's escape().
+    <pre class="sh_javascript">
+$.uri.urlEncode("this is a test");
+// returns "this%20is%20a%20test"
+</pre>
+  </dd>
+</dl>
+</section><!-- / context-uri-urlEncode -->
+</section><!-- / context-uri -->
+
+<section id="context-json">
+<h5>$.json</h5>
+
+$.json is a function that takes an object for later output as json.  It returns a "HyperJSON" object which is just 
+a fluid (chained) interfaced for creating json with links easily.
+
+
+<section id="context-json-toString">
+<dl>
+  <dt>
+     toString()
+  </dt>
+  <dd>
+    returns a json string representation of the input object.
+    <pre class="sh_javascript">
+$.json({some : "test"}).toString();
+// returns '{"some":"test"}'
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-json-toObject">
+<dl>
+  <dt>
+     toObject()
+  </dt>
+  <dd>
+    returns your input object, with any alterations you've made so far
+    <pre class="sh_javascript">
+$.json({some : "test"}).toObject();
+// returns {some:"test"}
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-json-property">
+<dl>
+  <dt>
+     property(name, value)
+  </dt>
+  <dd>
+    adds a property to your input object
+    <pre class="sh_javascript">
+$.json({some : "test"}).property("also", "this").toObject();
+// returns {some:"test",also:"this"}
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-json-link">
+<dl>
+  <dt>
+     link(rel, href, [options])
+  </dt>
+  <dd>
+    adds a link to your input object
+    <pre class="sh_javascript">
+$.json({some : "test"}).link("somerel", "http://some.example.com").toObject();
+// returns {some:"test",_links:{somerel:{href:"http://some.example.com"}}}
+</pre>
+  </dd>
+  <dd>
+    The options object can be used to specify the http method with a 'method' property and
+    a json schema with a 'schema' property   The schema property should be an object that, when converted to
+    json, is a valid <a href="http://json-schema.org/">json schema</a> object.
+    <pre class="sh_javascript">
+$.json({some : "test"}).link("somerel", "http://some.example.com", {method:"POST", schema:{}}).toObject();
+// returns {some:"test",_links:{somerel:{href:"http://some.example.com",method:"POST",schema:{}}}}
+</pre>
+  </dd>
+</dl>
+</section>
+
+<section id="context-json-send">
+<dl>
+  <dt>
+     send()
+  </dt>
+  <dd>
+    sends the input object as json in the http response and ends the response.
+    <pre class="sh_javascript">
+$.json({some : "test"}).send();
+</pre>
+  </dd>
+</dl>
+</section>  <!-- /$.json -->
+
+<section id="context-jsoncollection">
+<h5>$.jsonCollection</h5>
+This object is meant for creating and manipulating json "collections" which are useful in general when you want
+to output a list of things in json.  It has all the same capibilities as $.json, but it also adds some additional
+capability for dealing with the individual items in the list.
+
+$.jsonCollection() is function that takes either an array or an object that will be treated as a hash.  It will
+ then add that list/hash to an _items property in a wrapper object.
+
+<pre class="sh_javascript">
+// object/hash version
+$.jsonCollection({someitem : "1234",someotheritem : 4567}).toObject();
+// returns:
+{
+  _items : {
+    someitem : "1234",
+    someotheritem : "4567"
+  },
+  _links : {
+    parent: {
+      href: "http://example.com/api"
+    }
+  }
+}
+</pre>
+  </dd>
+</dl>
+
+<pre class="sh_javascript">
+// array version
+$.jsonCollection([{someitem : "1234"},{someotheritem : 4567}]).toObject();
+// returns:
+{
+  _items : [
+    {someitem : "1234"},
+    {someotheritem : "4567"}
+  ],
+  _links : {
+    parent: {
+      href: "http://example.com/api"
+    }
+  }
+}
+
+</pre>
+  </dd>
+</dl>
+
+
+
+<section id="context-jsoncollection-each">
+<dl>
+  <dt>
+     each(cb)
+  </dt>
+  <dd>
+    runs a given callback on each item in the list.  The list can be an array or an object that will be 
+    treated as a hash. The callback takes an individual item as its only parameter and replaces that item 
+    with the return value 
+    <pre class="sh_javascript">
+$.jsonCollection({some : "test"}).each(function(item){return item + "2";}).toObject();
+// returns...
+{
+  _items : {
+      some: "test2"
+  },
+  _links : {
+    parent: {
+      href: "http://example.com/api"
+    }
+  }
+}
+</pre>
+    <pre class="sh_javascript">
+$.jsonCollection([{some:"test"}]).each(function(item){return item + "2";}).toObject();
+// returns...
+{
+  _items : [
+    { some: "test2" }
+  ],
+  _links : {
+    parent: {
+      href: "http://example.com/api"
+    }
+  }
+}
+</pre>
+<!-- TODO verify the output of these.  Add parent/self links as well. -->
+  </dd>
+</dl>
+</section>
+
+
+<section id="context-jsoncollection-linkEach">
+<dl>
+  <dt>
+     linkEach(rel, cb)
+  </dt>
+  <dd>
+    You can use this function for adding a link to each item in the collection.  The 
+    <strong>rel</strong> argument is
+    the rel property of the link.  The rel property is usually a way of describing what this link 
+    will lead to.  There are a bunch of 
+<a href="http://www.iana.org/assignments/link-relations/link-relations.xml">predefined rel names</a> 
+    or you can make your own.
+    The <strong>cb</strong> argument is a callback that will be run on each item in the list and to create a link with the given rel 
+    from the callback's return value and add it to that item.  The callback takes an individual item as its 
+    only parameter and replaces that item with the return value 
+<pre class="sh_javascript">
+$.jsonCollection({some : "test"}).linkEach('plustwo', function(item){return 'http://server.com/' + item + "2";}).toObject();
+// returns...
+{
+  _items : {
+    some: "test",
+    _links : {
+      plustwo : {
+        href : 'http://server.com/test2'
+      }
+    }
+  },
+  _links : {
+    parent: {
+      href: "http://example.com/api"
+    }
+  }
+}
+</pre>
+<pre class="sh_javascript">
+$.jsonCollection([{some : "test"}]).linkEach('plustwo', function(item){return 'http://server.com/' + item['some'] + "2";}).toObject();
+// returns...
+{
+  _items : [
+    some: "test",
+    _links : {
+      plustwo : {
+        href : 'http://server.com/test2'
+      }
+    }
+  ],
+  _links : {
+    parent: {
+      href: "http://example.com/api"
+    }
+  }
+}
+</pre>
+  </dd>
+</dl>
+</section><!-- jsonCollection-linkEach -->
+</section><!-- jsonCollection -->
+
+
+
+<section id="context-onJson">
+<h5>$.onJson([schema], cb)</h5>
+<p>
+$.onJson() is used for handling a request where the request body is json (normally a PUT or POST).  It 
+takes care of accepting the incoming stream, attempting to parse it to json, and automatically 
+sending a 400 error if it does not parse.
+</p>
+<p>
+The first, <em>optional</em> parameter, <strong>schema</strong>,  is a 
+<a href="http://json-schema.org/">json schema</a> as a javascript object (not as a string).  This 
+schema object can be used to validate the incoming json object if desired.  $.onJson will return 
+an appropriate error to the user if the incoming json is not acceptable according to the schema.
+</p>
+<p>
+The last (or only) parameter is a callback that is used if the incoming json parses successfully.  
+The callback will take an 'error' and an 'object' parameter, where the error parameter will contain 
+any error that was not automatically handled (like a network error), and the object parameter will 
+contain any object that was deserialized from the incoming json (if possible).
+</p>
+<pre class="sh_javascript">
+// without a json schema...
+$.onJson(function(err, obj){
+  console.log('error: ', err);
+  console.log('object: ', obj);
+});
+</pre>
+<pre class="sh_javascript">
+// with a json schema...
+var schema = {
+    properties : {
+      "username" : {
+        type : "string",
+        required : true
+      }
+    };
+$.onJson(schema, function(err, obj){
+  console.log('error: ', err);
+  console.log('object: ', obj);
+});
+</pre>
+</section>
+
+
+
+
+<section id="context-onBody">
+<h5>$.onBody(cb)</h5>
+<p>
+$.onBody() is used for handling the streaming of non-json request bodies.
+</p>
+<p>
+The only parameter is a callback that takes an error and a body parameter.  The <strong>error
+</strong> parameter will be null unless an error occurred during streaming of the body, in 
+which case it will contain the error.  The <strong>body</strong> parameter will contain the
+request body as a string for use inside the callback.
+</p>
+
+<pre class="sh_javascript">
+$.onBody(function(err, body){
+  console.log('error: ', err);
+  console.log('body: ', body);  // body is just a string here
+});
+</pre>
+<p>
+NOTE: If you're expecting json, then you should normally use $.onJson() instead of this method.
+</p>
+
+<!--
+<h3>Resource Objects</h3>
+// TODO
+// authenticate
+// basicAuthenticate
+// fetch
+// handler and wildcard
+
+-->
+</section>
+
+<section id="crudCollection">
+<h3>CRUDCollection</h3>
+<p>
+A CRUDCollection is a module that implements handlers for
+a json collection, and all its members.  It allows you 
+to implement just your CRUD (create, read, update, 
+delete) logic for the collection and its
+members without having to deal with much HTTP/API logic at 
+all.
+</p>
+
+<h5>Creating a CRUDCollection</h5>
+
+<p>
+Here's how it's constructed:
+</p>
+<pre class="sh_javascript">
+var CRUDCollection = require('Percolator').CRUDCollection;
+var module = new CRUDCollection({
+  // implementation strategy goes here!
+});
+</pre>
+<p>
+The module that is created will have two properties: 
+<strong>handler</strong> and <strong>member</strong>.  The
+<strong>handler</strong> property is a handler for a collection and can just 
+be routed like this:
+</p>
+
+<pre class="sh_javascript">
+server.route('/myCollection', module.handler);
+</pre>
+<p>
+The <strong>wildcard</strong> property is a handler for the members
+of the collection and can be routed like this:
+</p>
+
+<pre class="sh_javascript">
+server.route('/myCollection/:memberid', module.wildcard);
+</pre>
+
+</p>
+
+<section id="crudCollection-list">
+</section>
+<h5>list($, cb)</h5>
+<p>
+Implement the list() function to provide the module with all
+the items that should show up in the collections GET view.  
+CRUDCollection requires that either this function or collectionGET()
+is implemented to ensure that your collection is accessible via
+GET.
+</p>
+<pre class="sh_javascript">
+var module = new CRUDCollection({
+  list : function($, cb){
+    // generate the list to return for the collection view.
+    cb(null, [{some : "object"}, {some : "otherobject"}]);
+  }
+});
+</pre>
+<section id="crudCollection-fetch">
+<h5> fetch($, cb) </h5>
+<p>
+Implement the fetch() function to provide the GET handler
+for individual members of the collection.  If you don't 
+implement this, you'll need to implement memberGET() to be 
+able to GET resources for individual members.
+</p>
+
+<p>The fetch() function has two required parameters: the 
+context object, and cb.</p>
+
+<p>The <strong>cb</strong> argument is a callback that takes two parameters.  The
+first parameter is an error object if any error occurred.  The
+second parameter should be the object that was fetched from your
+data source for the current uri.  It will automatically
+by added to the context object as $.fetched in any member resource
+methods that you implement.
+</p>
+<p>
+The fetch() function will 404 for you automatically if you
+pass strict <strong>true</strong> to the callback (<strong>
+cb</strong>) as the first parameter.
+</p>
+<p>
+This function is also used for automatically determining
+if it should 404 for PUTs and DELETEs to the individual 
+members as well.
+</p>
+
+<pre class="sh_javascript">
+var module = new CRUDCollection({
+  fetch : function($, cb){
+    // get some item from your data source, probably based on $.uri.pathEnd()
+    cb(null, theObject);
+  }
+});
+</pre>
+</section>
+
+<section id="crudCollection-create">
+<h5> create($, object, cb) </h5>
+<p>
+The create() function is used for creating new resources via
+POST to the collection when the unique ID for the user (and 
+its URI in general) are server-generated and NOT client-provided.
+</p>
+
+<p>
+Implement create() to allow this kind of object creation.  The
+CRUDCollection will do json parsing and validation for you (if you 
+supply a <strong>schema</strong> or a <strong>createSchema
+</strong>) and 
+it will respond with appropriate error messages automatically
+in the case of failures.
+</p>
+
+<p>
+The function will be passed a context object ($), the 
+unserialized json object, and a callback.  The callback takes
+no parameters and can optionally be called in the event of 
+successful creation to respond with a 201 CREATED status.  You have
+the option of not calling the callback at all and instead
+responding however you want.
+</p>
+<pre class="sh_javascript">
+var module = new CRUDCollection({
+  create : function($, object, cb){
+    // store your object here
+    cb();
+  }
+});
+</pre>
+</section>
+<section id="crudCollection-update">
+<h5> update($, id, obj, cb) </h5>
+<p>
+The update() function is used for updating existing resources
+via PUT to the individual resource's existing URI.
+</p>
+<p>
+Implement update() to allow resources to be updated.  The 
+CRUDCollection will handle the json parsing and validation for you (
+if you supply a <strong>schema</strong> or an 
+<strong>updateSchema</strong>) and it will respond with 
+appropriate error messages automatically in the case of failures.
+</p>
+<p>
+The function will be passed a context object ($), the 'id' at the
+end of the resource's URI, the object returned from 
+<code class="incode">fetch()</code>, and a callback.  The callback takes
+no parameters and can optionally be called in the event of 
+successful update to respond with a 303 redirect.  You have
+the option of not calling the callback at all and instead
+responding however you want.
+</p>
+<pre class="sh_javascript">
+var module = new CRUDCollection({
+  update : function($, id, obj, cb){
+    // update your object here
+    cb();
+  };
+});
+</pre>
+</section>
+<section id="crudCollection-upsert">
+<h5> upsert($, id, obj, cb) </h5>
+<p>
+In general, "upsert" is short for "update if existing, and insert
+if not already existing".
+</p>
+<p>
+The upsert() function is used for updating existing resources
+or creating resources if they don't already exist via PUT 
+to the individual resource's URI.  If the URI already exists, 
+the resource there will be updated.  If the URI doesn't already 
+exist, the resource there will be created.  You would use upsert()
+when the unique ID and URI of the resource is determined by the 
+client and is NOT server-generated.
+</p>
+<p>
+Implement upsert() to allow resources to be upserted.  The 
+CRUDCollection will handle the json parsing and validation for you (
+if you supply a <strong>schema</strong> or both 
+<strong>updateSchema</strong> AND <strong>createSchema</strong>
+) and it will respond with appropriate error messages 
+automatically in the case of failures.
+</p>
+<p>
+The function will be passed a context object ($), the 'id' at the
+end of the resource's URI, the object returned from 
+<code class="incode">fetch()</code>, and a callback.  The callback takes
+no parameters and can optionally be called in the event of 
+successful 'upsertion' to respond with a 303 redirect.  You have
+the option of not calling the callback at all and instead
+responding however you want.
+</p>
+<pre class="sh_javascript">
+var module = new CRUDCollection({
+  upsert : function($, id, obj, cb){
+    // upsert your object here
+    cb();
+  };
+});
+</pre>
+</section>
+<section id="crudCollection-destroy">
+<h5> destroy($, id, cb) </h5>
+<p>
+The destroy() function is used for removing existing resources
+via DELETE to the individual resource's URI.  If the URI 
+already exists, the resource there will be removed.  If the 
+URI doesn't exist, CRUDCollection will automatically respond with 
+a 404 NOT FOUND status.
+</p>
+<p>
+Implement destroy() to allow resources to be removed.
+</p>
+<p>
+The function will be passed a context object ($), the 'id' at the
+end of the resource's URI, and a callback.  The callback takes
+no parameters and can optionally be called in the event of 
+successful 'removal' to respond with a 204 to indicate a success
+with no response body.  You have the option of not calling the 
+callback at all and instead responding however you want.
+</p>
+<pre class="sh_javascript">
+var module = new CRUDCollection({
+  destroy : function($, id, cb){
+    // remove your object here
+    cb();
+  };
+});
+</pre>
+</section>
+<section id="crudCollection-collectionGET">
+<h5> collectionGET($) </h5>
+<p>
+The collectionGET() function is a way of completely handling the GET for the
+collection resource if you don't want the automatic handling that list()
+provides.  This usually shouldn't be necessary.  Also note that this
+is basically just an alias for crudCollection.handler.GET.
+
+</p>
+<pre class="sh_javascript">
+var module = new CRUDCollection({
+  collectionGET : function($){
+    $.json({"make":"your own response"}).send();
+  };
+});
+</pre>
+</section>
+<section id="crudCollection-memberGET">
+<h5> memberGET($) </h5>
+<p>
+The memberGET() function is a way of completely handling the GET for member
+resources (items in the collection) if you don't want the automatic
+handling that fetch() provides.  This usually shouldn't be necessary.
+Also note that this is basically just an alias for
+crudCollection.wildcard.GET.
+
+</p>
+<pre class="sh_javascript">
+var module = new CRUDCollection({
+  memberGET : function($){
+    $.json({"make":"your own response"}).send();
+  };
+});
+</pre>
+</section>
+<section id="crudCollection-updateSchema">
+<h5> updateSchema </h5>
+<p>
+The updateSchema property is a way to specify a 
+<a href="http://json-schema.org/">json schema object</a>
+that will be used to validate json used for updating the resource.  If
+you want the same validation for creating the resource as you want for
+updating it, you can just use the schema property instead.
+</p>
+<p>
+  The updateSchema object will also be used in the update link for the 
+individual collection member resource to show developers and machines
+how an update is validated.
+</p>
+<pre class="sh_javascript">
+</pre>
+</section>
+<section id="crudCollection-createSchema">
+<h5> createSchema </h5>
+<p>
+The createSchema property is a way to specify a 
+<a href="http://json-schema.org/">json schema object</a>
+that will be used to validate json used for creating a resource.  If
+you want the same validation for creating the resource as you want for
+updating it, you can just use the schema property instead.
+</p>
+<p>
+  The createSchema object will also be used in the create link in the 
+collection resource to show developers and machines
+how a create (POST) is validated.
+</p>
+<pre class="sh_javascript">
+</pre>
+</section>
+<section id="crudCollection-schema">
+<h5> schema </h5>
+<p>
+The schema property is a way to specify a 
+<a href="http://json-schema.org/">json schema object</a>
+that will be used to validate json used for creating or updating a 
+resource.  If you want different validations for creating the resource than
+you do for updating it, you can use the specific createSchema and updateSchema
+properties instead.
+</p>
+<p>
+  The schema object will also be used in the create link in the 
+collection resource and the update link in the individual collection
+member resource to show developers and machines how creates and updates 
+are validated.
+</p>
+<pre class="sh_javascript">
+</pre>
+</section> <!-- /crudCollection-schema -->
+</section> <!-- /crudCollection -->
+
+<section id="advancedrouting">
+<h3>Advanced Routing</h3>
+<h5>Hello World Refactored:</h5>
+
+<p>Percolator also allows a more advanced style of routing that lets you load 
+your route-handling resources from external files instead.</p>
+
+<ul class="unstyled">
+<li>With the "Hello World" example, we could instead move the handler into a file at the path 
+<code class="incode">./resources/index.js</code>.  (First create a <code class="incode">resources</code> directory and 
+then the <code class="incode">index.js</code> file in it, and then copying the handler logic into 
+<code class="incode">index.js</code> like so:</li>
+
+<pre class="sh_javascript">
+exports.handler = {
+  GET : function(req, res){
+    res.end('Hello World!');
+  }
+}
+</pre>
+We'll call files like that "resources" from now on.
+
+
+<li>Change your server.js to call <code class="incode">routeDirectory()</code> instead of <code class="incode">server.route()</code> like so:</li>
+
+<pre class="sh_javascript">
+var Percolator = require('Percolator');
+
+var server = new Percolator();
+server.routeDirectory(__dirname + '/resources', '/api', function(err){
+  if (!!err) {console.log(err);}
+  server.listen(function(err){
+    console.log('server is listening on port ', server.port);
+  });
+});
+</pre>
+
+<li>
+<p>Run the server:
+<code class="incode">node server.js</code>
+</p>
+</li>
+
+<li><p>See your "Hello World" output at http://localhost:3000/api .  You should see the same output
+as the original "Hello World" example.</p></li>
+</ul>
+<p>
+This worked because index.js is the reserved filename for responding to '/'.  If you want to respond
+to uris like '/hello', you can simply drop a <code class="incode">hello.js</code> in that folder (that exports a 
+similar handler) and it will respond to http://localhost:3000/api/hello .  The advantage to this way 
+of routing is that all your resources can be in separate files so that your project can be more easily
+organized.
+</p>
+</section>
+<section id="usingConnectMiddleware"></section>
+<h3>Using Connect Middleware</h3>
+<p>Percolator doesn't support <a href="http://www.senchalabs.org/connect/">connect</a> 
+middleware directly, but it's still possible to use it.
+</p>
+
+<p>
+Connect middleware are just functions with req, res and cb parameters where cb is a callback function
+to be called when the middleware has performed its function and other handling should continue.  That means
+it can simply be called directly in a Percolator server's onRequest() handler.
+</p>
+
+<p>
+Here's an example with connect.favicon, used for serving up favicons:
+</p>
+<p>
+<pre class="sh_javascript">
+server.onRequest(function(handler, $, cb){
+  connect.favicon()($.req, $.res, function(){
+    cb($);
+  });
+});
+</pre>
+
+</p>
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="js/bootstrap-transition.js"></script>
+    <script src="js/bootstrap-alert.js"></script>
+    <script src="js/bootstrap-modal.js"></script>
+    <script src="js/bootstrap-dropdown.js"></script>
+    <script src="js/bootstrap-scrollspy.js"></script>
+    <script src="js/bootstrap-tab.js"></script>
+    <script src="js/bootstrap-tooltip.js"></script>
+    <script src="js/bootstrap-popover.js"></script>
+    <script src="js/bootstrap-button.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+    <script src="js/bootstrap-carousel.js"></script>
+    <script src="js/bootstrap-typeahead.js"></script>
+    <script src="js/bootstrap-affix.js"></script>
+   <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-10626105-12']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script> 
+    
+
+  </body>
+</html>
+
+

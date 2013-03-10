@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+<html lang="en" ng-app="percdocs">
+  <head>
+    <meta charset="utf-8">
+    <title>percolator.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="css/sh_acid.min.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-57-precomposed.png">
+    <script type="text/javascript" src="/js/sh_main.min.js"></script>
+    <script type="text/javascript" src="/js/sh_javascript.min.js"></script>
+  </head>
+
+  <body  onload="sh_highlightDocument();">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/"><img src="/img/headr-nav.png" /></a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li class="active"><a href="about.html">About</a></li>
+              <li><a href="documentation.html">Documentation</a></li>
+              <li><a href="examples.html">Examples</a></li>
+              <li><a href="https://github.com/cainus/percolator">Source Code</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div >
+        <h4>
+        Percolator is an opinionated web framework for writing RESTful JSON APIs in node.js.
+        </h4>
+        <p>
+        It makes APIs much less tedious to write than many other modern-day frameworks, and 
+        it makes APIs that are generally nicer to use than many other modern day "REST" APIs.
+        </p>
+
+        <h3>Features:</h3>
+
+<ul>
+  <li>
+Helps to generate JSON Hypermedia APIs quickly and easily (There will be some links in your json, and it will be awesome).
+  </li>
+  <li>
+Helps to standardize your API with a very lightweight standard to simplify client development.
+  </li>
+  <li>
+Helps to remove a lot of the tedious mind-numbing boilerplate of CRUD APIs
+  </li>
+  <li>
+Correctly handles a lot of error scenarios for you.
+  </li>
+  <li>
+Makes code re-use / componentization simpler/easier
+  </li>
+  <li>
+Focuses on APIs specifically, so it's good for mobile app back-ends, single page apps, or great public-facing APIs.
+  </li>
+  <li>
+Can be extended easily.
+  </li>
+  <li>
+Can help organize your routes better.
+  </li>
+  <li>
+Has very little magic and absolutely no code generators
+  </li>
+</ul>
+
+<h3>It does NOT:</h3>
+
+<ul>
+  <li>
+  Have a way of generating dynamic HTML. You can certainly add that, but it's not included 
+  and probably won't be (Perhaps you'd be better off with <a href="http://expressjs.com/">express</a> if you need that capability). Percolator can serve static assets (html, js css) though if you want to create a one-page app.
+  </li>
+  <li>
+Have an opinion on how/if you manage persistence. Add that however you want. It just helps you with the API/HTTP end of things.
+  </li>
+  <li>
+  Use <a href="https://github.com/senchalabs/connect">connect</a> or <a href="http://expressjs.com/">express</a>, so it might not do things that you've come to expect from node frameworks that do. It doesn't even have a serialized, synchronous middleware framework (though my opinion is that you don't need that).
+  </li>
+  <li>
+Have all the intended features (yet!)
+  </li>
+  <li>
+Have support for non-json media-types, beyond what core node request/response objects provide.
+  </li>
+  <li>
+Augment node.js's core request/response objects in any way whatsoever.
+  </li>
+  <li>
+  Stay unopinionated.  It's impossible to do so much automatically without making some 
+  decisions about how things should be done.
+  </li>
+</ul>
+
+<h3>Hello World!</h3>
+<p>
+If you have a server.js with the following content...
+<pre class="sh_javascript">
+var Percolator = require('Percolator').Percolator;
+var server = new Percolator();
+server.route('/', function($){
+        $.json({hello : "world!"})
+             .send();
+          });
+server.listen(function(err){
+    if (err) { throw err; }
+    console.log("Percolator is listening on port ", server.port);
+});
+</pre>
+... you can run it with node server.js and it should tell you:
+</p>
+<p>
+<code> Percolator is listening on port 3000 </code>
+</p>
+
+<p>
+If you hit http://localhost:3000/ , you will see:
+</p>
+<pre class="sh_javascript">
+{
+
+    "hello": "world!",
+    "_links": {
+        "self": {
+            "href": "http://localhost:3000/"
+        }
+    }
+
+}
+</pre>
+</p>
+<h3>
+  What the @#$%&* is that?!?!?
+</h3>
+<p>
+One of the core features of Percolator is that it helps you make your API "surfable" by helping 
+you add links that allow you and your users to actually surf your API to see all the possible 
+uses and capabilities without you having to write a million pages of documentation, and 
+without asking your users to read it (Note: There are other possibly more important 
+benefits as well, but I'll save that more in-depth discussion for another time). In my experience, 
+these are the kinds of APIs that users (including the original developers!) actually enjoy using.
+</p>
+<p>
+The interesting parts of this example are probably all in the routing and request handling. Let's 
+take a second look at that:
+</p>
+<pre class="sh_javascript">
+server.route('/', function($){
+            $.json({hello : "world!"})
+             .send();
+          });
+</pre>
+<p>
+server.route() takes a route, in this case the root route '/', and associates a handler to it for when a request comes in for '/'. If the handler is just a function, as is the case here, then it will only handle GET requests.
+</p>
+<p>
+In general, the only parameter that handler functions need to take is a single 'context' parameter that I just name $ for brevity, but you can name it whatever you want. The context parameter comes with a number of useful methods and objects, but we just use the json() "context helper" to specify and then send() our object as json.
+</p>
+<p>
+The context parameter also has the plain node.js request and response objects on it, so you're still free to access those as usual. They'd be available in the handler function here as $.req and $.res and they are completely unaltered and should act exactly as shown in the node.js documentation.
+</p>
+<p>
+This just scratches the surface though. Other examples will show more advanced features.
+</p>
+<h3>Values</h3>
+<h4>
+Make the hard stuff simple
+</h4>
+<ul>
+  Get the HTTP/REST-Nerd stuff (serialization, authentication, hypermedia, status codes) right 
+  so that the developer doesn't have to. See 
+  <a href="http://wiki.basho.com/Webmachine-Diagram.html"> the WebMachine FSM diagram </a> to start to get an idea of what a full featured server should be doing on each request.
+</ul>
+<h4>
+Make the tedious stuff less tedious
+</h4>
+
+<ul>
+<li>
+Implicit / Automatic Routing. Each resource is in its own file (which is just a node.js module) and is routed automatically without you having to route explicitly.
+</li>
+<li>
+Automatic resource linking where possible, if desired.
+</li>
+<li>
+Make creating CRUD collections and their members as easy as possible.
+</li>
+</ul>
+<h4>
+Keep the simple stuff simple
+</h4>
+
+<ul>
+<li>
+HTTP is simple. If you know HTTP, you know the names of the methods of a Percolator resource.
+</li>
+<li>
+Can't do what you want within the framework? Percolator can be extended in a couple of different ways, and it exposes the raw, unaltered request and response objects from node.js, so it should be easily extendable.
+</li>
+<li>
+Minimal "magic", and no code generators. Only the the implicit routing (if you choose to use it) smells anything like magic.
+</li>
+</ul>
+<h4>
+Focus on helping create great APIs
+</h4>
+
+<ul>
+  <li>
+  Great APIs are easy to understand.  Percolator should achieve this by helping to make APIs that are self-describing: 
+  anything that is possible with the API should be discoverable (by 
+  humans and machines) from the API itself without having to read external docs.
+</li>
+<li>
+There are no plans to support server-generated dynamic HTML, though that can be added 
+in your application. <a href="http://expressjs.com/">Express</a> is already great at apps like that though.
+</li>
+<li>
+There are no plans to support specific database drivers or ORM. Of course these can still be added to your app quite easily but in this day and age, it would be silly for an API framework to assume what kind of persistence you want to use, or even that you require persistence at all.
+</li>
+</ul>
+
+      </div>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="js/bootstrap-transition.js"></script>
+    <script src="js/bootstrap-alert.js"></script>
+    <script src="js/bootstrap-modal.js"></script>
+    <script src="js/bootstrap-dropdown.js"></script>
+    <script src="js/bootstrap-scrollspy.js"></script>
+    <script src="js/bootstrap-tab.js"></script>
+    <script src="js/bootstrap-tooltip.js"></script>
+    <script src="js/bootstrap-popover.js"></script>
+    <script src="js/bootstrap-button.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+    <script src="js/bootstrap-carousel.js"></script>
+    <script src="js/bootstrap-typeahead.js"></script>
+    <script src="js/bootstrap-affix.js"></script>
+   <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-10626105-12']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script> 
+
+  </body>
+</html>
+
+

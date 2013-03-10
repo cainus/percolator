@@ -36,7 +36,7 @@ server.before(function(req, res, handler, cb){
 });
 
 server.after(function(req, res, handler){
-  console.log(' <-- ', req.method, ' ', req.url, (new Date() - req.started) + ' ms');
+  console.log(' <-- ', req.method, ' ', req.url, ' | duration: ' + (new Date() - req.started) + ' ms');
 });
 
 var resourceDir = __dirname + '/test/test_fixtures/resources';
