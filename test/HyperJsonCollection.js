@@ -9,7 +9,7 @@ describe("HyperJsonCollection", function(){
     });
     it ("should return a json collection when given an array", function(){
       new HyperJsonCollection([{thisis : "a test"}, {thisis : "too"}])
-          .toObject().should.eql({ _items : {0 : {thisis:"a test"}, 1 : {thisis : "too"}}});
+          .toObject().should.eql({ _items : [{thisis:"a test"}, {thisis : "too"}]});
     });
     it ("should return a json collection indexed by a particular property when given an array and property name", function(){
       new HyperJsonCollection([{thisis : "a test"}, {thisis : "too"}], 'thisis')
@@ -64,10 +64,10 @@ describe("HyperJsonCollection", function(){
             item.decorated = true;
             return item;
           })
-          .toObject().should.eql({ _items : { 0 : {thisis:"a test",
+          .toObject().should.eql({ _items : [{thisis:"a test",
                                               decorated : true},
-                                             1 : {thisis : "too",
-                                             decorated : true}}});
+                                             {thisis : "too",
+                                             decorated : true}]});
     });
     it ("should decorate each item in _items if its an object", function(){
       new HyperJsonCollection({thisis : {value : "a test"}, andsois : {value : "this"}})
