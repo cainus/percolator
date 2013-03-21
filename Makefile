@@ -13,7 +13,7 @@ test-cov:	lib-cov
 
 test:	lib-cov
 	echo TRAVIS_JOB_ID $(TRAVIS_JOB_ID)
-	@PERCOLATOR_COVERAGE=1 $(MAKE) test REPORTER=json-cov 2> /dev/null | ./node_modules/coveralls/bin/coveralls.js
+	@PERCOLATOR_COVERAGE=1 $(MAKE) t REPORTER=json-cov 2> /dev/null | ./node_modules/coveralls/bin/coveralls.js
 	rm -rf lib-cov
 
 .PHONY: test
