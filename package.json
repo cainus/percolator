@@ -7,7 +7,7 @@
        "url": "https://github.com/cainus/percolator/issues"
       },
       "scripts" : {
-        "test" : "make test"
+        "test" : "make test-coveralls"
       },
       "maintainers": [
         {
@@ -26,8 +26,9 @@
           "JSV" : "4.0.2"
       },
       "devDependencies" : {
+          "mocha-lcov-reporter" : "0.0.1",
           "jscoverage" : "0.3.6",
-          "coveralls": "1.1.0",
+          "coveralls": "2.0.5",
           "mockery" : "1.1.2",
           "hottap" : "1.0.0",
           "mocha" : "1.8.1",
