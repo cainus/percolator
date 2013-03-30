@@ -487,8 +487,8 @@ var linkCollection = new CRUDCollection({
     });
   },
 
-  fetch : function(req, res, id, cb){
-    db.findById(id, function(err, foundObject){
+  fetch : function(req, res, cb){
+    db.findById(req.uri.child(), function(err, foundObject){
       if (err){
         if (err === 'Not Found'){
           return cb(true);

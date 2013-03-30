@@ -48,6 +48,21 @@ server.routeDirectory(resourceDir, app.resourcePath, function(err){
                                 res.end("muahahah!"); 
                               }
                       });
+  server.route('/someProtectedPath', {
+    basicAuthenticate : function(username, password, req, res, cb){
+      // try to get the user here, based on cookie, Authentication header, etc
+      if (username === 'Pierre' && password === 'Collateur'){
+        return cb(null, {username : "Pierre", twitter_handle : "@Percolator"});
+        // user object will be available in req.authenticated in all methods
+      } else {
+        return cb(true);  // Percolator will 401 for you
+      }
+    },
+    GET : function(req, res){
+      res.object({youAre : req.authenticated}).send();
+    }
+  });
+
 
   if (err) {
     console.log("Routing error");
