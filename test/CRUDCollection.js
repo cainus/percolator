@@ -1,6 +1,8 @@
 var CRUDCollection = require('../index').CRUDCollection;
 var should = require('should');
 var urlgrey = require('urlgrey');
+var ContextFaker = require('../index').ContextFaker;
+var hottap = require('hottap').hottap;
 
 describe("CRUDCollection", function(){
     it ("sets fetch on wildcard if fetch is defined", function(){
@@ -211,6 +213,40 @@ describe("CRUDCollection", function(){
       var res = {};
       module.wildcard.fetchOnPUT.should.equal(false);
       module.wildcard.PUT(req, res);
+    });
+    it ("automatically handles an error in json parsing for options.upsert()", function(done){
+      var headerSet = false;
+      var headWritten = false;
+      var schema = {
+        "name" : "name"
+      };
+      var module = new CRUDCollection({
+                                    schema : schema,
+                                    list : function(req, res, cb){ cb([]); },
+                                    upsert : function(req, res, id, obj, cb){ 
+                                      should.fail("should never get here");
+                                    }
+                                  });
+      var app = { port : 33333 };
+      var server = new Percolator(app);
+      server.route('/', module.handler);
+      server.route('/:item', module.wildcard);
+      server.listen(function(err){
+        if (err) {console.log(err);throw err;}
+        console.log('Percolator running on ' + server.port);
+        hottap("http://localhost:33333/1234")
+          .request("PUT", 
+                   {"Content-Type" : "application/json"}, 
+                   '{"sadf" : "asd f字"}', 
+                   function(err, response){
+          server.close();
+          should.not.exist(err);
+          JSON.parse(response.body)
+            .should
+            .eql({"error":{"type":400,"message":"Bad Request","detail":"invalid json."}});
+          done();
+        });
+      });
     });
     it ("calls options.upsert() with its callback if it exists", function(done){
       var headerSet = false;
