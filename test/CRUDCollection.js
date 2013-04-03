@@ -233,7 +233,6 @@ describe("CRUDCollection", function(){
       server.route('/:item', module.wildcard);
       server.listen(function(err){
         if (err) {console.log(err);throw err;}
-        console.log('Percolator running on ' + server.port);
         hottap("http://localhost:33333/1234")
           .request("PUT", 
                    {"Content-Type" : "application/json"}, 
@@ -241,6 +240,7 @@ describe("CRUDCollection", function(){
                    function(err, response){
           server.close();
           should.not.exist(err);
+          response.status.should.equal(400);
           JSON.parse(response.body)
             .should
             .eql({"error":{"type":400,"message":"Bad Request","detail":"invalid json."}});
