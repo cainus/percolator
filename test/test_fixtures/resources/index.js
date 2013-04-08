@@ -9,6 +9,7 @@ exports.handler = {
         .link('many', req.uri.child('many'))
         .link('qstring', req.uri.child('qstring'))
         .link('restricted', req.uri.child('restricted'))
+        .link('remote', req.uri.child('remote'))
         .link('browser', req.uri.child('browser'))
         .send();
   }

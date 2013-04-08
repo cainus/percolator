@@ -43,6 +43,11 @@ var resourceDir = __dirname + '/test/test_fixtures/resources';
 server.routeDirectory(resourceDir, app.resourcePath, function(err){
   console.log("routed resources in " + resourceDir);
 
+  server.connectMiddleware(function(req, res, done){
+    console.log("hello from connect.  URL: ", req.url);
+    done();
+  });
+
   server.route('/inside', 
                       { GET : function(req, res){ 
                                 res.end("muahahah!"); 
