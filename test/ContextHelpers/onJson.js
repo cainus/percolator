@@ -1,5 +1,5 @@
 var should = require('should');
-var jbch = require('../index').onJsonHelper;
+var jbch = require('../../index').onJsonHelper;
 
 // TODO test bad schema, successful schema, json parse error
 describe("onJsonHelper", function(){

@@ -1,5 +1,5 @@
 var should = require('should');
-var bch = require('../index').onBodyHelper;
+var bch = require('../../index').onBodyHelper;
 
 
 describe("onBodyHelper", function(){

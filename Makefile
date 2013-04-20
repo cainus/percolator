@@ -1,7 +1,6 @@
 REPORTER = spec
 test:
-	echo TRAVIS_JOB_ID $(TRAVIS_JOB_ID)
-	@NODE_ENV=test ./node_modules/.bin/mocha -b --reporter $(REPORTER)
+	@NODE_ENV=test ./node_modules/.bin/mocha -b --reporter $(REPORTER) --recursive
 
 lib-cov:
 	./node_modules/jscoverage/bin/jscoverage lib lib-cov

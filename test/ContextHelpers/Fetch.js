@@ -1,5 +1,5 @@
 var should = require('should');
-var fch = require('../index').FetchHelper;
+var fch = require('../../index').FetchHelper;
 
 describe("FetchHelper", function(done){
   it ("does nothing if the handler has no fetch method", function(done){

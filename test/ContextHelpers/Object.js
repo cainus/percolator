@@ -1,5 +1,5 @@
 var should = require('should');
-var ObjectHelper = require('../index').ObjectHelper;
+var ObjectHelper = require('../../index').ObjectHelper;
 var urlgrey = require('urlgrey');
 
 describe("ObjectHelper", function(){

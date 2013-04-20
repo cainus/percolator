@@ -1,5 +1,5 @@
 var should = require('should');
-var bach = require('../index').BasicAuthenticateHelper;
+var bach = require('../../index').BasicAuthenticateHelper;
 
 describe("BasicAuthenticateHelper", function(done){
   it ("does nothing if the handler has no basicAuthenticate method", function(done){
