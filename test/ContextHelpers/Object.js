@@ -28,9 +28,10 @@ describe("ObjectHelper", function(){
     });
     describe("#send", function(){
       it ("should add default links and try to send as json", function(done){
+        var sent = false;
         var headerSet = false;
         var req = { 
-                    uri : urlgrey('http://localhost:8080/'),
+                    uri : urlgrey('http://localhost:8080/asdf'),
                     app : { autoLink : true }
                   };
         var res = { 
@@ -40,6 +41,7 @@ describe("ObjectHelper", function(){
             headerSet = true;
           },
           end : function(data){
+            sent = true;
             JSON.parse(data).should.eql({
               _items: [ { A: 'A' }, { B: 'B' }, { C: 'C' } ],
               _links: { 
@@ -52,7 +54,37 @@ describe("ObjectHelper", function(){
         ObjectHelper(req, res, handler, function(){
           res.collection([{"A" : "A"}, {"B" : "B"}, {"C" : "C"}])
             .send();
+          sent.should.equal(true);
           headerSet.should.equal(true);
+          done();
+        });
+      });
+      it ("should not add a parent link if the root has no parent", function(done){
+        var sent = false;
+        var headerSet = false;
+        var req = { 
+                    uri : urlgrey('http://localhost:8080/'),
+                    app : { autoLink : true }
+                  };
+        var res = { 
+          setHeader : function(name, value){
+            name.toLowerCase().should.equal('content-type');
+            value.should.equal('application/json');
+            headerSet = true;
+          },
+          end : function(data){
+            sent = true;
+            JSON.parse(data).should.eql({
+              _items: [ { A: 'A' }, { B: 'B' }, { C: 'C' } ]
+            });
+          } 
+        };
+        var handler = {};
+        ObjectHelper(req, res, handler, function(){
+          res.collection([{"A" : "A"}, {"B" : "B"}, {"C" : "C"}])
+            .send();
+          headerSet.should.equal(true);
+          sent.should.equal(true);
           done();
         });
       });
