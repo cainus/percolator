@@ -108,14 +108,17 @@ describe("CRUDCollection", function(){
       var req = {
           app : {
             autoLink : true
-          }
+          },
+					uri : urlgrey('http://localhost:8080/')
         };
       var res = {
           collection : function(items){
             items.should.eql({ sometest: { here: 'goes' } });
             return {
-              linkEach : function(rel, cb){
+              linkEach : function(rel, strategy){
                 rel.should.equal('self');
+								strategy({here : 'goes'}, 'somename').toString()
+										.should.equal('http://localhost:8080/somename');
                 return {
                   send : function(){
                     done();
