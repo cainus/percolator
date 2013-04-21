@@ -127,6 +127,25 @@ describe("CRUDCollection", function(){
       };
       module.handler.GET(req, res);
     });
+    it ("returns a 500 if the callback gets an error", function(done){
+      var module = new CRUDCollection({
+                                    list : function(req, res, cb){ cb("some error!"); }
+                                   });
+      var req = {
+          app : {
+            autoLink : true
+          }
+        };
+      var res = {
+					status : {
+						internalServerError : function(msg){
+							msg.should.equal("some error!");
+							done();
+						}
+					}
+      };
+      module.handler.GET(req, res);
+    });
   });
   describe("wildcard.DELETE", function(){
     it ("doesn't exist if options has no destroy()", function(){
