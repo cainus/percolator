@@ -2,6 +2,7 @@ var should = require('should');
 var Percolator = require('../../index').Percolator;
 var BasicAuthenticateHelper = require('../../index').BasicAuthenticateHelper;
 var hottap = require('hottap').hottap;
+var request = require('request');
 var _ = require('underscore');
 var urls = [];
 
@@ -100,6 +101,14 @@ describe("Percolator", function(){
 			//JSON.parse(response.body).should.eql({});
       done();
 		});
+  });
+
+  it ("has basic authentication support", function(done){
+    request({url : 'http://localhost:8080/api/restricted', auth : {username : 'login', password : 'password'}}, function(err, response, body){
+      should.not.exist(err);
+      JSON.parse(body).accessGranted.should.equal(true);
+      done();
+    });
   });
 
   it ("can support connectMiddleware", function(done){
