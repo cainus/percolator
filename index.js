@@ -6,7 +6,6 @@ var helperDir = dir + 'ContextHelpers/';
 
 exports.JsonResponder = require(dir + 'JsonResponder');
 exports.StatusManager = require(dir + 'StatusManager');
-exports.HyperJson = require(dir + 'HyperJson');
 exports.HyperJsonCollection = require(dir + 'HyperJsonCollection');
 exports.CRUDCollection = require(dir + 'CRUDCollection');
 
