@@ -37,7 +37,7 @@ describe("ObjectHelper", function(){
         var res = { 
           setHeader : function(name, value){
             name.toLowerCase().should.equal('content-type');
-            value.should.equal('application/json');
+            value.should.equal('application/json; charset=utf-8');
             headerSet = true;
           },
           end : function(data){
@@ -69,7 +69,7 @@ describe("ObjectHelper", function(){
         var res = { 
           setHeader : function(name, value){
             name.toLowerCase().should.equal('content-type');
-            value.should.equal('application/json');
+            value.should.equal('application/json; charset=utf-8');
             headerSet = true;
           },
           end : function(data){

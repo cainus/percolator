@@ -8,7 +8,7 @@
     "resource",
     "hypermedia"
   ],
-  "version": "1.0.10",
+  "version": "1.0.11",
   "bugs": {
     "url": "https://github.com/cainus/percolator/issues"
   },
