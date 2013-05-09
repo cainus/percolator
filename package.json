@@ -31,7 +31,6 @@
   },
   "devDependencies": {
     "request": "2.19.0",
-    "portfinder": "~0.2.1",
     "mocha-lcov-reporter": "0.0.1",
     "jscoverage": "0.3.6",
     "coveralls": "2.0.7",

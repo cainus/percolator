@@ -3,7 +3,8 @@ var should = require('should');
 var urlgrey = require('urlgrey');
 var ContextFaker = require('../index').ContextFaker;
 var hottap = require('hottap').hottap;
-var portfinder = require('portfinder');
+var jobNumber = process.env.TRAVIS_JOB_NUMBER || '0.0';
+var port = 8000 + parseInt(jobNumber.split(".")[1], 10);
 
 describe("CRUDCollection", function(){
     it ("sets fetch on wildcard if fetch is defined", function(){
@@ -250,27 +251,25 @@ describe("CRUDCollection", function(){
                                       should.fail("should never get here");
                                     }
                                   });
-			portfinder.getPort(function (err, port) {
-				should.not.exist(err);
-				var app = { port : port };
-				var server = new Percolator(app);
-				server.route('/', module.handler);
-				server.route('/:item', module.wildcard);
-				server.listen(function(err){
-					if (err) {console.log(err);throw err;}
-					hottap("http://localhost:" + port + "/1234")
-						.request("PUT", 
-                     {"Content-Type" : "application/json"},
-                      '{"sadf" : "asd f字"}', 
-                     function(err, response){
-						server.close();
-						should.not.exist(err);
-						response.status.should.equal(400);
-						JSON.parse(response.body)
-							.should
-							.eql({"error":{"type":400,"message":"Bad Request","detail":"invalid json."}});
-						done();
-					});
+			console.log("testing with port: ", port);
+			var app = { port : port };
+			var server = new Percolator(app);
+			server.route('/', module.handler);
+			server.route('/:item', module.wildcard);
+			server.listen(function(err){
+				if (err) {console.log(err);throw err;}
+				hottap("http://localhost:" + port + "/1234")
+					.request("PUT", 
+                   {"Content-Type" : "application/json"},
+                   '{"sadf" : "asd f字"}', 
+                   function(err, response){
+					server.close();
+					should.not.exist(err);
+					response.status.should.equal(400);
+					JSON.parse(response.body)
+						.should
+						.eql({"error":{"type":400,"message":"Bad Request","detail":"invalid json."}});
+					done();
 				});
 			});
     });
