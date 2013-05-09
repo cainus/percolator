@@ -3,6 +3,7 @@ var should = require('should');
 var urlgrey = require('urlgrey');
 var ContextFaker = require('../index').ContextFaker;
 var hottap = require('hottap').hottap;
+var request = require('request');
 var jobNumber = process.env.TRAVIS_JOB_NUMBER || '0.0';
 var port = 8000 + parseInt(jobNumber.split(".")[1], 10);
 
@@ -244,11 +245,12 @@ describe("CRUDCollection", function(){
       var schema = {
         "name" : "name"
       };
+			var upsertWasCalled = false;
       var module = new CRUDCollection({
                                     schema : schema,
-                                    list : function(req, res, cb){ cb([]); },
+                                    list : function(req, res, cb){ cb(null, []); },
                                     upsert : function(req, res, id, obj, cb){ 
-                                      should.fail("should never get here");
+																			upsertWasCalled = true;
                                     }
                                   });
 			console.log("testing with port: ", port);
@@ -258,17 +260,18 @@ describe("CRUDCollection", function(){
 			server.route('/:item', module.wildcard);
 			server.listen(function(err){
 				if (err) {console.log(err);throw err;}
-				hottap("http://localhost:" + port + "/1234")
-					.request("PUT", 
-                   {"Content-Type" : "application/json"},
-                   '{"sadf" : "asd f字"}', 
-                   function(err, response){
+				request({method : 'PUT',
+                 uri : "http://localhost:" + port + "/1234",
+                 headers : {"Content-Type" : "application/json"},
+                 body : '{"sadf" : "asd f字"'},   // incomplete json
+                   function(err, response, body){
 					server.close();
 					should.not.exist(err);
-					response.status.should.equal(400);
+					response.statusCode.should.equal(400);
 					JSON.parse(response.body)
 						.should
 						.eql({"error":{"type":400,"message":"Bad Request","detail":"invalid json."}});
+					upsertWasCalled.should.equal(false);
 					done();
 				});
 			});
