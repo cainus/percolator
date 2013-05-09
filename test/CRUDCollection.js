@@ -265,14 +265,15 @@ describe("CRUDCollection", function(){
                  headers : {"Content-Type" : "application/json"},
                  body : '{"sadf" : "asd f字"'},   // incomplete json
                    function(err, response, body){
-					server.close();
 					should.not.exist(err);
 					response.statusCode.should.equal(400);
 					JSON.parse(response.body)
 						.should
 						.eql({"error":{"type":400,"message":"Bad Request","detail":"invalid json."}});
 					upsertWasCalled.should.equal(false);
-					done();
+					server.close(function(){
+						done();
+					});
 				});
 			});
     });
