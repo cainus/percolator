@@ -2,6 +2,8 @@ var should = require('should');
 var hottap = require('hottap').hottap;
 var _ = require('underscore');
 var Percolator = require('../index').Percolator;
+var jobNumber = process.env.TRAVIS_JOB_NUMBER || '0.0';
+var port = 9000 + parseInt(jobNumber.split(".")[1], 10);
 
 
 /*
@@ -26,7 +28,7 @@ function closeServer(server, cb){
 
 describe('Percolator', function(){
   beforeEach(function(done){
-    this.port = 3000;
+    this.port = port;
     if (!this.server){ 
       this.server = null;
     }
@@ -39,8 +41,8 @@ describe('Percolator', function(){
 
   it("has default error handlers for 404s", function(done){
       var that = this;
-      var url = "http://localhost:3000/DOES_NOT_EXIST";
-      this.server = new Percolator({port : 3000});
+      var url = "http://localhost:" + port + "/DOES_NOT_EXIST";
+      this.server = new Percolator({port : port});
       this.server.route('/', {  GET : function(req, res){
                                                res.end("Hello World!");
                                              }});
@@ -60,8 +62,8 @@ describe('Percolator', function(){
   });
   it("has default error handlers for 405s", function(done){
       var that = this;
-      var url = "http://localhost:3000/";
-      this.server = new Percolator({port : 3000});
+      var url = "http://localhost:" + port + "/";
+      this.server = new Percolator({port : port});
       this.server.route('/', {  GET : function(req, res){
                                                res.end("Hello World!");
                                              }});
@@ -81,8 +83,8 @@ describe('Percolator', function(){
   });
   it("has default error handlers for 501s", function(done){
       var that = this;
-      var url = "http://localhost:3000/";
-      this.server = new Percolator({port : 3000});
+      var url = "http://localhost:" + port + "/";
+      this.server = new Percolator({port : port});
       this.server.route('/', {  GET : function(req, res){
                                                res.end("Hello World!");
                                              }});
@@ -104,8 +106,8 @@ describe('Percolator', function(){
       var that = this;
       var bigpath = "1";
       _.times(4097, function(){bigpath += '1';});
-      var url = "http://localhost:3000/" + bigpath;
-      this.server = new Percolator({port : 3000});
+      var url = "http://localhost:" + port + "/" + bigpath;
+      this.server = new Percolator({port : port});
       this.server.route('/', {  GET : function(req, res){
                                                res.end("Hello World!");
                                              }});
@@ -126,8 +128,8 @@ describe('Percolator', function(){
 
   it ("exposes a before hook for executing logic before requests", function(done){
     var that = this;
-    var url = "http://localhost:3000/";
-    this.server = new Percolator({port : 3000});
+    var url = "http://localhost:" + port + "/";
+    this.server = new Percolator({port : port});
     this.server.route('/', {  GET : function(req, res){
                                              res.end("Hello World! " + req.decorated);
                                            }});
@@ -152,8 +154,8 @@ describe('Percolator', function(){
   it ("exposes an after hook for executing logic after requests", function(done){
     var that = this;
     var responded = false;
-    var url = "http://localhost:3000/";
-    this.server = new Percolator({port : 3000});
+    var url = "http://localhost:" + port + "/";
+    this.server = new Percolator({port : port});
     this.server.route('/', {  GET : function(req, res){
                                              res.end("Hello World!");
                                            }});
@@ -176,7 +178,7 @@ describe('Percolator', function(){
 
   it ("can respond to simple requests", function(done){
     var that = this;
-    this.server = new Percolator({port : 3000});
+    this.server = new Percolator({port : port});
     this.server.route('/', {  GET : function(req, res){
                                              res.end("Hello World!");
                                            }});
@@ -199,7 +201,7 @@ describe('Percolator', function(){
   it ("can respond to static requests", function(done){
     var that = this;
     var staticDir = __dirname + '/test_fixtures/static';
-    this.server = new Percolator({port : 3000, staticDir : staticDir});
+    this.server = new Percolator({port : port, staticDir : staticDir});
     this.server.route('/', {  GET : function(req, res){
                                              res.end("Hello World!");
                                            }});
@@ -223,7 +225,7 @@ describe('Percolator', function(){
   it ("throws an error when staticDir is set, but the dir doesn't exist.", function(done){
     var that = this;
     var staticDir = __dirname + '/test_fixtures/NO_EXIST';
-    this.server = new Percolator({port : 3000, staticDir : staticDir});
+    this.server = new Percolator({port : port, staticDir : staticDir});
     this.server.listen(function(err){
       if (err) {
         err.should.equal("Your staticDir path could not be found.");
@@ -233,10 +235,10 @@ describe('Percolator', function(){
   });
   it ("passes options on to the req's 'app' namespace", function(done){
     var that = this;
-    this.server = new Percolator({port : 3000});
+    this.server = new Percolator({port : port});
     this.server.route('/', {  GET : function(req, res){
                                              should.exist(req.app);
-                                             req.app.port.should.equal(3000);
+                                             req.app.port.should.equal(port);
                                              res.end("Hello World!");
                                            }});
     this.server.listen(function(err){
@@ -257,7 +259,7 @@ describe('Percolator', function(){
 
   it ("adds a router reference to every req", function(done){
     var that = this;
-    this.server = new Percolator({port : 3000});
+    this.server = new Percolator({port : port});
     this.server.route('/', {  GET : function(req, res){
                                              should.exist(req.router);
                                              res.end("Hello World!");
@@ -280,7 +282,7 @@ describe('Percolator', function(){
 
   it ("HEAD for a GET-only resource returns the same headers, blank resource", function(done){
     var that = this;
-    this.server = new Percolator({port : 3000});
+    this.server = new Percolator({port : port});
     this.server.route('/', {  GET : function(req, res){
                                        res.setHeader('Content-Type', 'text/plain');
                                        res.end('yo yo yo');
@@ -305,7 +307,7 @@ describe('Percolator', function(){
 
   it ("OPTIONS for a GET-only resource returns, GET, HEAD, OPTIONS", function(done){
     var that = this;
-    this.server = new Percolator({port : 3000});
+    this.server = new Percolator({port : port});
     this.server.route('/', {  GET : function(req, res){
                                              res.end("Hello World!");
                                            }});
@@ -344,7 +346,7 @@ describe('Percolator', function(){
 
   describe('#ctor', function(){
     it("can be created", function(){
-      var server = new Percolator({port : 3000});
+      var server = new Percolator({port : port});
       should.exist(server);
     });
     it ("can override the default port", function(done){

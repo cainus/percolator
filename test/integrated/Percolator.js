@@ -5,6 +5,8 @@ var hottap = require('hottap').hottap;
 var request = require('request');
 var _ = require('underscore');
 var urls = [];
+var jobNumber = process.env.TRAVIS_JOB_NUMBER || '0.0';
+var port = 7000 + parseInt(jobNumber.split(".")[1], 10);
 
 describe("Percolator", function(){
 	before(function(done){
@@ -13,7 +15,7 @@ describe("Percolator", function(){
 			protocol : 'http',
 			resourcePath : '/api',
 			staticDir : __dirname + '/../test_fixtures/static',
-			port : 8080
+			port : port
 		};
 
 		/*
@@ -95,7 +97,7 @@ describe("Percolator", function(){
 	// as per https://groups.google.com/forum/?fromgroups=#!topic/nodejs/n-W9BSfxCjI
   xit ("can catch an uncaught exception and 500", function(done){
 		process._fatalException = function(err) {console.log('here', err.stack);};
-		var failUrl = "http://localhost:8080/api/fail";
+		var failUrl = "http://localhost:" + port + "/api/fail";
 		hottap(failUrl).request("GET", function(err, response){
 			//should.not.exist(err);
 			//JSON.parse(response.body).should.eql({});
@@ -104,7 +106,7 @@ describe("Percolator", function(){
   });
 
   it ("has basic authentication support", function(done){
-    request({url : 'http://localhost:8080/api/restricted', auth : {username : 'login', password : 'password'}}, function(err, response, body){
+    request({url : 'http://localhost:' + port + '/api/restricted', auth : {username : 'login', password : 'password'}}, function(err, response, body){
       should.not.exist(err);
       JSON.parse(body).accessGranted.should.equal(true);
       done();
@@ -112,7 +114,7 @@ describe("Percolator", function(){
   });
 
   it ("can support connectMiddleware", function(done){
-		hottap('http://localhost:8080/api').request("GET", function(err, response){
+		hottap('http://localhost:' + port + '/api').request("GET", function(err, response){
 			_.last(urls).should.equal('/api');
 			done();
 		});
