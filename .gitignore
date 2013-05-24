@@ -2,3 +2,5 @@ node_modules
 npm-debug.log
 lib-cov
 coverage.html
+.coveralls.yml
+
