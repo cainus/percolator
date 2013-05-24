@@ -34,7 +34,7 @@
     "request": "2.19.0",
     "mocha-lcov-reporter": "0.0.1",
     "jscoverage": "0.3.6",
-    "coveralls": "2.0.8",
+    "coveralls": "2.0.9",
     "mockery": "1.1.2",
     "hottap": "1.0.0",
     "mocha": "1.8.1",
