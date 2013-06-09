@@ -4,7 +4,6 @@ if (process.env.PERCOLATOR_COVERAGE){
 }
 var helperDir = dir + 'ContextHelpers/';
 
-exports.JsonResponder = require(dir + 'JsonResponder');
 exports.StatusManager = require(dir + 'StatusManager');
 exports.HyperJsonCollection = require(dir + 'HyperJsonCollection');
 exports.CRUDCollection = require(dir + 'CRUDCollection');
