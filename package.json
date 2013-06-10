@@ -30,7 +30,8 @@
     "JSV": "4.0.2",
     "connect": "2.7.4",
     "urlgrey-connect": "0.1.0",
-    "onbody": "0.0.1"
+    "onbody": "0.0.1",
+    "log-driver": "1.2.1"
   },
   "devDependencies": {
     "request": "2.19.0",
