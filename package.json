@@ -1,5 +1,5 @@
 {
-  "name": "Percolator",
+  "name": "percolator",
   "description": "Percolator is a framework for quickly and easily building quality HTTP APIs in Node.js",
   "keywords": [
     "api",
