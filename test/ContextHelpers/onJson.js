@@ -117,9 +117,9 @@ describe("onJsonHelper", function(){
     var handler = {};
     var res = {
         status : {
-          badRequest : function(message, detail){
-            message.should.equal('json failed schema validation.');
-            detail[0].message.should.equal('Additional properties are not allowed');
+          badRequest : function(error){
+            error.reason.should.equal('json failed schema validation.');
+            error.errors[0].message.should.equal('Additional properties are not allowed');
             // detail looks like this:
             // [ { uri: 'urn:uuid:167293d9-3c95-493d-826e-1bfd4146a8b9#',
             // schemaUri: 'urn:uuid:b7e07efd-fd80-4370-8206-9162f4c39cc9#',
@@ -160,9 +160,9 @@ describe("onJsonHelper", function(){
     var handler = {};
     var res = {
         status : {
-          badRequest : function(message, detail){
-            message.should.equal('json failed schema validation.');
-            detail[0].details[0].should.equal('number');
+          badRequest : function(error){
+            error.reason.should.equal('json failed schema validation.');
+            error.errors[0].details[0].should.equal('number');
             // detail looks like this:
             // [ { uri: 'urn:uuid:67ef53a9-1b09-48b1-b97d-fae313e4ee39#/age',
             // schemaUri: 'urn:uuid:51edca59-120a-4486-a961-0ee2aa5c276b#/properties/age',
