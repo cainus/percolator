@@ -106,8 +106,10 @@ describe("CRUDCollection", function(){
   describe("collection.GET", function(){
     it ("creates self links in all items", function(done){
       var module = new CRUDCollection({
-                                    list : function(req, res, cb){ cb(null, { sometest : {"here" : "goes"}}); }
-                                   });
+                    list : function(req, res, cb){
+                      cb(null, { sometest : {"here" : "goes"}}); 
+                    }
+                   });
       var req = {
           app : {
             autoLink : true
@@ -122,6 +124,37 @@ describe("CRUDCollection", function(){
                 rel.should.equal('self');
 								strategy({here : 'goes'}, 'somename').toString()
 										.should.equal('http://localhost:8080/somename');
+                return {
+                  send : function(){
+                    done();
+                  }
+                };
+              }
+            };
+          }
+      };
+      module.handler.GET(req, res);
+    });
+    it ("creates self links in all items based on a given key", function(done){
+      var module = new CRUDCollection({
+                    list : function(req, res, cb){
+                      cb(null, { sometest : {"here" : "goes"}}, {key : 'here'}); 
+                    }
+                   });
+      var req = {
+          app : {
+            autoLink : true
+          },
+					uri : urlgrey('http://localhost:8080/')
+        };
+      var res = {
+          collection : function(items){
+            items.should.eql({ sometest: { here: 'goes' } });
+            return {
+              linkEach : function(rel, strategy){
+                rel.should.equal('self');
+								strategy({here : 'goes'}, 'somename').toString()
+										.should.equal('http://localhost:8080/goes');
                 return {
                   send : function(){
                     done();
