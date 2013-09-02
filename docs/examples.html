@@ -107,7 +107,7 @@
 <ul>
 <li> Create a <code>server.js</code> in your project directory, and copy this code below into it:</li>
 <pre class="sh_javascript">
-var Percolator = require('Percolator').Percolator;
+var Percolator = require('percolator').Percolator;
 
 var server = new Percolator();
 server.route('/', {  GET : function(req, res){
@@ -426,8 +426,8 @@ console.log('Listening on port ', port);
           <div class="span6">
             <h3>Percolator example</h3>
             <pre class="sh_javascript">
-var Percolator = require('Percolator').Percolator;
-var CRUDCollection = require('Percolator').CRUDCollection;
+var Percolator = require('percolator').Percolator;
+var CRUDCollection = require('percolator').CRUDCollection;
 var SomeDB = require('./SomeDB');
 
 var db = new SomeDB();

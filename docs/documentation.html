@@ -112,6 +112,7 @@
             <a href="#server-listen">listen</a>&nbsp;
             <a href="#server-before">before</a>&nbsp;
             <a href="#server-after">after</a>&nbsp;
+            <a href="#server-connectmiddleware">connectMiddleware</a>&nbsp;
           </p>
           <li class="nav-header" ><a href="#handler">The Handler Object</a></li>
           <li class="nav-sub-header"><a href="#handler-GET">GET</a></li>
@@ -200,11 +201,10 @@
           </p>
 
           <li class="nav-header" ><a href="#advancedrouting">Advanced Routing</a> </li>
-          <li class="nav-header" ><a href="#usingConnectMiddleware">Using Connect Middleware</a> </li>
         </ul>
       <section id="installation">
         <h3>Installation</h3>
-        <code>npm install Percolator</code>
+        <code>npm install percolator</code>
       </section>
       <section id="runningtests">
         <h3>Running Tests</h3>
@@ -216,7 +216,7 @@
 <ul class="unstyled">
 <li> Create a <code class="incode">server.js</code> in your project directory, and copy this code below into it:</li>
 <pre class="sh_javascript">
-var Percolator = require('Percolator').Percolator;
+var Percolator = require('percolator').Percolator;
 
 var server = new Percolator();
 server.route('/', {  GET : function(req, res){
@@ -463,6 +463,21 @@ server.after(function(req, res, handler){
   // print the request method and url after every request.
   console.log(' <-- ', req.method, ' ', req.url);
 });
+</pre>
+</section>
+<section id="server-connectmiddleware">
+<h5>connectMiddleware(middleware)</h5>
+<p>
+The connectMiddleware() method takes a <a href="http://www.senchalabs.org/connect/">connect compatible middleware</a> as its only parameter.  
+</p>
+
+<p>
+Here's an example:
+</p>
+
+<pre class="sh_javascript">
+server.connectMiddleware(connect.favicon());
+// add the favicon middleware to the percolator server
 </pre>
 </section>
 </section>
@@ -1662,7 +1677,7 @@ all.
 Here's how it's constructed:
 </p>
 <pre class="sh_javascript">
-var CRUDCollection = require('Percolator').CRUDCollection;
+var CRUDCollection = require('percolator').CRUDCollection;
 var module = new CRUDCollection({
   // implementation strategy goes here!
 });
@@ -2025,31 +2040,6 @@ of routing is that all your resources can be in separate files so that your proj
 organized.
 </p>
 </section>
-<section id="usingConnectMiddleware"></section>
-<h3>Using Connect Middleware</h3>
-<p>Percolator doesn't support <a href="http://www.senchalabs.org/connect/">connect</a> 
-middleware directly, but it's still possible to use it.
-</p>
-
-<p>
-Connect middleware are just functions with req, res and cb parameters where cb is a callback function
-to be called when the middleware has performed its function and other handling should continue.  That means
-it can simply be called directly in a Percolator server's before() handler.
-</p>
-
-<p>
-Here's an example with connect.favicon, used for serving up favicons:
-</p>
-<p>
-<pre class="sh_javascript">
-server.before(function(req, res, handler, cb){
-  connect.favicon()(req, res, function(){
-    cb();
-  });
-});
-</pre>
-
-</p>
     </div> <!-- /container -->
 
     <!-- Le javascript
