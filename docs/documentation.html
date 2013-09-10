@@ -320,7 +320,10 @@ great for shared configuration, database objects, etc.
   <a href="http://yourdomain.com/api">http://yourdomain.com/api</a> .<br>
 <strong>staticDir</strong> - The directory on the filesystem from which you will serve static content (use an absolute path!).<br><strong>port</strong> - the http port.  A low port like 80 will not work unless you run the app with root privileges.  </p>
 <strong>autoLink</strong> - A boolean that indicates whether or not to automatically add some links to your json payloads for you.  This value is optional, and the default is 'true', meaning that hyperlinks will be added automatically to your json payloads.<br>
-<strong>port</strong> - the http port.  A low port like 80 will not work unless you run the app with root privileges.  </p>
+<strong>port</strong> - the http port.  A low port like 80 will not work unless you run the app with root privileges.  <br>
+<strong>key</strong> - the key for https. If you're not doing https, this is ignored.<br>
+<strong>cert</strong> - the cert for https. If you're not doing https, this is ignored.<br>
+<strong>pfx</strong> - the pfx for https. If you're not doing https, this is ignored.<br>
 <strong>parseBody</strong> - A boolean that indicates whether or not to automatically wait for the entire body to stream in before
 calling an HTTP method handler.  If set to true, the body will be available as req.rawBody or parsed as json to an object available as req.body .  The default for this is false,
 because the <a href="#req-onBody">req.onBody</a> and <a href="#req-onJson">req.onJson</a> functions allow you to access the same data on a case-by-case basis.  It's recommended that you try those first.
