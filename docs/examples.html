@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" ng-app="percdocs">
   <head>
@@ -481,7 +480,7 @@ var linkCollection = new CRUDCollection({
     });
   },
 
-  list : function(res, res, cb){
+  list : function(req, res, cb){
     db.find(function(err, objects){
       return cb(err, objects);
     });
