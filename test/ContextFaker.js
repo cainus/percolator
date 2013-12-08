@@ -13,7 +13,9 @@ describe("ContextFaker", function(){
     faker.route( resource, function(actual){
       actual.statusCode.should.equal(200);
       JSON.parse(actual.body).should.eql(
-        {"this" : "is", "a" : "test"}
+        { "this" : "is",
+          "a" : "test",
+          _links : {'parent' : {'href' : 'http://localhost'}}}
       );
       done();
     });
@@ -29,7 +31,8 @@ describe("ContextFaker", function(){
     faker.route( resource, function(actual){
       actual.statusCode.should.equal(200);
       JSON.parse(actual.body).should.eql(
-        {"parentLink" : 'http://localhost'}
+        {"parentLink" : 'http://localhost',
+          _links : {'parent' : {'href' : 'http://localhost'}}}
       );
       done();
     });
@@ -43,7 +46,7 @@ describe("ContextFaker", function(){
       }
     };
     var faker = new ContextFaker("GET")
-                      .url("/asdf");
+                      .url("/");
     faker.route( resource, function(actual){
       actual.statusCode.should.equal(200);
       JSON.parse(actual.body).should.eql(
@@ -67,7 +70,7 @@ describe("ContextFaker", function(){
       }
     };
     var faker = new ContextFaker("GET")
-                      .url("/asdf")
+                      .url("/")
                       .body('{"incoming":"test"}');
     faker.route( resource, function(actual){
       actual.statusCode.should.equal(200);
@@ -86,7 +89,7 @@ describe("ContextFaker", function(){
     };
     var faker = new ContextFaker("GET")
                       .header("test", "header")
-                      .url("/asdf");
+                      .url("/");
     faker.route( resource, function(actual){
       actual.statusCode.should.equal(200);
       JSON.parse(actual.body).should.eql(
@@ -106,7 +109,7 @@ describe("ContextFaker", function(){
     var faker = new ContextFaker("GET")
                       .headers({"test" : "header",
                                 "test2" : "header2"})
-                      .url("/asdf");
+                      .url("/");
     faker.route( resource, function(actual){
       actual.statusCode.should.equal(200);
       JSON.parse(actual.body).should.eql(
@@ -126,7 +129,7 @@ describe("ContextFaker", function(){
       }
     };
     var faker = new ContextFaker("GET")
-                      .url("/asdf");
+                      .url("/");
     faker.route( resource, function(actual){
       actual.statusCode.should.equal(200);
       actual.body.should.equal("YES");
@@ -165,7 +168,7 @@ describe("ContextFaker", function(){
       }
     };
     var faker = new ContextFaker("GET")
-                      .url("/asdf");
+                      .url("/");
     faker.route( resource, function(actual){
       actual.statusCode.should.equal(500);
       JSON.parse(actual.body).should.eql(

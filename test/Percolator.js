@@ -5,15 +5,6 @@ var Percolator = require('../index').Percolator;
 var jobNumber = process.env.TRAVIS_JOB_NUMBER || '0.0';
 var port = 9000 + parseInt(jobNumber.split(".")[1], 10);
 
-
-/*
-TODO : 
-   tarantula - finds undocumented rels, unhittable endpoints, api errors, valid urls
-   viewer like jsonviewer
-   api time-cost report
-   how to document rels easily?
- */
-
 function closeServer(server, cb){
   if (!!server){
     try {
