@@ -32,7 +32,7 @@
     "urlgrey-connect": "0.1.0",
     "onbody": "0.0.1",
     "log-driver": "1.2.1",
-    "hyperjson-connect": "0.0.6"
+    "hyperjson-connect": "0.0.7"
   },
   "devDependencies": {
     "request": "2.19.0",
