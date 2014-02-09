@@ -219,7 +219,7 @@
 var Percolator = require('percolator').Percolator;
 
 var server = new Percolator();
-server.route('/', {  GET : function(req, res){
+server.route('/hello', {  GET : function(req, res){
                               res.object({message : 'Hello World!'}).send();
                             }});
 server.listen(function(err){
@@ -233,14 +233,14 @@ server.listen(function(err){
 </p>
 </li>
 
-<li><p>See your "Hello World" output at http://localhost:3000/ and be completely floored by the greatest 
+<li><p>See your "Hello World" output at http://localhost:3000/hello and be completely floored by the greatest 
 API of all time.  Or not.</p>
 The output json look like this:
 <pre class="sh_javascript">
 {
   message: "Hello World!",
   _links: {
-    self: {
+    parent: {
       href: "http://localhost:3000/"
     }
   }
