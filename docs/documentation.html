@@ -2008,7 +2008,7 @@ then the <code class="incode">index.js</code> file in it, and then copying the h
 <pre class="sh_javascript">
 exports.handler = {
   GET : function(req, res){
-    res.end('Hello World!');
+    res.object({message : 'Hello World!'}).send();
   }
 }
 </pre>
