@@ -2,15 +2,6 @@ var _ = require('underscore');
 var Percolator = require('./index').Percolator;
 var BasicAuthenticateHelper = require('./index').BasicAuthenticateHelper;
 
-// TODO make status man do conneg
-// TODO producers of app/json should respond to requests for app/blah+json
-// TODO get a specific mediatype in there
-// TODO don't use in/out for mediatype handlers
-// == low priority ==
-// TODO better error output when there's an error in mediaTypes, resources, etc.
-// TODO better way to see all routes
-
-
 var app = {
   protocol : 'http',
   resourcePath : '/api',

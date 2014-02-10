@@ -1,3 +1,4 @@
+var Percolator = require('../index').Percolator;
 var CRUDCollection = require('../index').CRUDCollection;
 var should = require('should');
 var urlgrey = require('urlgrey');
