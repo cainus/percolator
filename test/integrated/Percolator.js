@@ -5,8 +5,7 @@ var hottap = require('hottap').hottap;
 var request = require('request');
 var _ = require('underscore');
 var urls = [];
-var jobNumber = process.env.TRAVIS_JOB_NUMBER || '0.0';
-var port = 7000 + parseInt(jobNumber.split(".")[1], 10);
+var port = 9000;
 var server;
 
 describe("Percolator", function(){
@@ -31,7 +30,7 @@ describe("Percolator", function(){
       app.teas = _.map(app.teas, function(tea){ tea.created = new Date(); return tea; });
       */
 
-      var server = new Percolator(app);
+      server = new Percolator(app);
       server.before(function(req, res, handler, cb){
         req.started = new Date();
         BasicAuthenticateHelper(req, res, handler, function(){
@@ -92,21 +91,13 @@ describe("Percolator", function(){
           done();
         });
       });
-      afterEach(function(done){
-        try {
-        server.close(function(err){
-          if (err){
-            console.log("error closing");
-            throw err;
-          }
-          done();
-        });} catch(ex){
-          done();
-        }
-      });
 
     });
     
+    afterEach(function(done){
+      server.close(done);
+    });
+
     // this should work in 0.10 
     // as per https://groups.google.com/forum/?fromgroups=#!topic/nodejs/n-W9BSfxCjI
     xit ("can catch an uncaught exception and 500", function(done){
@@ -136,8 +127,11 @@ describe("Percolator", function(){
   });
 
   describe("when the defaultLinks option is false", function(){
+    afterEach(function(done){
+      server.close(done);
+    });
     it ("has no parent link on a non-root resource", function(done){
-      var server = Percolator({
+      server = Percolator({
         autoLink : false,
         protocol : 'http',
         resourcePath : '/api',
