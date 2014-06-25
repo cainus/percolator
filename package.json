@@ -8,7 +8,7 @@
     "resource",
     "hypermedia"
   ],
-  "version": "1.4.4",
+  "version": "1.5.0",
   "bugs": {
     "url": "https://github.com/cainus/percolator/issues"
   },
@@ -20,7 +20,7 @@
   ],
   "dependencies": {
     "JSV": "4.0.2",
-    "connect": "2.7.4",
+    "connect": "3.0.1",
     "detour": "0.16.9",
     "hyperjson": "0.0.1",
     "hyperjson-browser": "0.0.7",

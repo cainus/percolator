@@ -101,7 +101,7 @@ describe('Percolator', function(){
       server.route('/', {  GET : function(req, res){
                                                res.end("Hello World!");
                                              }});
-      server.after(function(req, res, handler){
+      server.after(function(req, res){
         req.url.should.equal('/');
         done();
       });

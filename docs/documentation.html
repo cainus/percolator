@@ -450,22 +450,18 @@ response is ended.
 </p>
 
 <p>
-The callback takes req, res, and handler parameters.  
+The callback takes req and res parameters.  
 </p>
 <p>
 The <strong>req and res</strong> parameters are the standard node request and response objects.  
 If you want to augment them for some reason, for all requests, this is a great place to do it.
 </p>
 <p>
-The <strong>handler</strong> is the resource object that is routed to the request url in 
-the router.  It will contain the functions meant to handle the different HTTP methods.
-</p>
-<p>
 Here's an example:
 </p>
 
 <pre class="sh_javascript">
-server.after(function(req, res, handler){
+server.after(function(req, res){
   // print the request method and url after every request.
   console.log(' <-- ', req.method, ' ', req.url);
 });
