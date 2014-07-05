@@ -4,7 +4,6 @@ if (process.env.PERCOLATOR_COVERAGE){
 }
 var helperDir = dir + 'ContextHelpers/';
 
-exports.StatusManager = require(dir + 'StatusManager');
 exports.CRUDCollection = require(dir + 'CRUDCollection');
 
 exports.AuthenticateHelper = require(helperDir + 'Authenticate');

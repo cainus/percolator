@@ -1,4 +1,4 @@
-
+/*
 var should = require('should');
 var StatusManager = require('../index').StatusManager;
 
@@ -8,3 +8,4 @@ describe("StatusManager", function(){
     should.exist(sm);
   });
 });
+*/

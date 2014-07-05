@@ -139,7 +139,7 @@ describe("ContextFaker", function(){
   it ("fakes a 404 request to a module that implements fetch()", function(done){
     var resource = {
       fetch : function(req, res, cb){
-        cb(true);
+        return cb(true);
       },
       GET : function(req, res){
         should.fail("should not get here");
