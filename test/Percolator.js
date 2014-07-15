@@ -200,7 +200,7 @@ describe('Percolator', function(){
     });
 
     describe('when managing a text/plain body', function(){
-      it ("parsed body gets added to the req", function(done){
+      it ("parsed body gets returned in onBody", function(done){
         server.route('/', {  GET : function(req, res){
                                       res.end("Hello World!");
                                     },
@@ -214,6 +214,77 @@ describe('Percolator', function(){
           hottap("http://localhost:" + port + "/").request("POST", 
                                                    {"content-type":"text/plain"},
                                                    'wakka wakka wakka',
+                                                   function(err, response){
+                                                      if (err) {
+                                                        throw err;
+                                                      }
+                                                      response.status.should.equal(200);
+                                                      response.body.should.equal("Hello World!");
+                                                      done();
+                                                   });
+      });
+    });
+    describe('when managing an application/json body', function(){
+      it ("parsed body gets returned in onJson", function(done){
+        server.route('/', {  GET : function(req, res){
+                                      res.end("Hello World!");
+                                    },
+
+                                    POST : function(req, res){
+                                      req.onJson(function(err, body){
+                                        should.exist(body.tests);
+                                        should.exist(body.tests2);
+                                        body.tests.length.should.equal(162);
+                                        res.end("Hello World!");
+                                      });
+                                    }});
+          var largerJson = {
+            "tests" : [
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test"
+            ],
+            "tests2" : [
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test",
+              "test", "test", "test", "test", "test", "test", "test", "test", "test"
+            ],
+
+          
+          };
+          hottap("http://localhost:" + port + "/").request("POST", 
+                                                   {"content-type":"application/json"},
+                                                   JSON.stringify(largerJson),
                                                    function(err, response){
                                                       if (err) {
                                                         throw err;
