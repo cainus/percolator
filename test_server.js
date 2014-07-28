@@ -39,9 +39,9 @@ server.routeDirectory(resourceDir, app.resourcePath, function(err){
     done();
   });
 
-  server.route('/inside', 
-                      { GET : function(req, res){ 
-                                res.end("muahahah!"); 
+  server.route('/inside',
+                      { GET : function(req, res){
+                                res.end("muahahah!");
                               }
                       });
   server.route('/someProtectedPath', {
@@ -56,6 +56,16 @@ server.routeDirectory(resourceDir, app.resourcePath, function(err){
     },
     GET : function(req, res){
       res.object({youAre : req.authenticated}).send();
+    }
+  });
+
+  server.route('/trypost', {
+    POST : function(request, response){
+      console.log('calling onJson');
+      request.onJson(function(error, input){
+        console.log('onJson callback invoked', arguments);
+        return response.object({onJson: arguments}).send();
+      });
     }
   });
 

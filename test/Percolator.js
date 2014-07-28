@@ -279,10 +279,8 @@ describe('Percolator', function(){
               "test", "test", "test", "test", "test", "test", "test", "test", "test",
               "test", "test", "test", "test", "test", "test", "test", "test", "test"
             ],
-
-          
           };
-          hottap("http://localhost:" + port + "/").request("POST", 
+          hottap("http://localhost:" + port + "/").request("POST",
                                                    {"content-type":"application/json"},
                                                    JSON.stringify(largerJson),
                                                    function(err, response){
@@ -294,6 +292,45 @@ describe('Percolator', function(){
                                                       done();
                                                    });
       });
+    });
+    it ("parsed body gets returned in onJson even when stream processing is delayed", function(done){
+      this.timeout(5000);
+      server.route('/', {
+
+        authenticate : function(req, res, cb){
+          setTimeout(function(){
+            cb();
+          }, 4000);
+        },
+
+        GET : function(req, res){
+                                    res.end("Hello World!");
+                                  },
+
+                                  POST : function(req, res){
+                                    req.onJson(function(err, body){
+                                      should.exist(body.tests);
+                                      body.tests.length.should.equal(18);
+                                      res.end("Hello World!");
+                                    });
+                                  }});
+        var largerJson = {
+          "tests" : [
+            "test", "test", "test", "test", "test", "test", "test", "test", "test",
+            "test", "test", "test", "test", "test", "test", "test", "test", "test",
+          ]
+        };
+        hottap("http://localhost:" + port + "/").request("POST",
+                                                 {"content-type":"application/json"},
+                                                 JSON.stringify(largerJson),
+                                                 function(err, response){
+                                                    if (err) {
+                                                      throw err;
+                                                    }
+                                                    response.status.should.equal(200);
+                                                    response.body.should.equal("Hello World!");
+                                                    done();
+                                                 });
     });
   });
 
