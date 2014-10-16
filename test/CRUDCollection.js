@@ -7,6 +7,7 @@ var hottap = require('hottap').hottap;
 var request = require('request');
 var jobNumber = process.env.TRAVIS_JOB_NUMBER || '0.0';
 var port = 8000 + parseInt(jobNumber.split(".")[1], 10);
+var hyperjson = require('hyperjson-connect');
 
 describe("CRUDCollection", function(){
     it ("sets fetch on wildcard if fetch is defined", function(){
@@ -167,6 +168,85 @@ describe("CRUDCollection", function(){
       };
       module.handler.GET(req, res);
     });
+
+    it ("creates object by key", function (done) {
+      var module = new CRUDCollection({
+                    list : function(req, res, cb){
+                      cb(null, [{"id": "0", value: "zero"}, {"id": "1", value: "one"}, {"id": "2", value: "two"}], {key : "id", listAsKeyedObject: true}); 
+                    }
+                   });
+      var req = {
+          app : {
+            autoLink : true
+          },
+          uri : urlgrey('http://localhost:8080/'),
+          headers: {}
+        };
+      var res = {
+          setHeader: function () {},
+          end: function (body) {
+
+            body.toString().should.equal('{"_items":{"0":{"id":"0","value":"zero","_links":{"self":{"href":"http://localhost:8080/0"}}},"1":{"id":"1","value":"one","_links":{"self":{"href":"http://localhost:8080/1"}}},"2":{"id":"2","value":"two","_links":{"self":{"href":"http://localhost:8080/2"}}}}}')
+            console.log(body);
+            done();
+          }
+        };
+      hyperjson()(req, res, function () {});
+      module.handler.GET(req, res);
+    });
+
+    it ("only use the key to create links", function (done) {
+      var module = new CRUDCollection({
+                    list : function(req, res, cb){
+                      cb(null, [{"id": "0", value: "zero"}, {"id": "1", value: "one"}, {"id": "2", value: "two"}], {key : "id"}); 
+                    }
+                   });
+      var req = {
+          app : {
+            autoLink : true
+          },
+          uri : urlgrey('http://localhost:8080/'),
+          headers: {}
+        };
+      var res = {
+          setHeader: function () {},
+          end: function (body) {
+
+            body.toString().should.equal('{"_items":[{"id":"0","value":"zero","_links":{"self":{"href":"http://localhost:8080/0"}}},{"id":"1","value":"one","_links":{"self":{"href":"http://localhost:8080/1"}}},{"id":"2","value":"two","_links":{"self":{"href":"http://localhost:8080/2"}}}]}')
+            console.log(body);
+            done();
+          }
+        };
+      hyperjson()(req, res, function () {});
+      module.handler.GET(req, res);
+    });
+
+    it ("should create links when values for key are falsy (ex: 0)", function (done) {
+      var module = new CRUDCollection({
+                    list : function(req, res, cb){
+                      cb(null, [{"id": 0, value: "zero"}], {key : "id"}); 
+                    }
+                   });
+      var req = {
+          app : {
+            autoLink : true
+          },
+          uri : urlgrey('http://localhost:8080/'),
+          headers: {}
+        };
+      var res = {
+          setHeader: function () {},
+          end: function (body) {
+
+            body.toString().should.equal('{"_items":[{"id":0,"value":"zero","_links":{"self":{"href":"http://localhost:8080/0"}}}]}')
+            console.log(body);
+            done();
+          }
+        };
+      hyperjson()(req, res, function () {});
+      module.handler.GET(req, res);
+    });
+
     it ("returns a 500 if the callback gets an error", function(done){
       var module = new CRUDCollection({
                                     list : function(req, res, cb){ cb("some error!"); }
